@@ -1,217 +1,51 @@
-<footer
-
-class="
-bg-gray-950
-text-gray-300
-"
-
->
-
-
-<div
-
-class="
-mx-auto
-grid
-max-w-7xl
-gap-10
-px-6
-py-14
-md:grid-cols-3
-"
-
->
-
-
-<div>
-
-
-<img
-
-src="/assets/images/logo.svg"
-
-alt="GunPartSelector.com logo"
-
-class="
-h-32
-w-auto
-"
-
->
-
-
-<p
-
-class="
-mt-5
-leading-relaxed
-"
-
->
-Website design, development, and
-ongoing support for growing
-businesses.
-</p>
-
-
-</div>
-
-
-
-
-
-<div>
-
-
-<h3
-
-class="
-font-bold
-text-white
-"
-
->
-Contact
-</h3>
-
-
-
-<p class="mt-4">
-
-Austin, TX
-
-</p>
-
-
-
-
-<p class="mt-3">
-
-zachw&#64;wdwebsolutions.com
-
-</p>
-
-
-
-</div>
-
-
-
-
-
-<div>
-
-
-<h3
-
-class="
-font-bold
-text-white
-"
-
->
-Quick Links
-</h3>
-
-
-<nav
-
-aria-label="Footer navigation"
-
-class="
-mt-4
-space-y-2
-"
-
->
-
-
-<a
-
-routerLink="/services"
-
-class="
-block
-hover:text-white
-"
-
->
-Services
-</a>
-
-
-<a
-
-routerLink="/resources"
-
-class="
-block
-hover:text-white
-"
-
->
-Resources
-</a>
-
-
-<a
-
-routerLink="/contact"
-
-class="
-block
-hover:text-white
-"
-
->
-Contact
-</a>
-
-
-</nav>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div
-
-class="
-border-t
-border-gray-800
-px-6
-py-6
-text-sm
-"
-
->
-
-<div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
-
-<p>© {{year}} WD Web Solutions. All rights reserved.</p>
-
-<nav aria-label="Legal" class="flex flex-wrap justify-center gap-x-6 gap-y-2">
-
-<a routerLink="/privacy-policy" class="inline-flex min-h-6 items-center hover:text-white">
-Privacy Policy
-</a>
-
-<a routerLink="/terms" class="inline-flex min-h-6 items-center hover:text-white">
-Terms &amp; Conditions
-</a>
-
-</nav>
-
-</div>
-
-</div>
-
-
+<footer class="border-t border-forge-line bg-forge-ink text-forge-text-muted">
+
+  <div class="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-4">
+
+    <div class="md:col-span-2">
+      <img src="/assets/images/logo.svg" alt="GunPartSelector.com logo" class="h-24 w-auto">
+
+      <p class="mt-5 max-w-sm leading-relaxed">
+        Build your AR-15 part by part. Browse categories, check compatibility, compare parts,
+        and share your build.
+      </p>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-forge-text">Build</h3>
+      <nav aria-label="Footer build navigation" class="mt-4 space-y-2">
+        <a routerLink="/" class="block hover:text-forge-accent">Builder</a>
+        <a routerLink="/parts" class="block hover:text-forge-accent">Browse Parts</a>
+        <a routerLink="/gallery" class="block hover:text-forge-accent">Featured Builds</a>
+      </nav>
+    </div>
+
+    <div>
+      <h3 class="font-bold text-forge-text">Company</h3>
+      <nav aria-label="Footer company navigation" class="mt-4 space-y-2">
+        <a routerLink="/resources" class="block hover:text-forge-accent">Buying Guides</a>
+        <a routerLink="/blog" class="block hover:text-forge-accent">Blog</a>
+        <a routerLink="/about" class="block hover:text-forge-accent">About</a>
+        <a routerLink="/services" class="block hover:text-forge-accent">Support</a>
+        <a routerLink="/contact" class="block hover:text-forge-accent">Contact</a>
+      </nav>
+    </div>
+
+  </div>
+
+  <div class="border-t border-forge-line px-6 py-6 text-sm">
+    <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
+      <p>© {{ year }} GunPartSelector.com. All rights reserved.</p>
+
+      <nav aria-label="Legal" class="flex flex-wrap justify-center gap-x-6 gap-y-2">
+        <a routerLink="/privacy-policy" class="inline-flex min-h-6 items-center hover:text-forge-text">
+          Privacy Policy
+        </a>
+        <a routerLink="/terms" class="inline-flex min-h-6 items-center hover:text-forge-text">
+          Terms &amp; Conditions
+        </a>
+      </nav>
+    </div>
+  </div>
 
 </footer>

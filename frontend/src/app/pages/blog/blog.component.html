@@ -1,105 +1,80 @@
-<section class="relative overflow-hidden bg-gray-900 py-20">
-  <app-hero-video></app-hero-video>
-  <div class="relative z-10 mx-auto max-w-7xl px-6">
-    <p class="text-sm font-semibold uppercase tracking-widest text-orange-400">Blog</p>
-    <h1 class="mt-5 text-5xl font-bold text-white">Web Design & Development Insights</h1>
-    <p class="mt-6 max-w-3xl text-xl text-gray-300">
-      Guides and updates on web design, development, and growing your business online.
+<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+  <app-page-container>
+
+    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Blog</p>
+    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
+      Build write-ups &amp; part news
+    </h1>
+    <p class="mt-4 max-w-2xl text-forge-text-muted">
+      Comparisons, build breakdowns, and whatever else is worth knowing before you buy.
     </p>
-  </div>
-</section>
 
-<section class="py-16">
-  <div class="mx-auto max-w-7xl px-6">
-
-    @if(tags().length > 0)
-    {
-    <div class="flex flex-wrap gap-2">
-      <button
-        type="button"
-        (click)="selectTag(null)"
-        class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
-        [class.bg-blue-600]="selectedTag() === null"
-        [class.text-white]="selectedTag() === null"
-        [class.bg-gray-100]="selectedTag() !== null"
-        [class.text-gray-600]="selectedTag() !== null"
-      >
-        All
-      </button>
-      @for(tag of tags(); track tag)
-      {
-      <button
-        type="button"
-        (click)="selectTag(tag)"
-        class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
-        [class.bg-blue-600]="selectedTag() === tag"
-        [class.text-white]="selectedTag() === tag"
-        [class.bg-gray-100]="selectedTag() !== tag"
-        [class.text-gray-600]="selectedTag() !== tag"
-      >
-        {{ tag }}
-      </button>
-      }
-    </div>
-    }
-
-    @if(errorMessage())
-    {
-    <p class="mt-8 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
-    }
-
-    @if(isLoading())
-    {
-    <p class="mt-10 text-gray-500">Loading posts…</p>
-    }
-    @else if(posts().length === 0)
-    {
-    <p class="mt-10 text-gray-500">No posts yet. Check back soon.</p>
-    }
-    @else
-    {
-    <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-      @for(post of posts(); track post.id)
-      {
-      <a
-        [routerLink]="['/blog', post.slug]"
-        class="
-        block
-        overflow-hidden
-        rounded-xl
-        bg-white
-        shadow-lg
-        transition
-        duration-300
-        hover:-translate-y-2
-        hover:shadow-2xl"
-      >
-        @if(post.coverImageUrl)
-        {
-        <img
-          [src]="post.coverImageUrl"
-          [alt]="post.title"
-          class="h-48 w-full object-cover"
+    @if (tags().length > 0) {
+      <div class="mt-10 flex flex-wrap gap-2">
+        <button
+          type="button"
+          (click)="selectTag(null)"
+          class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
+          [class.bg-forge-accent]="selectedTag() === null"
+          [class.text-white]="selectedTag() === null"
+          [class.bg-forge-steel]="selectedTag() !== null"
+          [class.text-forge-text-muted]="selectedTag() !== null"
         >
+          All
+        </button>
+        @for (tag of tags(); track tag) {
+          <button
+            type="button"
+            (click)="selectTag(tag)"
+            class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
+            [class.bg-forge-accent]="selectedTag() === tag"
+            [class.text-white]="selectedTag() === tag"
+            [class.bg-forge-steel]="selectedTag() !== tag"
+            [class.text-forge-text-muted]="selectedTag() !== tag"
+          >
+            {{ tag }}
+          </button>
         }
-
-        <div class="p-6">
-          @if(post.tags.length > 0)
-          {
-          <p class="text-sm font-semibold text-blue-600">{{ post.tags.join(', ') }}</p>
-          }
-
-          <h2 class="mt-2 text-xl font-bold text-gray-900">{{ post.title }}</h2>
-          <p class="mt-3 text-gray-600">{{ post.excerpt }}</p>
-
-          <p class="mt-4 text-sm text-gray-400">
-            {{ post.authorName }} · {{ post.publishedAt | date: 'mediumDate' }}
-          </p>
-        </div>
-      </a>
-      }
-    </div>
+      </div>
     }
 
-  </div>
-</section>
+    @if (errorMessage()) {
+      <p class="mt-8 rounded-lg border border-forge-danger bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">
+        {{ errorMessage() }}
+      </p>
+    }
+
+    @if (isLoading()) {
+      <p class="mt-10 text-forge-text-muted">Loading posts…</p>
+    } @else if (posts().length === 0) {
+      <p class="mt-10 text-forge-text-muted">No posts yet. Check back soon.</p>
+    } @else {
+      <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        @for (post of posts(); track post.id) {
+          <a
+            [routerLink]="['/blog', post.slug]"
+            class="block overflow-hidden rounded-lg border border-forge-line bg-forge-steel transition hover:border-forge-accent"
+          >
+            @if (post.coverImageUrl) {
+              <img [src]="post.coverImageUrl" [alt]="post.title" class="h-48 w-full object-cover">
+            }
+
+            <div class="p-6">
+              @if (post.tags.length > 0) {
+                <p class="font-mono text-xs uppercase tracking-wide text-forge-accent">{{ post.tags.join(', ') }}</p>
+              }
+
+              <h2 class="mt-2 text-lg font-bold text-forge-text">{{ post.title }}</h2>
+              <p class="mt-3 text-sm text-forge-text-muted">{{ post.excerpt }}</p>
+
+              <p class="mt-4 font-mono text-xs text-forge-text-muted">
+                {{ post.authorName }} · {{ post.publishedAt | date: 'mediumDate' }}
+              </p>
+            </div>
+          </a>
+        }
+      </div>
+    }
+
+  </app-page-container>
+</div>

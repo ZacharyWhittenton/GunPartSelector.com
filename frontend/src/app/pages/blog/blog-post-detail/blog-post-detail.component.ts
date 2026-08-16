@@ -140,7 +140,7 @@ export class BlogPostDetailComponent implements OnInit {
         next: post => {
           this.post.set(post);
           this.seoService.updatePage(
-            `${post.title} | WD Web Solutions`,
+            `${post.title} | GunPartSelector.com`,
             post.excerpt,
             post.coverImageUrl ?? undefined
           );

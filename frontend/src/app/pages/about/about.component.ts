@@ -1,60 +1,22 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { SeoService } from '../../core/services/seo.service';
-
-import { HeroVideoComponent } from '../../shared/components/hero-video/hero-video.component';
-
-
+import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
 
 @Component({
-
   selector: 'app-about',
-
   standalone: true,
-
-  imports: [
-
-    RouterLink,
-
-    HeroVideoComponent
-
-  ],
-
-  templateUrl:
-
-    './about.component.html',
-
+  imports: [RouterLink, PageContainerComponent],
+  templateUrl: './about.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl:
-
-    './about.component.css'
-
+  styleUrl: './about.component.css'
 })
 export class AboutComponent {
-
-
-
-constructor(
-
-private seoService: SeoService
-
-) {
-
-
-
-this.seoService.updatePage(
-
-'About WD Web Solutions | Web Design & Development Agency',
-
-'Learn about WD Web Solutions, our story, experience, and commitment to building great websites and web applications.'
-
-);
-
-
-}
-
-
-
+  constructor(private seoService: SeoService) {
+    this.seoService.updatePage(
+      'About | GunPartSelector.com',
+      'GunPartSelector.com is a build configurator for AR-15 platform rifles: browse parts by category, check compatibility, and assemble your build.'
+    );
+  }
 }

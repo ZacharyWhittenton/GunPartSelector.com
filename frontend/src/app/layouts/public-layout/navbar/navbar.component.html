@@ -1,848 +1,200 @@
-<header
-[class.site-navbar--home]="isHome()"
-[class.site-navbar--transparent]="isTransparent()"
-class="
-site-navbar
-sticky
-top-0
-z-50
-border-b
-border-gray-200
-bg-white
-"
->
-
-<nav
-aria-label="Primary navigation"
-class="
-site-navbar__primary
-mx-auto
-flex
-max-w-7xl
-items-center
-justify-between
-px-6
-py-4
-"
->
-
-<!-- LOGO -->
-
-<a
-routerLink="/"
-(click)="closeMenu()"
-aria-label="GunPartSelector.com home"
-class="
-site-navbar__logo
-group
-flex
-items-center
-"
->
-
-<img
-
-src="/assets/images/logo.svg"
-
-alt="GunPartSelector.com logo"
-
-class="
-h-28
-w-auto
-transition
-duration-300
-group-hover:scale-105
-"
-
->
-
-</a>
-
-
-
-<!-- DESKTOP NAV -->
-
-<div
-class="
-site-navbar__desktop-nav
-hidden
-items-center
-gap-8
-xl:flex
-"
->
-
-
-<a
-routerLink="/"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Home
-</a>
-
-
-
-<a
-routerLink="/about"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-About
-</a>
-
-
-
-<a
-routerLink="/services"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Services
-</a>
-
-
-
-<a
-routerLink="/gallery"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Gallery
-</a>
-
-
-
-<a
-routerLink="/resources"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Resources
-</a>
-
-
-
-<a
-routerLink="/blog"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Blog
-</a>
-
-
-
-<a
-routerLink="/schedule"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Schedule
-</a>
-
-
-
-<a
-routerLink="/marketplace"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-relative
-font-medium
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-
-after:absolute
-after:-bottom-2
-after:left-0
-after:h-0.5
-after:w-0
-after:bg-blue-600
-after:transition-all
-after:duration-300
-hover:after:w-full
-"
->
-Marketplace
-</a>
-
-
-</div>
-
-
-
-
-
-<!-- ACTION BUTTONS -->
-
-<div
-class="
-site-navbar__actions
-hidden
-items-center
-gap-4
-xl:flex
-"
->
-
-
-@if(currentUser())
-{
-
-<span
-class="
-font-medium
-text-gray-600
-"
->
-Hi, {{ currentUser()?.fullName }}
-</span>
-
-
-
-<a
-
-routerLink="/account"
-
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-
-class="
-font-medium
-text-gray-600
-transition
-duration-300
-hover:text-blue-600
-"
->
-My Account
-</a>
-
-
-
-@if(currentUser()?.role === 'admin')
-{
-
-<a
-
-routerLink="/admin/dashboard"
-
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-
-class="
-font-medium
-text-gray-600
-transition
-duration-300
-hover:text-blue-600
-"
->
-Admin
-</a>
-
-}
-
-
-
-<button
-
-(click)="logout()"
-
-type="button"
-
-class="
-font-medium
-text-gray-600
-transition
-duration-300
-hover:text-blue-600
-"
->
-Logout
-</button>
-
-}
-@else
-{
-
-<a
-
-routerLink="/login"
-
-class="
-font-medium
-text-gray-600
-transition
-duration-300
-hover:text-blue-600
-"
->
-Login
-</a>
-
-
-
-
-<a
-
-routerLink="/register"
-
-class="
-rounded-lg
-border
-border-blue-600
-px-4
-py-2
-font-semibold
-text-blue-600
-transition
-duration-300
-
-hover:-translate-y-1
-hover:bg-blue-600
-hover:text-white
-hover:shadow-lg
-"
->
-Register
-</a>
-
-}
-
-
-
-<a
-routerLink="/cart"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-class="
-site-navbar__cart
-relative
-text-xl
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-"
-aria-label="Cart"
->
-🛒
-@if(cartItemCount() > 0)
-{
-<span
-class="
-absolute
--right-2
--top-2
-flex
-h-5
-w-5
-items-center
-justify-center
-rounded-full
-bg-orange-500
-text-xs
-font-bold
-text-white
-"
->
-{{ cartItemCount() }}
-</span>
-}
-</a>
-
-
-
-<a
-
-routerLink="/contact"
-
-class="
-site-navbar__estimate
-rounded-lg
-bg-blue-600
-px-5
-py-3
-font-semibold
-text-white
-
-transition
-duration-300
-
-hover:-translate-y-1
-hover:bg-blue-700
-hover:shadow-xl
-"
->
-Request Estimate
-</a>
-
-
-</div>
-
-
-
-
-
-<!-- MOBILE BUTTON -->
-
-<button
-
-type="button"
-
-(click)="toggleMenu()"
-
-[attr.aria-expanded]="mobileMenuOpen"
-
-aria-controls="mobile-navigation"
-
-[attr.aria-label]="mobileMenuOpen ? 'Close main menu' : 'Open main menu'"
-
-class="
-site-navbar__menu-button
-h-11
-w-11
-text-2xl
-text-gray-700
-transition
-duration-300
-hover:text-blue-600
-xl:hidden
-"
-
->
-
-<span aria-hidden="true">{{mobileMenuOpen ? '×' : '☰'}}</span>
-
-</button>
-
-
-</nav>
-
-
-
-
-
-<!-- MOBILE MENU -->
-
-@if(mobileMenuOpen)
-{
-
-<nav
-
-id="mobile-navigation"
-
-aria-label="Mobile navigation"
-
-class="
-border-t
-border-gray-200
-bg-white
-px-6
-py-6
-xl:hidden
-"
-
->
-
-
-<div
-
-class="
-space-y-5
-"
-
->
-
-
-<a
-routerLink="/"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Home
-</a>
-
-
-<a
-routerLink="/about"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-About
-</a>
-
-
-<a
-routerLink="/services"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Services
-</a>
-
-
-<a
-routerLink="/gallery"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Gallery
-</a>
-
-
-<a
-routerLink="/resources"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Resources
-</a>
-
-
-<a
-routerLink="/blog"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Blog
-</a>
-
-
-<a
-routerLink="/schedule"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Schedule
-</a>
-
-
-<a
-routerLink="/marketplace"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Marketplace
-</a>
-
-
-<a
-routerLink="/cart"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Cart{{ cartItemCount() > 0 ? ' (' + cartItemCount() + ')' : '' }}
-</a>
-
-
-@if(currentUser())
-{
-
-<p
-class="
-block
-font-medium
-text-gray-600
-"
->
-Hi, {{ currentUser()?.fullName }}
-</p>
-
-
-<a
-routerLink="/account"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-My Account
-</a>
-
-
-@if(currentUser()?.role === 'admin')
-{
-
-<a
-routerLink="/admin/dashboard"
-routerLinkActive="text-blue-600"
-ariaCurrentWhenActive="page"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Admin
-</a>
-
-}
-
-
-<button
-(click)="logout()"
-type="button"
-class="
-block
-w-full
-text-left
-transition
-hover:text-blue-600
-"
->
-Logout
-</button>
-
-}
-@else
-{
-
-<a
-routerLink="/login"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Login
-</a>
-
-
-<a
-routerLink="/register"
-(click)="closeMenu()"
-class="
-block
-transition
-hover:text-blue-600
-"
->
-Register
-</a>
-
-}
-
-
-<a
-routerLink="/contact"
-(click)="closeMenu()"
-class="
-block
-rounded-lg
-bg-blue-600
-px-5
-py-3
-text-center
-font-semibold
-text-white
-transition
-duration-300
-hover:-translate-y-1
-hover:bg-blue-700
-hover:shadow-xl
-"
->
-Request Estimate
-</a>
-
-
-</div>
-
-
-</nav>
-
-}
-
+<header class="sticky top-0 z-50 border-b border-forge-line bg-forge-ink">
+  <nav aria-label="Primary navigation" class="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+
+    <!-- LOGO -->
+    <a routerLink="/" (click)="closeMenu()" aria-label="GunPartSelector.com home" class="group flex items-center">
+      <img
+        src="/assets/images/logo.svg"
+        alt="GunPartSelector.com logo"
+        class="h-14 w-auto transition duration-300 group-hover:scale-105"
+      >
+    </a>
+
+    <!-- DESKTOP NAV -->
+    <div class="hidden items-center gap-7 xl:flex">
+      <a
+        routerLink="/"
+        routerLinkActive="text-forge-accent"
+        [routerLinkActiveOptions]="{ exact: true }"
+        ariaCurrentWhenActive="page"
+        class="font-medium text-forge-text-muted transition hover:text-forge-text"
+      >
+        Builder
+      </a>
+
+      <a
+        routerLink="/parts"
+        routerLinkActive="text-forge-accent"
+        ariaCurrentWhenActive="page"
+        class="font-medium text-forge-text-muted transition hover:text-forge-text"
+      >
+        Parts
+      </a>
+
+      <a
+        routerLink="/gallery"
+        routerLinkActive="text-forge-accent"
+        ariaCurrentWhenActive="page"
+        class="font-medium text-forge-text-muted transition hover:text-forge-text"
+      >
+        Builds
+      </a>
+
+      <div class="relative" data-nav-dropdown>
+        <button
+          type="button"
+          (click)="toggleDropdown('guides')"
+          [attr.aria-expanded]="openDropdown() === 'guides'"
+          class="flex items-center gap-1 font-medium text-forge-text-muted transition hover:text-forge-text"
+        >
+          Guides
+          <span aria-hidden="true" class="text-xs">▾</span>
+        </button>
+
+        @if (openDropdown() === 'guides') {
+          <div class="absolute left-0 top-full mt-3 w-48 rounded-lg border border-forge-line bg-forge-steel py-2 shadow-xl">
+            <a routerLink="/resources" (click)="closeDropdown()" class="block px-4 py-2 text-sm text-forge-text-muted transition hover:bg-forge-line hover:text-forge-text">
+              Buying Guides
+            </a>
+            <a routerLink="/blog" (click)="closeDropdown()" class="block px-4 py-2 text-sm text-forge-text-muted transition hover:bg-forge-line hover:text-forge-text">
+              Blog
+            </a>
+          </div>
+        }
+      </div>
+
+      <div class="relative" data-nav-dropdown>
+        <button
+          type="button"
+          (click)="toggleDropdown('company')"
+          [attr.aria-expanded]="openDropdown() === 'company'"
+          class="flex items-center gap-1 font-medium text-forge-text-muted transition hover:text-forge-text"
+        >
+          Company
+          <span aria-hidden="true" class="text-xs">▾</span>
+        </button>
+
+        @if (openDropdown() === 'company') {
+          <div class="absolute left-0 top-full mt-3 w-48 rounded-lg border border-forge-line bg-forge-steel py-2 shadow-xl">
+            <a routerLink="/about" (click)="closeDropdown()" class="block px-4 py-2 text-sm text-forge-text-muted transition hover:bg-forge-line hover:text-forge-text">
+              About
+            </a>
+            <a routerLink="/services" (click)="closeDropdown()" class="block px-4 py-2 text-sm text-forge-text-muted transition hover:bg-forge-line hover:text-forge-text">
+              Support
+            </a>
+            <a routerLink="/contact" (click)="closeDropdown()" class="block px-4 py-2 text-sm text-forge-text-muted transition hover:bg-forge-line hover:text-forge-text">
+              Contact
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="hidden items-center gap-4 xl:flex">
+      @if (currentUser()) {
+        <span class="font-medium text-forge-text-muted">Hi, {{ currentUser()?.fullName }}</span>
+
+        <a routerLink="/account" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" class="font-medium text-forge-text-muted transition hover:text-forge-text">
+          My Account
+        </a>
+
+        @if (currentUser()?.role === 'admin') {
+          <a routerLink="/admin/dashboard" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" class="font-medium text-forge-text-muted transition hover:text-forge-text">
+            Admin
+          </a>
+        }
+
+        <button (click)="logout()" type="button" class="font-medium text-forge-text-muted transition hover:text-forge-text">
+          Logout
+        </button>
+      } @else {
+        <a routerLink="/login" class="font-medium text-forge-text-muted transition hover:text-forge-text">
+          Login
+        </a>
+      }
+
+      <a
+        routerLink="/"
+        class="rounded-md bg-forge-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+      >
+        Start Building
+      </a>
+    </div>
+
+    <!-- MOBILE BUTTON -->
+    <button
+      type="button"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="mobileMenuOpen"
+      aria-controls="mobile-navigation"
+      [attr.aria-label]="mobileMenuOpen ? 'Close main menu' : 'Open main menu'"
+      class="h-11 w-11 text-2xl text-forge-text transition hover:text-forge-accent xl:hidden"
+    >
+      <span aria-hidden="true">{{ mobileMenuOpen ? '×' : '☰' }}</span>
+    </button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  @if (mobileMenuOpen) {
+    <nav id="mobile-navigation" aria-label="Mobile navigation" class="border-t border-forge-line bg-forge-ink px-6 py-6 xl:hidden">
+      <div class="flex flex-col gap-5">
+        <a routerLink="/" [routerLinkActiveOptions]="{ exact: true }" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-text transition hover:text-forge-accent">
+          Builder
+        </a>
+        <a routerLink="/parts" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-text transition hover:text-forge-accent">
+          Parts
+        </a>
+        <a routerLink="/gallery" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-text transition hover:text-forge-accent">
+          Builds
+        </a>
+
+        <div>
+          <button type="button" (click)="toggleMobileGroup('guides')" class="flex w-full items-center justify-between font-medium text-forge-text">
+            Guides
+            <span aria-hidden="true" class="text-xs">{{ mobileGroupOpen === 'guides' ? '▴' : '▾' }}</span>
+          </button>
+          @if (mobileGroupOpen === 'guides') {
+            <div class="mt-3 flex flex-col gap-3 pl-4">
+              <a routerLink="/resources" (click)="closeMenu()" class="text-forge-text-muted transition hover:text-forge-accent">Buying Guides</a>
+              <a routerLink="/blog" (click)="closeMenu()" class="text-forge-text-muted transition hover:text-forge-accent">Blog</a>
+            </div>
+          }
+        </div>
+
+        <div>
+          <button type="button" (click)="toggleMobileGroup('company')" class="flex w-full items-center justify-between font-medium text-forge-text">
+            Company
+            <span aria-hidden="true" class="text-xs">{{ mobileGroupOpen === 'company' ? '▴' : '▾' }}</span>
+          </button>
+          @if (mobileGroupOpen === 'company') {
+            <div class="mt-3 flex flex-col gap-3 pl-4">
+              <a routerLink="/about" (click)="closeMenu()" class="text-forge-text-muted transition hover:text-forge-accent">About</a>
+              <a routerLink="/services" (click)="closeMenu()" class="text-forge-text-muted transition hover:text-forge-accent">Support</a>
+              <a routerLink="/contact" (click)="closeMenu()" class="text-forge-text-muted transition hover:text-forge-accent">Contact</a>
+            </div>
+          }
+        </div>
+
+        @if (currentUser()) {
+          <p class="font-medium text-forge-text-muted">Hi, {{ currentUser()?.fullName }}</p>
+          <a routerLink="/account" (click)="closeMenu()" class="block text-forge-text-muted transition hover:text-forge-accent">My Account</a>
+          @if (currentUser()?.role === 'admin') {
+            <a routerLink="/admin/dashboard" (click)="closeMenu()" class="block text-forge-text-muted transition hover:text-forge-accent">Admin</a>
+          }
+          <button (click)="logout()" type="button" class="block w-full text-left text-forge-text-muted transition hover:text-forge-accent">Logout</button>
+        } @else {
+          <a routerLink="/login" (click)="closeMenu()" class="block text-forge-text-muted transition hover:text-forge-accent">Login</a>
+        }
+
+        <a
+          routerLink="/"
+          (click)="closeMenu()"
+          class="block rounded-md bg-forge-accent px-5 py-3 text-center font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+        >
+          Start Building
+        </a>
+      </div>
+    </nav>
+  }
 </header>

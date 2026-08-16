@@ -13,10 +13,6 @@
   } @else {
     <p class="mt-2 text-gray-500">
       Signed in as {{ currentUser()?.fullName }}.
-      <a routerLink="/schedule" class="font-semibold text-blue-600 hover:text-blue-800">My Appointments</a>
-      ·
-      <a routerLink="/wishlist" class="font-semibold text-blue-600 hover:text-blue-800">Wishlist</a>
-      ·
       <a routerLink="/testimonials/write" class="font-semibold text-blue-600 hover:text-blue-800">My Testimonial</a>
     </p>
 
@@ -31,7 +27,7 @@
     } @else if (orders().length === 0) {
       <p class="mt-6 text-gray-500">
         No orders yet.
-        <a routerLink="/marketplace" class="font-semibold text-blue-600 hover:text-blue-800">Browse the marketplace</a>
+        <a routerLink="/parts" class="font-semibold text-blue-600 hover:text-blue-800">Browse parts</a>
       </p>
     } @else {
       <div class="mt-6 space-y-4">

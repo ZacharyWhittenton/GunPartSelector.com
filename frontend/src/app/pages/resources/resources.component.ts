@@ -1,54 +1,24 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { RESOURCES } from '../../core/data/resources.data';
-import { HeroVideoComponent } from '../../shared/components/hero-video/hero-video.component';
 import { SeoService } from '../../core/services/seo.service';
-
-
+import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
 
 @Component({
-
   selector: 'app-resources',
-
   standalone: true,
-
-  imports: [HeroVideoComponent, RouterLink],
-
-  templateUrl:
-
-    './resources.component.html',
-
+  imports: [PageContainerComponent],
+  templateUrl: './resources.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl:
-
-    './resources.component.css'
-
+  styleUrl: './resources.component.css'
 })
 export class ResourcesComponent {
+  readonly resources = RESOURCES;
 
-
-resources =
-RESOURCES;
-
-
-constructor(
-
-private seoService: SeoService
-
-) {
-
-
-this.seoService.updatePage(
-
-'Resources | WD Web Solutions',
-
-'Guides and resources on website design, development, and growing your business online from WD Web Solutions.'
-
-);
-
-
-}
-
-
+  constructor(private seoService: SeoService) {
+    this.seoService.updatePage(
+      'Buying Guides | GunPartSelector.com',
+      'Caliber selection, compatibility basics, and other guides for planning an AR-15 build.'
+    );
+  }
 }

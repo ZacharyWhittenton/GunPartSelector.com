@@ -23,15 +23,6 @@ export const routes: Routes = [
 
       },
       {
-        path:'services/:slug',
-        
-        loadComponent:()=> 
-        import('./pages/service-detail/service-detail.component')
-        .then(m=>m.ServiceDetailComponent)
-        
-        },
-
-      {
         path: 'about',
 
         loadComponent: () =>
@@ -122,16 +113,6 @@ export const routes: Routes = [
 
 
       {
-        path: 'schedule',
-
-        loadComponent: () =>
-          import('./pages/schedule/schedule.component')
-            .then(m => m.ScheduleComponent)
-
-      },
-
-
-      {
         path: 'parts',
 
         loadComponent: () =>
@@ -167,56 +148,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./pages/build-configurator/build-share/build-share.component')
             .then(m => m.BuildShareComponent)
-
-      },
-
-
-      {
-        path: 'marketplace',
-
-        loadComponent: () =>
-          import('./pages/marketplace/marketplace.component')
-            .then(m => m.MarketplaceComponent)
-
-      },
-
-
-      {
-        path: 'marketplace/success',
-
-        loadComponent: () =>
-          import('./pages/marketplace/checkout-success/checkout-success.component')
-            .then(m => m.CheckoutSuccessComponent)
-
-      },
-
-
-      {
-        path: 'marketplace/:slug',
-
-        loadComponent: () =>
-          import('./pages/marketplace/item-detail/item-detail.component')
-            .then(m => m.ItemDetailComponent)
-
-      },
-
-
-      {
-        path: 'cart',
-
-        loadComponent: () =>
-          import('./pages/cart/cart.component')
-            .then(m => m.CartComponent)
-
-      },
-
-
-      {
-        path: 'wishlist',
-
-        loadComponent: () =>
-          import('./pages/wishlist/wishlist.component')
-            .then(m => m.WishlistComponent)
 
       },
 

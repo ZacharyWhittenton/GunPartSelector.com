@@ -73,42 +73,47 @@ MOCK_ACCOUNTS = [
 
 BLOG_POSTS = [
     {
-        "title": "5 Signs Your Website Needs a Redesign",
-        "excerpt": "If your site is slow, hard to update, or looks dated on mobile, it might be time for a refresh.",
+        "title": "Carbine vs. Mid-Length vs. Rifle Gas Systems",
+        "excerpt": "The gas system length behind your barrel changes recoil impulse, reliability, and which handguards will fit.",
         "body": (
-            "Your website is often the first impression a potential customer has of your "
-            "business. Here are five signs it's time for a redesign: slow load times, a "
-            "layout that doesn't work well on phones, an outdated visual style, content "
-            "that's a pain to update, and low conversion rates on your key calls to action. "
-            "A modern rebuild focused on speed, clarity, and mobile-first design can turn "
-            "your website from a liability into your best salesperson."
+            "Gas system length is set by where the gas port sits on the barrel, and it has "
+            "a real effect on how a rifle shoots. Carbine-length systems are compact and "
+            "common on shorter barrels but run a snappier recoil impulse. Mid-length "
+            "systems soften that impulse and have become the default on 14.5-16 inch "
+            "barrels. Rifle-length systems, originally spec'd for 20 inch barrels, give "
+            "the softest cycling of the three. Whichever you pick, your handguard has to "
+            "be long enough to clear the gas block — that's one of the checks our builder "
+            "flags automatically."
         ),
-        "tags": ("web design", "tips"),
+        "tags": ("compatibility", "guides"),
     },
     {
-        "title": "Why Website Maintenance Matters",
-        "excerpt": "A website isn't a one-time project — regular maintenance keeps it fast, secure, and reliable.",
+        "title": "Mil-Spec vs. Commercial Buffer Tubes: Why It Matters",
+        "excerpt": "Two buffer tube diameters exist, they aren't interchangeable, and the wrong stock won't fit.",
         "body": (
-            "Launching a website is just the beginning. Software dependencies need "
-            "updates, security patches need to be applied, and broken links or outdated "
-            "content can quietly erode trust with visitors. A regular maintenance plan "
-            "catches these issues before they become problems, keeps your site running "
-            "fast, and gives you peace of mind that your online presence is in good hands."
+            "Mil-spec and commercial buffer tubes differ by about a tenth of an inch in "
+            "outer diameter — small enough to miss, big enough that a commercial stock "
+            "will not fit a mil-spec tube and vice versa. Mil-spec is the more common "
+            "standard today and tends to have a wider aftermarket stock selection. Before "
+            "you buy a stock or brace, confirm which spec your buffer tube (or complete "
+            "lower) uses — it's one of the compatibility checks built into every "
+            "GunPartSelector.com build."
         ),
-        "tags": ("maintenance", "security"),
+        "tags": ("compatibility", "guides"),
     },
     {
-        "title": "Choosing the Right E-Commerce Platform for Your Business",
-        "excerpt": "From inventory management to checkout flow, the right platform depends on how you sell.",
+        "title": "5.56 NATO, .223 Wylde, or .300 Blackout: Picking a Barrel",
+        "excerpt": "Chamber choice affects what ammunition is safe to run and what your bolt carrier group needs to match.",
         "body": (
-            "Not all e-commerce platforms are built the same. Before choosing one, think "
-            "about your catalog size, whether you need custom checkout logic, how you "
-            "manage inventory, and what integrations matter most — payment processors, "
-            "shipping providers, or your existing business tools. We help clients weigh "
-            "these tradeoffs and build a storefront that fits how they actually sell, "
-            "not just a generic template."
+            "5.56 NATO chambers handle both 5.56 and .223 Remington safely; .223 Wylde "
+            "chambers are cut for tighter accuracy while still safely running 5.56; and "
+            ".300 Blackout is a different cartridge entirely, built around standard AR-15 "
+            "magazines and bolt geometry but requiring a barrel, and often a bolt carrier "
+            "group, chambered specifically for it. Whatever you land on, your barrel and "
+            "BCG both need to agree on caliber — that mismatch is the single most common "
+            "compatibility error we see."
         ),
-        "tags": ("e-commerce", "business"),
+        "tags": ("compatibility", "guides"),
     },
 ]
 

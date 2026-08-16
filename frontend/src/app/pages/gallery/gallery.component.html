@@ -1,211 +1,46 @@
-<!-- Gallery Hero -->
+<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+  <app-page-container>
 
-<section
-  class="
-    relative
-    overflow-hidden
-    bg-gray-900
-    py-24
-  "
->
-
-  <app-hero-video></app-hero-video>
-
-  <div
-    class="
-      relative
-      z-10
-      mx-auto
-      max-w-7xl
-      px-6
-    "
-  >
-
-    <p
-      class="
-        text-sm
-        font-semibold
-        uppercase
-        tracking-widest
-        text-orange-400
-      "
-    >
-      Our Work
-    </p>
-
-
-    <h1
-      class="
-        mt-5
-        text-5xl
-        font-bold
-        text-white
-      "
-    >
-      Web Design & Development Projects
+    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Builds</p>
+    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
+      Featured builds
     </h1>
-
-
-    <p
-      class="
-        mt-6
-        max-w-3xl
-        text-xl
-        leading-relaxed
-        text-gray-300
-      "
-    >
-      Explore examples of website design, web application
-      development, e-commerce, and ongoing support projects
-      completed by WD Web Solutions.
+    <p class="mt-4 max-w-2xl text-forge-text-muted">
+      A few complete builds assembled with the configurator, start to finish.
     </p>
 
-  </div>
+    @if (isLoading()) {
+      <p class="mt-12 text-forge-text-muted">Loading builds…</p>
+    } @else {
+      <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+        @for (featured of featuredBuilds(); track featured.slug) {
+          <a
+            [routerLink]="['/builder/share', featured.slug]"
+            class="flex flex-col rounded-lg border border-forge-line bg-forge-steel p-6 transition hover:border-forge-accent"
+          >
+            <h2 class="text-lg font-bold text-forge-text">{{ featured.build.name }}</h2>
+            <p class="mt-2 text-sm text-forge-text-muted">{{ featured.blurb }}</p>
 
-</section>
+            <div class="mt-4 flex flex-wrap gap-1.5">
+              @for (item of featured.build.items.slice(0, 3); track item.product.id) {
+                <span class="rounded border border-forge-line px-2 py-0.5 font-mono text-[10px] text-forge-text-muted">
+                  {{ item.product.brand }}
+                </span>
+              }
+            </div>
 
+            <div class="mt-auto flex items-center justify-between pt-6">
+              <span class="font-mono text-xl font-bold tabular-nums text-forge-text">
+                {{ featured.totalPriceCents / 100 | currency }}
+              </span>
+              <span class="font-mono text-xs text-forge-text-muted">
+                {{ featured.build.items.length }} parts
+              </span>
+            </div>
+          </a>
+        }
+      </div>
+    }
 
-
-
-
-<!-- Gallery Projects -->
-
-<section
-  class="
-    py-20
-  "
->
-
-  <div
-    class="
-      mx-auto
-      max-w-7xl
-      px-6
-    "
-  >
-
-
-    <div
-      class="
-        grid
-        gap-8
-        md:grid-cols-2
-        lg:grid-cols-3
-      "
-    >
-
-
-      @for(item of galleryItems; track item.title)
-      {
-
-        <app-ui-card
-
-          [title]="item.title"
-
-          [description]="item.description"
-
-          [category]="item.category"
-
-          [image]="item.image"
-
-        >
-        </app-ui-card>
-
-
-      }
-
-
-    </div>
-
-
-  </div>
-
-
-</section>
-
-
-
-
-
-
-
-<!-- CTA -->
-
-<section
-  class="
-    bg-blue-600
-    py-20
-  "
->
-
-
-  <div
-    class="
-      mx-auto
-      max-w-5xl
-      px-6
-      text-center
-    "
-  >
-
-
-    <h2
-      class="
-        text-4xl
-        font-bold
-        text-white
-      "
-    >
-      Have a Project in Mind?
-    </h2>
-
-
-
-    <p
-      class="
-        mx-auto
-        mt-5
-        max-w-2xl
-        text-lg
-        text-blue-100
-      "
-    >
-      Contact WD Web Solutions today for a free
-      estimate on your next web project.
-    </p>
-
-
-
-
-    <a
-
-      routerLink="/contact"
-
-      class="
-        mt-8
-        inline-flex
-        items-center
-        rounded-lg
-        bg-white
-        px-8
-        py-4
-        font-semibold
-        text-blue-600
-
-        transition
-        duration-300
-
-        hover:-translate-y-1
-        hover:shadow-xl
-      "
-
-    >
-      Request Estimate
-
-    </a>
-
-
-  </div>
-
-
-</section>
+  </app-page-container>
+</div>

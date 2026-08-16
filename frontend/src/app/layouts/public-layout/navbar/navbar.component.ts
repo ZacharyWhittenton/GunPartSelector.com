@@ -1,122 +1,81 @@
 import { Component, ChangeDetectionStrategy, HostListener, inject, signal } from '@angular/core';
-
-import {
-  NavigationEnd,
-  Router,
-  RouterLink,
-  RouterLinkActive
-} from '@angular/router';
-
-import { DOCUMENT } from '@angular/common';
+import { NavigationStart, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
-import { CartService } from '../../../core/services/cart.service';
 
-
+export type NavDropdown = 'guides' | 'company' | null;
 
 @Component({
-
   selector: 'app-navbar',
-
   standalone: true,
-
-  imports: [
-
-    RouterLink,
-
-    RouterLinkActive
-
-  ],
-
-  templateUrl:
-
-    './navbar.component.html',
-
+  imports: [RouterLink, RouterLinkActive],
+  templateUrl: './navbar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl:
-
-    './navbar.component.css'
-
+  styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-
   private readonly authService = inject(AuthService);
-  private readonly cartService = inject(CartService);
   private readonly router = inject(Router);
-  private readonly document = inject(DOCUMENT);
 
   readonly currentUser = this.authService.currentUser;
-  readonly cartItemCount = this.cartService.itemCount;
-  readonly isHome = signal(this.isHomeRoute(this.router.url));
-  readonly isScrolled = signal(false);
-
+  readonly openDropdown = signal<NavDropdown>(null);
 
   mobileMenuOpen = false;
+  mobileGroupOpen: NavDropdown = null;
 
   constructor() {
-    this.onWindowScroll();
     this.router.events
       .pipe(
-        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        filter((event): event is NavigationStart => event instanceof NavigationStart),
         takeUntilDestroyed()
       )
-      .subscribe(event => {
-        this.isHome.set(this.isHomeRoute(event.urlAfterRedirects));
+      .subscribe(() => {
         this.closeMenu();
-        this.onWindowScroll();
+        this.openDropdown.set(null);
       });
   }
 
-  @HostListener('window:scroll')
-  onWindowScroll(scrollY = this.document.defaultView?.scrollY ?? 0): void {
-    this.isScrolled.set(scrollY > 24);
+  toggleDropdown(dropdown: NavDropdown): void {
+    this.openDropdown.set(this.openDropdown() === dropdown ? null : dropdown);
   }
 
-  isTransparent(): boolean {
-    return this.isHome() && !this.isScrolled() && !this.mobileMenuOpen;
+  closeDropdown(): void {
+    this.openDropdown.set(null);
   }
 
-
+  toggleMobileGroup(dropdown: NavDropdown): void {
+    this.mobileGroupOpen = this.mobileGroupOpen === dropdown ? null : dropdown;
+  }
 
   toggleMenu(): void {
-
-    this.mobileMenuOpen =
-      !this.mobileMenuOpen;
-
+    this.mobileMenuOpen = !this.mobileMenuOpen;
   }
-
-
 
   closeMenu(): void {
-
-    this.mobileMenuOpen =
-      false;
-
+    this.mobileMenuOpen = false;
+    this.mobileGroupOpen = null;
   }
-
 
   @HostListener('document:keydown.escape')
-  closeMenuWithEscape(): void {
+  closeOnEscape(): void {
     this.closeMenu();
+    this.closeDropdown();
   }
 
-
+  @HostListener('document:click', ['$event'])
+  closeOnOutsideClick(event: MouseEvent): void {
+    if (this.openDropdown() === null) return;
+    const target = event.target as HTMLElement;
+    if (!target.closest('[data-nav-dropdown]')) {
+      this.closeDropdown();
+    }
+  }
 
   logout(): void {
-
     this.authService.logout();
-
     this.closeMenu();
-
     this.router.navigateByUrl('/');
-
   }
-
-  private isHomeRoute(url: string): boolean {
-    return url.split(/[?#]/, 1)[0] === '/';
-  }
-
-
 }

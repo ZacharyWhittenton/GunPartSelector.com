@@ -6,12 +6,12 @@ import { finalize } from 'rxjs';
 import { BlogPostSummary } from '../../core/models/blog.model';
 import { BlogService } from '../../core/services/blog.service';
 import { SeoService } from '../../core/services/seo.service';
-import { HeroVideoComponent } from '../../shared/components/hero-video/hero-video.component';
+import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
 
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [RouterLink, DatePipe, HeroVideoComponent],
+  imports: [RouterLink, DatePipe, PageContainerComponent],
   templateUrl: './blog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './blog.component.css'
@@ -28,8 +28,8 @@ export class BlogComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.updatePage(
-      'Blog | WD Web Solutions',
-      'Articles and updates on website design, development, and growing your business online from WD Web Solutions.'
+      'Blog | GunPartSelector.com',
+      'Build write-ups, part comparisons, and news for AR-15 builders.'
     );
 
     this.blogService.listTags().subscribe({
