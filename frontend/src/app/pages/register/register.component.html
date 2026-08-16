@@ -1,0 +1,94 @@
+<section class="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+
+    <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+
+      <h1 class="text-center text-3xl font-bold text-gray-900">
+        Create Account
+      </h1>
+
+      <p class="mt-2 text-center text-gray-500">
+        Register for WD Web Solutions.
+      </p>
+
+      @if(errorMessage())
+      {
+      <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+        {{ errorMessage() }}
+      </p>
+      }
+
+      <form [formGroup]="registerForm" (ngSubmit)="submitRegisterForm()" class="mt-8 space-y-5">
+
+        <div>
+          <input
+            formControlName="fullName"
+            placeholder="Full Name"
+            class="w-full rounded-lg border px-4 py-3">
+          @if(hasError('fullName'))
+          {
+          <p class="mt-1 text-sm text-red-600">Full name is required.</p>
+          }
+        </div>
+
+        <div>
+          <input
+            type="email"
+            formControlName="emailAddress"
+            placeholder="Email"
+            class="w-full rounded-lg border px-4 py-3">
+          @if(hasError('emailAddress'))
+          {
+          <p class="mt-1 text-sm text-red-600">A valid email address is required.</p>
+          }
+        </div>
+
+        <div>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+            class="w-full rounded-lg border px-4 py-3">
+          @if(hasError('password'))
+          {
+          <p class="mt-1 text-sm text-red-600">Password must be at least 8 characters.</p>
+          }
+        </div>
+
+        <div>
+          <input
+            type="password"
+            formControlName="confirmPassword"
+            placeholder="Confirm Password"
+            class="w-full rounded-lg border px-4 py-3">
+          @if(passwordsMismatch)
+          {
+          <p class="mt-1 text-sm text-red-600">Passwords do not match.</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting()"
+          class="
+          w-full
+          rounded-lg
+          bg-blue-700
+          py-3
+          font-semibold
+          text-white
+          hover:bg-blue-800
+          disabled:cursor-not-allowed
+          disabled:opacity-60">
+          {{ isSubmitting() ? 'Creating account…' : 'Register' }}
+        </button>
+
+        <p class="text-center text-sm text-gray-500">
+          Already have an account?
+          <a routerLink="/login" class="font-semibold text-blue-600 hover:text-blue-800">Login</a>
+        </p>
+
+      </form>
+
+    </div>
+
+  </section>

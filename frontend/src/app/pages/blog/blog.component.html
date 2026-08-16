@@ -1,0 +1,105 @@
+<section class="relative overflow-hidden bg-gray-900 py-20">
+  <app-hero-video></app-hero-video>
+  <div class="relative z-10 mx-auto max-w-7xl px-6">
+    <p class="text-sm font-semibold uppercase tracking-widest text-orange-400">Blog</p>
+    <h1 class="mt-5 text-5xl font-bold text-white">Web Design & Development Insights</h1>
+    <p class="mt-6 max-w-3xl text-xl text-gray-300">
+      Guides and updates on web design, development, and growing your business online.
+    </p>
+  </div>
+</section>
+
+<section class="py-16">
+  <div class="mx-auto max-w-7xl px-6">
+
+    @if(tags().length > 0)
+    {
+    <div class="flex flex-wrap gap-2">
+      <button
+        type="button"
+        (click)="selectTag(null)"
+        class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
+        [class.bg-blue-600]="selectedTag() === null"
+        [class.text-white]="selectedTag() === null"
+        [class.bg-gray-100]="selectedTag() !== null"
+        [class.text-gray-600]="selectedTag() !== null"
+      >
+        All
+      </button>
+      @for(tag of tags(); track tag)
+      {
+      <button
+        type="button"
+        (click)="selectTag(tag)"
+        class="rounded-full px-4 py-1.5 text-sm font-semibold transition"
+        [class.bg-blue-600]="selectedTag() === tag"
+        [class.text-white]="selectedTag() === tag"
+        [class.bg-gray-100]="selectedTag() !== tag"
+        [class.text-gray-600]="selectedTag() !== tag"
+      >
+        {{ tag }}
+      </button>
+      }
+    </div>
+    }
+
+    @if(errorMessage())
+    {
+    <p class="mt-8 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+    }
+
+    @if(isLoading())
+    {
+    <p class="mt-10 text-gray-500">Loading posts…</p>
+    }
+    @else if(posts().length === 0)
+    {
+    <p class="mt-10 text-gray-500">No posts yet. Check back soon.</p>
+    }
+    @else
+    {
+    <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      @for(post of posts(); track post.id)
+      {
+      <a
+        [routerLink]="['/blog', post.slug]"
+        class="
+        block
+        overflow-hidden
+        rounded-xl
+        bg-white
+        shadow-lg
+        transition
+        duration-300
+        hover:-translate-y-2
+        hover:shadow-2xl"
+      >
+        @if(post.coverImageUrl)
+        {
+        <img
+          [src]="post.coverImageUrl"
+          [alt]="post.title"
+          class="h-48 w-full object-cover"
+        >
+        }
+
+        <div class="p-6">
+          @if(post.tags.length > 0)
+          {
+          <p class="text-sm font-semibold text-blue-600">{{ post.tags.join(', ') }}</p>
+          }
+
+          <h2 class="mt-2 text-xl font-bold text-gray-900">{{ post.title }}</h2>
+          <p class="mt-3 text-gray-600">{{ post.excerpt }}</p>
+
+          <p class="mt-4 text-sm text-gray-400">
+            {{ post.authorName }} · {{ post.publishedAt | date: 'mediumDate' }}
+          </p>
+        </div>
+      </a>
+      }
+    </div>
+    }
+
+  </div>
+</section>

@@ -1,0 +1,61 @@
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
+
+# Node
+**/node_modules/
+npm-debug.log
+yarn-error.log
+
+# Python
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.coverage
+**/htmlcov/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+**/.angular/cache/
+.sass-cache/
+/connect.lock
+**/coverage/
+/libpeerconnection.log
+testem.log
+/typings
+
+# Pulumi local state and generated artifacts
+**/.pulumi/
+
+# Locally uploaded blog images (dev-only file storage)
+backend/uploads/
+
+# System files
+.DS_Store
+Thumbs.db

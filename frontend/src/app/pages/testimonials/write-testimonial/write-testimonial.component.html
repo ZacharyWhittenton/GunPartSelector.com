@@ -1,0 +1,84 @@
+<section class="mx-auto max-w-2xl px-6 py-16">
+
+  <h1 class="text-4xl font-bold text-gray-900">Share Your Experience</h1>
+  <p class="mt-2 text-gray-500">
+    Let other visitors know what it's like to work with WD Web Solutions.
+  </p>
+
+  @if (!isAuthenticated) {
+    <p class="mt-6 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-800">
+      You'll need an account to leave a testimonial.
+      <a routerLink="/login" class="font-semibold text-blue-700 hover:text-blue-900">Log in</a>
+      or
+      <a routerLink="/register" class="font-semibold text-blue-700 hover:text-blue-900">register</a>
+      to continue.
+    </p>
+  } @else if (isLoading()) {
+    <p class="mt-6 text-gray-500">Loading…</p>
+  } @else {
+    @if (myTestimonial(); as existing) {
+      <div
+        class="mt-6 rounded-lg px-4 py-3 text-sm"
+        [class.bg-amber-50]="existing.status === 'pending'"
+        [class.text-amber-800]="existing.status === 'pending'"
+        [class.bg-green-50]="existing.status === 'approved'"
+        [class.text-green-800]="existing.status === 'approved'"
+        [class.bg-gray-100]="existing.status === 'rejected'"
+        [class.text-gray-700]="existing.status === 'rejected'"
+      >
+        @if (existing.status === 'pending') {
+          Your testimonial is awaiting admin approval.
+        } @else if (existing.status === 'approved') {
+          Your testimonial is live on our homepage. Thank you!
+        } @else {
+          Your testimonial wasn't approved for publication. You can edit and resubmit below.
+        }
+      </div>
+    }
+
+    @if (successMessage()) {
+      <p class="mt-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-800">
+        {{ successMessage() }}
+      </p>
+    }
+
+    @if (errorMessage()) {
+      <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+    }
+
+    <form class="mt-8 space-y-6" (ngSubmit)="submit()">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Your rating</label>
+        <div class="mt-2">
+          <app-star-rating
+            [rating]="rating"
+            [interactive]="true"
+            size="lg"
+            (ratingChange)="onRatingChange($event)"
+          ></app-star-rating>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700">Your review</label>
+        <textarea
+          [(ngModel)]="body"
+          name="body"
+          rows="5"
+          maxlength="2000"
+          placeholder="Tell us about your experience working with us…"
+          class="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none"
+        ></textarea>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="isSubmitting()"
+        class="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isSubmitting() ? 'Submitting…' : myTestimonial() ? 'Update Testimonial' : 'Submit Testimonial' }}
+      </button>
+    </form>
+  }
+
+</section>

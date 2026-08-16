@@ -1,0 +1,88 @@
+<section class="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+
+    <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+
+      <h1 class="text-center text-3xl font-bold text-gray-900">
+        Login
+      </h1>
+
+      <p class="mt-2 text-center text-gray-500">
+        Access your WD Web Solutions account.
+      </p>
+
+      @if(errorMessage())
+      {
+      <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+        {{ errorMessage() }}
+      </p>
+      }
+
+      <form [formGroup]="loginForm" (ngSubmit)="submitLoginForm()" class="mt-8 space-y-5">
+
+        <div>
+          <input
+            type="email"
+            formControlName="emailAddress"
+            placeholder="Email"
+            class="
+            w-full
+            rounded-lg
+            border
+            px-4
+            py-3
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-600">
+          @if(hasError('emailAddress'))
+          {
+          <p class="mt-1 text-sm text-red-600">A valid email address is required.</p>
+          }
+        </div>
+
+        <div>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+            class="
+            w-full
+            rounded-lg
+            border
+            px-4
+            py-3
+            focus:outline-none
+            focus:ring-2
+            focus:ring-blue-600">
+          @if(hasError('password'))
+          {
+          <p class="mt-1 text-sm text-red-600">Password is required.</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting()"
+          class="
+          w-full
+          rounded-lg
+          bg-blue-700
+          py-3
+          font-semibold
+          text-white
+          transition
+          hover:bg-blue-800
+          disabled:cursor-not-allowed
+          disabled:opacity-60">
+          {{ isSubmitting() ? 'Logging in…' : 'Login' }}
+        </button>
+
+        <p class="text-center text-sm text-gray-500">
+          Don't have an account?
+          <a routerLink="/register" class="font-semibold text-blue-600 hover:text-blue-800">Register</a>
+        </p>
+
+      </form>
+
+    </div>
+
+  </section>

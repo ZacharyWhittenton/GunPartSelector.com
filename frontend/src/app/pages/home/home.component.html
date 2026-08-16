@@ -1,0 +1,649 @@
+<main>
+
+
+    <!-- HERO -->
+    
+    <section
+    
+    class="
+    relative
+    overflow-hidden
+    bg-gray-900
+    "
+    
+    >
+
+    <app-hero-video></app-hero-video>
+
+    <div
+
+    class="
+    relative
+    z-10
+    mx-auto
+    max-w-7xl
+    px-6
+    py-24
+    lg:flex
+    lg:items-center
+    "
+    
+    >
+    
+    
+    <div
+    
+    class="
+    max-w-3xl
+    "
+    
+    >
+    
+    
+    <p
+    
+    class="
+    text-sm
+    font-semibold
+    uppercase
+    tracking-widest
+    text-orange-400
+    "
+    
+    >
+    
+    Web Design & Development, Done Right
+    
+    </p>
+    
+    
+    
+    <h1
+    
+    class="
+    mt-6
+    text-5xl
+    font-bold
+    leading-tight
+    text-white
+    
+    md:text-6xl
+    
+    "
+    
+    >
+    
+    Custom Web Solutions
+    Built To Last
+    
+    </h1>
+    
+    
+    
+    
+    <p
+    
+    class="
+    mt-6
+    text-xl
+    leading-relaxed
+    text-gray-300
+    "
+    
+    >
+    
+    WD Web Solutions provides professional website
+    design, web application development, e-commerce,
+    and ongoing support for growing businesses.
+    
+    </p>
+    
+    
+    
+    
+    <div
+    
+    class="
+    mt-10
+    flex
+    flex-wrap
+    gap-4
+    "
+    
+    >
+    
+    
+    <a
+    
+    routerLink="/contact"
+    
+    class="
+    rounded-lg
+    bg-blue-600
+    px-8
+    py-4
+    font-semibold
+    text-white
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-1
+    hover:bg-blue-700
+    hover:shadow-xl
+    "
+    
+    >
+    
+    Request Estimate
+    
+    </a>
+    
+    
+    
+    <a
+    
+    routerLink="/services"
+    
+    class="
+    rounded-lg
+    border
+    border-white
+    px-8
+    py-4
+    font-semibold
+    text-white
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-1
+    hover:bg-white
+    hover:text-gray-900
+    "
+    
+    >
+    
+    View Services
+    
+    </a>
+    
+    
+    </div>
+    
+    
+    
+    </div>
+    
+    
+    </div>
+    
+    
+    </section>
+    
+    
+    
+    
+    
+    <!-- TRUST -->
+
+    <section
+
+    class="
+    bg-white
+    pb-16
+    pt-40
+    "
+
+    >
+    
+    <div
+    
+    class="
+    mx-auto
+    grid
+    max-w-7xl
+    gap-8
+    px-6
+    
+    md:grid-cols-3
+    
+    "
+    
+    >
+    
+    
+    <div
+    
+    class="
+    rounded-xl
+    p-6
+    text-center
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-2
+    hover:shadow-xl
+    "
+    
+    >
+    
+    <h3
+    
+    class="
+    text-4xl
+    font-bold
+    text-blue-600
+    "
+    
+    >
+    10+
+    </h3>
+    
+    <p
+    
+    class="
+    mt-2
+    text-gray-600
+    "
+    
+    >
+    Years Experience
+    </p>
+    
+    </div>
+    
+    
+    
+    <div
+    
+    class="
+    rounded-xl
+    p-6
+    text-center
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-2
+    hover:shadow-xl
+    "
+    
+    >
+    
+    <h3
+    
+    class="
+    text-4xl
+    font-bold
+    text-blue-600
+    "
+    
+    >
+    500+
+    </h3>
+    
+    
+    <p
+    
+    class="
+    mt-2
+    text-gray-600
+    "
+    
+    >
+    Completed Projects
+    </p>
+    
+    
+    </div>
+    
+    
+    
+    
+    <div
+    
+    class="
+    rounded-xl
+    p-6
+    text-center
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-2
+    hover:shadow-xl
+    "
+    
+    >
+    
+    <h3
+    
+    class="
+    text-4xl
+    font-bold
+    text-blue-600
+    "
+    
+    >
+    100%
+    
+    </h3>
+    
+    
+    <p
+    
+    class="
+    mt-2
+    text-gray-600
+    "
+    
+    >
+    Customer Focus
+    </p>
+    
+    
+    </div>
+    
+    
+    </div>
+    
+    </section>
+    
+    
+    
+    
+    
+    
+    <!-- SERVICES -->
+    
+    <section
+    
+    class="
+    bg-gray-100
+    py-20
+    "
+    
+    >
+    
+    
+    <div
+    
+    class="
+    mx-auto
+    max-w-7xl
+    px-6
+    "
+    
+    >
+    
+    
+    <h2
+    
+    class="
+    text-center
+    text-4xl
+    font-bold
+    text-gray-900
+    "
+    
+    >
+    
+    Our Services
+    
+    </h2>
+    
+    
+    
+    <div
+    
+    class="
+    mt-12
+    grid
+    gap-8
+    
+    md:grid-cols-2
+    
+    lg:grid-cols-3
+    
+    "
+    
+    >
+    
+    
+    @for(service of services; track service.slug)
+    
+    {
+    
+    
+    <app-ui-card
+    
+    [title]="service.title"
+    
+    [category]="service.category"
+    
+    [description]="service.description"
+    
+    [icon]="service.icon"
+    
+    [image]="service.image"
+    
+    [link]="'/services/' + service.slug"
+    
+    >
+    
+    </app-ui-card>
+    
+    
+    }
+    
+    
+    </div>
+    
+    
+    </div>
+    
+    
+    </section>
+    
+    
+    
+    
+    
+    
+    <!-- WHY US -->
+    
+    <section
+    
+    class="
+    py-20
+    "
+    
+    >
+    
+    
+    <div
+    
+    class="
+    mx-auto
+    max-w-5xl
+    px-6
+    text-center
+    "
+    
+    >
+    
+    
+    <h2
+    
+    class="
+    text-4xl
+    font-bold
+    text-gray-900
+    "
+    
+    >
+    
+    Why Choose WD Web Solutions?
+    
+    </h2>
+    
+    
+    
+    <p
+    
+    class="
+    mt-6
+    text-lg
+    text-gray-600
+    "
+    
+    >
+    
+    We focus on clean code, clear communication, and
+    dependable service. Every project gets the same
+    attention to detail that built our reputation.
+    
+    </p>
+    
+    
+    </div>
+    
+    
+    </section>
+
+
+    <!-- TESTIMONIALS -->
+
+    <section
+
+    class="
+    bg-gray-100
+    py-20
+    "
+
+    >
+
+    <div
+
+    class="
+    mx-auto
+    max-w-7xl
+    px-6
+    "
+
+    >
+
+    <h2
+
+    class="
+    text-center
+    text-4xl
+    font-bold
+    text-gray-900
+    "
+
+    >
+
+    What Our Clients Say
+
+    </h2>
+
+    <div class="mt-12">
+
+    <app-testimonial-carousel></app-testimonial-carousel>
+
+    </div>
+
+    <p class="mt-10 text-center text-gray-600">
+
+    Worked with us?
+    <a routerLink="/testimonials/write" class="font-semibold text-blue-600 hover:underline">Share your experience</a>
+
+    </p>
+
+    </div>
+
+    </section>
+
+
+
+
+    <!-- CTA -->
+    
+    <section
+    
+    class="
+    bg-blue-600
+    py-20
+    "
+    
+    >
+    
+    <div
+    
+    class="
+    mx-auto
+    max-w-5xl
+    px-6
+    text-center
+    "
+    
+    >
+    
+    
+    <h2
+    
+    class="
+    text-4xl
+    font-bold
+    text-white
+    "
+    
+    >
+    
+    Ready To Start Your Project?
+    
+    </h2>
+    
+    
+    
+    <a
+    
+    routerLink="/contact"
+    
+    class="
+    mt-8
+    inline-flex
+    rounded-lg
+    bg-white
+    px-8
+    py-4
+    
+    font-semibold
+    text-blue-600
+    
+    transition
+    duration-300
+    
+    hover:-translate-y-1
+    hover:shadow-xl
+    
+    "
+    
+    >
+    
+    Request Estimate
+    
+    </a>
+    
+    
+    </div>
+    
+    
+    </section>
+    
+    
+    
+    </main>

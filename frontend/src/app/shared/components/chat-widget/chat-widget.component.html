@@ -1,0 +1,150 @@
+<div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+
+  @if(isOpen())
+  {
+  <div
+    class="
+      mb-4
+      flex
+      h-[32rem]
+      w-96
+      max-w-[calc(100vw-3rem)]
+      flex-col
+      overflow-hidden
+      rounded-xl
+      border
+      border-gray-200
+      bg-white
+      shadow-2xl
+    "
+  >
+
+    <div class="flex items-center justify-between bg-blue-600 px-4 py-3 text-white">
+      <div>
+        <p class="font-semibold">WD Web Solutions Assistant</p>
+        <p class="text-xs text-blue-100">{{ greeting }}</p>
+      </div>
+      <button
+        type="button"
+        (click)="toggle()"
+        aria-label="Close chat"
+        class="text-white/80 transition hover:text-white"
+      >
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <div class="flex-1 space-y-3 overflow-y-auto bg-gray-50 px-4 py-4">
+
+      @if(messages().length === 0)
+      {
+      <p class="text-sm text-gray-500">
+        Ask about our services, pricing, or how to book time with our team.
+      </p>
+      }
+
+      @for(turn of messages(); track $index)
+      {
+      <div
+        class="flex"
+        [class.justify-end]="turn.role === 'user'"
+      >
+        <div
+          class="max-w-[85%] rounded-xl px-3 py-2 text-sm"
+          [class.bg-blue-600]="turn.role === 'user'"
+          [class.text-white]="turn.role === 'user'"
+          [class.bg-white]="turn.role === 'assistant'"
+          [class.text-gray-800]="turn.role === 'assistant'"
+          [class.border]="turn.role === 'assistant'"
+          [class.border-gray-200]="turn.role === 'assistant'"
+        >
+          {{ turn.content }}
+        </div>
+      </div>
+      }
+
+      @if(isSending())
+      {
+      <div class="flex justify-start">
+        <div class="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-400">
+          Thinking&hellip;
+        </div>
+      </div>
+      }
+
+      @if(errorMessage())
+      {
+      <p class="text-xs text-red-600">{{ errorMessage() }}</p>
+      }
+
+      <div #scrollAnchor></div>
+
+    </div>
+
+    <form (ngSubmit)="send()" class="flex items-center gap-2 border-t border-gray-200 p-3">
+      <input
+        type="text"
+        name="message"
+        [(ngModel)]="draftMessage"
+        placeholder="Type a message&hellip;"
+        autocomplete="off"
+        class="
+          flex-1
+          rounded-lg
+          border
+          border-gray-300
+          px-3
+          py-2
+          text-sm
+          focus:border-blue-500
+          focus:outline-none
+        "
+      >
+      <button
+        type="submit"
+        [disabled]="isSending() || !draftMessage.trim()"
+        aria-label="Send message"
+        class="
+          rounded-lg
+          bg-blue-600
+          px-3
+          py-2
+          text-white
+          transition
+          hover:bg-blue-700
+          disabled:cursor-not-allowed
+          disabled:opacity-50
+        "
+      >
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </form>
+
+  </div>
+  }
+
+  <button
+    type="button"
+    (click)="toggle()"
+    [attr.aria-label]="isOpen() ? 'Close chat' : 'Open chat'"
+    class="
+      flex
+      h-14
+      w-14
+      items-center
+      justify-center
+      rounded-full
+      bg-blue-600
+      text-xl
+      text-white
+      shadow-lg
+      transition
+      hover:-translate-y-1
+      hover:bg-blue-700
+      hover:shadow-xl
+    "
+  >
+    <i class="fa-solid" [class.fa-comment]="!isOpen()" [class.fa-xmark]="isOpen()"></i>
+  </button>
+
+</div>

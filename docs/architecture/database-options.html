@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Company Name — Database Decision</title>
+  <style>
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: #101828; }
+    main { width: min(1050px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0 96px; }
+    h1 { font-size: clamp(2.2rem, 6vw, 4.4rem); line-height: 1; letter-spacing: -.05em; }
+    h2 { margin-top: 48px; }
+    p, li { color: #475467; }
+    a { color: #b54708; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px; border-bottom: 1px solid #d0d5dd; text-align: left; vertical-align: top; }
+    th { font-size: .82rem; text-transform: uppercase; letter-spacing: .08em; color: #667085; }
+    .recommended { display: inline-block; padding: 3px 8px; border-radius: 999px; color: #9a3412; background: #ffedd5; font-weight: 700; font-size: .8rem; }
+    .callout { margin: 32px 0; padding: 20px; border-left: 4px solid #f97316; background: #fff7ed; }
+  </style>
+</head>
+<body>
+<main>
+  <p><a href="index.html">← Architecture overview</a></p>
+  <h1>Serverless PostgreSQL: choose for this workload, not fashion.</h1>
+  <p>The site is low traffic, cost-sensitive, and initially stores contact submissions. Fast wake-up and low idle cost matter more than maximum throughput.</p>
+
+  <div class="callout">
+    <strong>Recommendation: Neon for phase 1, pending client approval of a third-party data processor.</strong>
+    <p>Neon’s compute suspends after inactivity and typically reactivates within hundreds of milliseconds. That fits a public contact form better than Aurora’s documented roughly 15-second typical resume. Keep Aurora as the fallback when AWS-only governance outweighs latency and cost.</p>
+  </div>
+
+  <table>
+    <thead><tr><th>Option</th><th>Strengths</th><th>Costs / risks</th><th>Fit</th></tr></thead>
+    <tbody>
+      <tr><td>Neon <span class="recommended">Recommended</span></td><td>Fast scale-to-zero resume, pooled connection endpoint, low operational burden.</td><td>External vendor; data-processing, region, backup, and support requirements must be approved.</td><td>Best phase-1 fit for intermittent contact and future blog traffic.</td></tr>
+      <tr><td>Aurora Serverless v2</td><td>Native AWS IAM/networking, 0 ACU auto-pause on supported PostgreSQL versions.</td><td>Storage and ancillary charges remain; typical resume is about 15 seconds and can exceed 30 seconds after long pauses.</td><td>Best when AWS-only governance is mandatory and wake latency is acceptable.</td></tr>
+      <tr><td>Supabase</td><td>PostgreSQL plus auth, storage, and realtime capabilities.</td><td>Adds services this project does not yet need; may pull architecture toward its platform APIs.</td><td>Revisit only if customer accounts, realtime features, or managed storage become near-term requirements.</td></tr>
+      <tr><td>Provisioned RDS PostgreSQL</td><td>Predictable AWS-native behavior.</td><td>Does not scale to zero and conflicts with the low-idle-cost requirement.</td><td>Not recommended for the current workload.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Decision checklist</h2>
+  <ol>
+    <li>Confirm whether client contact data may be stored with a third-party provider.</li>
+    <li>Choose the data region, retention period, backup window, and deletion policy.</li>
+    <li>Measure acceptable cold-query latency for the estimate form.</li>
+    <li>Confirm monthly budget and whether a paid support/SLA tier is required.</li>
+    <li>Set the Pulumi <code>databaseProvider</code> and encrypted <code>databaseUrl</code>.</li>
+    <li>Run the first Alembic migration before enabling the production form.</li>
+  </ol>
+
+  <h2>Primary references</h2>
+  <ul>
+    <li><a href="https://neon.com/docs/introduction/scale-to-zero">Neon scale-to-zero documentation</a></li>
+    <li><a href="https://neon.com/pricing">Neon pricing</a></li>
+    <li><a href="https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2-auto-pause.html">AWS Aurora Serverless v2 auto-pause documentation</a></li>
+  </ul>
+</main>
+</body>
+</html>

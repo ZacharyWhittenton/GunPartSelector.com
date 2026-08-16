@@ -1,0 +1,6 @@
+name: site-infra
+description: Serverless AWS infrastructure for Your Company Name
+runtime:
+  name: python
+  options:
+    virtualenv: .venv

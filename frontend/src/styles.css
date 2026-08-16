@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+
+@theme {
+
+  /* Brand Colors */
+
+  --color-primary: #2563eb;
+
+  --color-primary-dark: #1e40af;
+
+  --color-secondary: #f97316;
+
+
+  /* Neutral Colors */
+
+  --color-dark: #111827;
+
+  --color-light: #f8fafc;
+
+  --color-muted: #64748b;
+
+}
+
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+body {
+
+  margin: 0;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+
+  color: #111827;
+
+  background: #ffffff;
+
+}
+
+
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid #ffffff !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px #1d4ed8 !important;
+}
+
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  background: #111827;
+  font-weight: 700;
+  transform: translateY(-200%);
+  transition: transform 150ms ease;
+}
+
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

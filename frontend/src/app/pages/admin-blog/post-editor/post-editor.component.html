@@ -1,0 +1,114 @@
+<section class="mx-auto max-w-3xl px-6 py-12">
+
+  <a routerLink="/admin/blog" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+    &larr; Back to Posts
+  </a>
+
+  <h1 class="mt-4 text-3xl font-bold text-gray-900">
+    {{ isEditMode() ? 'Edit Post' : 'New Post' }}
+  </h1>
+
+  @if(errorMessage())
+  {
+  <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+  }
+
+  @if(isLoading())
+  {
+  <p class="mt-8 text-gray-500">Loading post…</p>
+  }
+  @else
+  {
+  <form [formGroup]="postForm" (ngSubmit)="submit()" class="mt-8 space-y-6">
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700">Title</label>
+      <input
+        formControlName="title"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+      >
+      @if(hasError('title'))
+      {
+      <p class="mt-1 text-sm text-red-600">Title is required.</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700">Excerpt</label>
+      <textarea
+        formControlName="excerpt"
+        rows="2"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+      ></textarea>
+      @if(hasError('excerpt'))
+      {
+      <p class="mt-1 text-sm text-red-600">Excerpt is required.</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700">Body</label>
+      <textarea
+        formControlName="body"
+        rows="12"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+      ></textarea>
+      @if(hasError('body'))
+      {
+      <p class="mt-1 text-sm text-red-600">Body is required.</p>
+      }
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700">Tags (comma-separated)</label>
+      <input
+        formControlName="tags"
+        placeholder="web design, maintenance"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+      >
+    </div>
+
+    <div>
+      <label class="block text-sm font-semibold text-gray-700">Cover Image</label>
+
+      @if(coverImageUrl())
+      {
+      <img [src]="coverImageUrl()" alt="Cover preview" class="mt-2 h-40 rounded-lg object-cover">
+      }
+
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        (change)="onImageSelected($event)"
+        [disabled]="isUploadingImage()"
+        class="mt-2 block text-sm text-gray-600"
+      >
+
+      @if(isUploadingImage())
+      {
+      <p class="mt-1 text-sm text-gray-500">Uploading…</p>
+      }
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="isSaving() || isUploadingImage()"
+      class="
+      rounded-lg
+      bg-blue-600
+      px-6
+      py-3
+      font-semibold
+      text-white
+      transition
+      hover:bg-blue-700
+      disabled:cursor-not-allowed
+      disabled:opacity-50"
+    >
+      {{ isSaving() ? 'Saving…' : 'Save Post' }}
+    </button>
+
+  </form>
+  }
+
+</section>

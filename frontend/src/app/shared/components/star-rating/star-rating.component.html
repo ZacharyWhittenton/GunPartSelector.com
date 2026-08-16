@@ -1,0 +1,21 @@
+<div
+  class="inline-flex items-center gap-1"
+  [class.cursor-pointer]="interactive"
+  (mouseleave)="onMouseLeave()"
+  role="img"
+  [attr.aria-label]="rating + ' out of 5 stars'"
+>
+  @for (star of stars; track star) {
+    <i
+      class="fa-star"
+      [class.fas]="isFilled(star)"
+      [class.far]="!isFilled(star)"
+      [class.text-amber-400]="isFilled(star)"
+      [class.text-gray-300]="!isFilled(star)"
+      [class.text-lg]="size === 'sm'"
+      [class.text-3xl]="size === 'lg'"
+      (click)="onStarClick(star)"
+      (mouseenter)="onStarHover(star)"
+    ></i>
+  }
+</div>

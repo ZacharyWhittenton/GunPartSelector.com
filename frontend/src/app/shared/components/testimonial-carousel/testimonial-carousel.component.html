@@ -1,0 +1,28 @@
+@if (testimonials().length > 0) {
+  <div class="mx-auto max-w-3xl text-center">
+    @if (testimonials()[currentIndex()]; as testimonial) {
+      <app-star-rating [rating]="testimonial.rating" size="lg"></app-star-rating>
+
+      <blockquote class="mt-6 text-xl leading-relaxed text-gray-700">
+        &ldquo;{{ testimonial.body }}&rdquo;
+      </blockquote>
+
+      <p class="mt-6 font-semibold text-gray-900">{{ testimonial.customerName }}</p>
+    }
+
+    @if (testimonials().length > 1) {
+      <div class="mt-8 flex justify-center gap-2">
+        @for (testimonial of testimonials(); track testimonial.id; let index = $index) {
+          <button
+            type="button"
+            class="h-2.5 w-2.5 rounded-full transition"
+            [class.bg-blue-600]="index === currentIndex()"
+            [class.bg-gray-300]="index !== currentIndex()"
+            [attr.aria-label]="'Show testimonial ' + (index + 1)"
+            (click)="goTo(index)"
+          ></button>
+        }
+      </div>
+    }
+  </div>
+}

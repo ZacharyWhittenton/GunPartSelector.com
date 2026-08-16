@@ -1,0 +1,74 @@
+<!-- Services Hero -->
+
+<section
+  class="
+    relative
+    overflow-hidden
+    bg-gray-900
+    py-24
+  "
+>
+
+  <app-hero-video></app-hero-video>
+
+  <div
+    class="
+      relative
+      z-10
+      mx-auto
+      max-w-7xl
+      px-6
+    "
+  >
+
+    <p
+      class="
+        text-sm
+        font-semibold
+        uppercase
+        tracking-widest
+        text-orange-400
+      "
+    >
+      Our Services
+    </p>
+
+    <h1 class="mt-5 text-5xl font-bold text-white">
+      Website Design & Development Services
+    </h1>
+
+    <p class="mt-6 max-w-3xl text-xl leading-relaxed text-gray-300">
+      From new websites to ongoing support, WD Web Solutions builds
+      and maintains the tools your business runs on.
+    </p>
+
+  </div>
+
+</section>
+
+<section class="py-16">
+  <div class="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-2 lg:grid-cols-3">
+
+    @for(service of services; track service.slug)
+    {
+
+    <app-ui-card
+
+    [title]="service.title"
+
+    [description]="service.description"
+
+    [category]="service.category"
+
+    [icon]="service.icon"
+
+    [link]="'/services/' + service.slug"
+
+    >
+
+    </app-ui-card>
+
+    }
+
+  </div>
+</section>

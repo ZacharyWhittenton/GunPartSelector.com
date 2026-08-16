@@ -1,0 +1,86 @@
+.site-navbar {
+  transition:
+    background-color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.site-navbar--home {
+  position: fixed;
+  inset: 0 0 auto;
+  width: 100%;
+}
+
+.site-navbar--home:not(.site-navbar--transparent) {
+  box-shadow: 0 0.5rem 2rem rgb(15 23 42 / 10%);
+}
+
+.site-navbar--transparent {
+  border-color: transparent;
+  background: linear-gradient(180deg, rgb(2 6 23 / 74%), transparent);
+}
+
+.site-navbar--transparent .site-navbar__desktop-nav a,
+.site-navbar--transparent .site-navbar__actions > a:not(.site-navbar__estimate),
+.site-navbar--transparent .site-navbar__actions > button,
+.site-navbar--transparent .site-navbar__actions > span,
+.site-navbar--transparent .site-navbar__menu-button {
+  color: #ffffff;
+  text-shadow: 0 1px 0.75rem rgb(2 6 23 / 85%);
+}
+
+.site-navbar--transparent .site-navbar__desktop-nav a:hover,
+.site-navbar--transparent .site-navbar__desktop-nav a[aria-current='page'],
+.site-navbar--transparent .site-navbar__actions > a:not(.site-navbar__estimate):hover,
+.site-navbar--transparent .site-navbar__actions > button:hover,
+.site-navbar--transparent .site-navbar__menu-button:hover {
+  color: #fdba74;
+}
+
+.site-navbar--transparent .site-navbar__desktop-nav a::after {
+  background: #fb923c;
+}
+
+.site-navbar__logo img {
+  transform-origin: center;
+}
+
+.site-navbar--transparent .site-navbar__logo img {
+  filter: drop-shadow(0 0.35rem 0.8rem rgb(2 6 23 / 65%));
+}
+
+.site-navbar__estimate {
+  text-shadow: none;
+}
+
+.site-navbar__cart {
+  position: relative;
+}
+
+.site-navbar--transparent .site-navbar__cart {
+  color: #ffffff;
+  text-shadow: 0 1px 0.75rem rgb(2 6 23 / 85%);
+}
+
+@media (max-width: 47.99rem) {
+  .site-navbar__primary {
+    padding-block: 0.75rem;
+  }
+
+  .site-navbar__logo img {
+    height: 4.5rem;
+  }
+
+  #mobile-navigation a,
+  #mobile-navigation button {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-navbar {
+    transition: none;
+  }
+}

@@ -1,0 +1,10 @@
+config:
+  aws:region: us-east-1
+  site-infra:environment: dev
+  site-infra:expectedAccountId: "123456789012"
+  site-infra:domainName: example.com
+  site-infra:hostedZoneId: Z0123456789EXAMPLE
+  site-infra:certificateArn: arn:aws:acm:us-east-1:123456789012:certificate/replace-me
+  site-infra:lambdaArchivePath: ../backend/dist/lambda.zip
+  site-infra:databaseProvider: deferred
+  site-infra:protectResources: false

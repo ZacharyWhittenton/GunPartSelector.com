@@ -1,0 +1,106 @@
+<div
+  class="
+    group
+    overflow-hidden
+    rounded-xl
+    bg-white
+    shadow-md
+    transition
+    duration-300
+    hover:-translate-y-2
+    hover:shadow-xl
+  "
+>
+
+  <!-- Image -->
+  <div
+    class="
+      relative
+      h-56
+      overflow-hidden
+    "
+  >
+
+    <img
+      [src]="image"
+      [alt]="title"
+      class="
+        h-full
+        w-full
+        object-cover
+        transition
+        duration-500
+        group-hover:scale-110
+      "
+    />
+
+
+    <!-- Overlay -->
+    <div
+      class="
+        absolute
+        inset-0
+        bg-black/20
+        transition
+        group-hover:bg-black/40
+      "
+    >
+    </div>
+
+  </div>
+
+
+
+  <!-- Content -->
+  <div
+    class="
+      flex
+      min-h-[260px]
+      flex-col
+      p-6
+    "
+  >
+
+    <h3
+      class="
+        text-2xl
+        font-bold
+        text-dark
+      "
+    >
+      {{ title }}
+    </h3>
+
+
+    <p
+      class="
+        mt-4
+        flex-grow
+        leading-relaxed
+        text-muted
+      "
+    >
+      {{ description }}
+    </p>
+
+
+    <a
+      class="
+        mt-6
+        inline-flex
+        items-center
+        font-semibold
+        text-primary
+        transition
+        hover:text-primary-dark
+      "
+    >
+      Learn More
+      <span class="ml-2">
+        →
+      </span>
+    </a>
+
+  </div>
+
+</div>

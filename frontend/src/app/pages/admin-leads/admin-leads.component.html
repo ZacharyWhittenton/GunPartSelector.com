@@ -1,0 +1,167 @@
+<section class="mx-auto max-w-7xl px-6 py-12">
+
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Leads</h1>
+      <p class="mt-2 text-gray-500">Every contact form submission, in one place.</p>
+    </div>
+
+    <button
+      type="button"
+      (click)="exportCsv()"
+      [disabled]="leads().length === 0"
+      class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+    >
+      Export CSV
+    </button>
+  </div>
+
+  <div class="mt-4 flex flex-wrap gap-2">
+    @for (option of statusOptions; track option) {
+      <button
+        type="button"
+        (click)="onFilterChange(option)"
+        class="rounded-full px-3 py-1 text-xs font-semibold"
+        [class.bg-blue-600]="statusFilter() === option"
+        [class.text-white]="statusFilter() === option"
+        [class.bg-gray-100]="statusFilter() !== option"
+        [class.text-gray-600]="statusFilter() !== option"
+      >
+        {{ option || 'all' }}
+      </button>
+    }
+  </div>
+
+  @if (errorMessage()) {
+    <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+  }
+
+  @if (isLoading()) {
+    <p class="mt-8 text-gray-500">Loading leads…</p>
+  } @else if (leads().length === 0) {
+    <p class="mt-8 text-gray-500">No leads here.</p>
+  } @else {
+    <div class="mt-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+      <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
+        <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500">
+          <tr>
+            <th class="px-4 py-3">Name</th>
+            <th class="px-4 py-3">Contact</th>
+            <th class="px-4 py-3">Service</th>
+            <th class="px-4 py-3">Received</th>
+            <th class="px-4 py-3">Status</th>
+            <th class="px-4 py-3">Follow-up</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          @for (lead of leads(); track lead.id) {
+            <tr>
+              <td class="px-4 py-3 font-medium text-gray-900">
+                {{ lead.name }}
+                @if (lead.company) {
+                  <span class="block text-xs text-gray-400">{{ lead.company }}</span>
+                }
+              </td>
+              <td class="px-4 py-3 text-gray-600">
+                <a [href]="'mailto:' + lead.emailAddress" class="hover:text-blue-600">{{ lead.emailAddress }}</a>
+                @if (lead.phone) {
+                  <span class="block text-xs text-gray-400">{{ lead.phone }}</span>
+                }
+              </td>
+              <td class="px-4 py-3 text-gray-600">{{ lead.service }}</td>
+              <td class="px-4 py-3 text-gray-600">{{ lead.createdAt | date: 'mediumDate' }}</td>
+              <td class="px-4 py-3">
+                <select
+                  [ngModel]="lead.status"
+                  (ngModelChange)="updateStatus(lead, $event)"
+                  [disabled]="isPending(lead.id)"
+                  class="rounded-lg border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <option value="received">received</option>
+                  <option value="contacted">contacted</option>
+                  <option value="qualified">qualified</option>
+                  <option value="won">won</option>
+                  <option value="lost">lost</option>
+                </select>
+              </td>
+              <td class="px-4 py-3">
+                <input
+                  type="date"
+                  [ngModel]="toDateInputValue(lead.followUpAt)"
+                  (ngModelChange)="updateFollowUp(lead, $event)"
+                  [disabled]="isPending(lead.id)"
+                  class="rounded-lg border border-gray-300 px-2 py-1 text-xs text-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                @if (isOverdue(lead)) {
+                  <span class="mt-1 block rounded-full bg-red-100 px-2 py-0.5 text-center text-xs font-semibold text-red-700">
+                    Overdue
+                  </span>
+                }
+              </td>
+              <td class="px-4 py-3">
+                <button
+                  type="button"
+                  (click)="toggleExpanded(lead)"
+                  class="text-xs font-semibold text-blue-600 hover:text-blue-800"
+                >
+                  {{ expandedLeadId() === lead.id ? 'Hide' : 'View' }}
+                </button>
+              </td>
+            </tr>
+
+            @if (expandedLeadId() === lead.id) {
+              <tr>
+                <td colspan="7" class="bg-gray-50 px-4 py-4">
+                  <div class="max-w-2xl">
+                    <p class="text-sm text-gray-700">{{ lead.message }}</p>
+                    <p class="mt-2 text-xs text-gray-400">
+                      Last updated {{ lead.updatedAt | date: 'medium' }}
+                    </p>
+
+                    <h3 class="mt-5 text-sm font-semibold text-gray-700">Notes</h3>
+
+                    <div class="mt-3 flex gap-2">
+                      <textarea
+                        [(ngModel)]="newNoteBody"
+                        rows="2"
+                        placeholder="Log a call, follow-up plan, or other note…"
+                        class="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      ></textarea>
+                      <button
+                        type="button"
+                        (click)="submitNote(lead.id)"
+                        [disabled]="isAddingNote() || !newNoteBody.trim()"
+                        class="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        Add
+                      </button>
+                    </div>
+
+                    @if (notesLoading()) {
+                      <p class="mt-3 text-sm text-gray-500">Loading notes…</p>
+                    } @else if (notes().length === 0) {
+                      <p class="mt-3 text-sm text-gray-500">No notes yet.</p>
+                    } @else {
+                      <ul class="mt-4 space-y-3">
+                        @for (note of notes(); track note.id) {
+                          <li class="rounded-lg border border-gray-200 bg-white px-3 py-2">
+                            <p class="text-sm text-gray-800">{{ note.body }}</p>
+                            <p class="mt-1 text-xs text-gray-400">
+                              {{ note.authorName }} · {{ note.createdAt | date: 'medium' }}
+                            </p>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</section>

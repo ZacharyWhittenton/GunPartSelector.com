@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Company Name — Architecture Plan</title>
+  <style>
+    :root { color-scheme: light; --ink: #101828; --muted: #475467; --line: #d0d5dd; --brand: #f97316; --panel: #f8fafc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: var(--ink); background: white; }
+    main { width: min(1120px, calc(100% - 40px)); margin: 0 auto; padding: 64px 0 96px; }
+    header { border-bottom: 1px solid var(--line); padding-bottom: 32px; }
+    h1 { margin: 0; font-size: clamp(2.3rem, 6vw, 4.8rem); line-height: 1; letter-spacing: -.05em; }
+    h2 { margin-top: 56px; font-size: 1.8rem; }
+    h3 { margin-bottom: 6px; }
+    p { color: var(--muted); }
+    a { color: #b54708; }
+    .eyebrow { color: var(--brand); font-weight: 750; text-transform: uppercase; letter-spacing: .12em; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+    .card { border: 1px solid var(--line); border-radius: 14px; padding: 20px; background: var(--panel); }
+    .card p { margin-bottom: 0; }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: center; }
+    .node { min-height: 110px; display: grid; place-items: center; text-align: center; border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: white; box-shadow: 0 8px 20px rgb(16 24 40 / 7%); }
+    .arrow { text-align: center; color: var(--brand); font-size: 1.6rem; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 14px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    pre { overflow: auto; padding: 20px; border-radius: 12px; background: #101828; color: #f8fafc; }
+    .callout { border-left: 4px solid var(--brand); padding: 4px 20px; background: #fff7ed; }
+    @media (max-width: 760px) { .flow { grid-template-columns: 1fr; } .arrow { transform: rotate(90deg); } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">Architecture plan · August 2026</div>
+    <h1>Serverless foundation with clean ownership boundaries.</h1>
+    <p>The existing Angular site is preserved, while frontend, backend, data, infrastructure, documentation, and automation can now change independently.</p>
+    <p><a href="database-options.html">Database decision →</a> · <a href="system.d2">D2 system diagram source →</a></p>
+  </header>
+
+  <h2>Request path</h2>
+  <div class="flow" aria-label="System request flow">
+    <div class="node"><strong>Visitor</strong></div><div class="arrow">→</div>
+    <div class="node"><strong>CloudFront</strong><br>SPA + API routing</div><div class="arrow">→</div>
+    <div class="node"><strong>S3 or API Gateway</strong><br>Static or /api/*</div>
+  </div>
+  <div class="flow" style="margin-top:10px" aria-label="Backend request flow">
+    <div class="node"><strong>API Gateway</strong></div><div class="arrow">→</div>
+    <div class="node"><strong>Lambda</strong><br>FastAPI + Mangum</div><div class="arrow">→</div>
+    <div class="node"><strong>PostgreSQL</strong><br>Provider deferred</div>
+  </div>
+
+  <h2>Repository ownership</h2>
+  <div class="grid">
+    <section class="card"><h3>frontend/</h3><p>Angular 22 public site, same-origin API client, Vitest unit tests.</p></section>
+    <section class="card"><h3>backend/</h3><p>FastAPI routes, application services, domain entities, repository adapters, Lambda handler.</p></section>
+    <section class="card"><h3>data/</h3><p>Provider-neutral Alembic migrations and local-only seed guidance.</p></section>
+    <section class="card"><h3>infra/</h3><p>Config-driven Pulumi resources with mandatory AWS account and hosted-zone validation.</p></section>
+    <section class="card"><h3>docs/</h3><p>Architecture decisions and implementation plans that can be reviewed in a browser.</p></section>
+    <section class="card"><h3>scripts/</h3><p>Reproducible cross-project packaging and developer automation.</p></section>
+  </div>
+
+  <h2>Deliberate boundaries</h2>
+  <table>
+    <thead><tr><th>Decision</th><th>Current rule</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Database provider</td><td>Deferred</td><td>Application code accepts a standard PostgreSQL URL; no provider SDK leaks into the API.</td></tr>
+      <tr><td>Health checks</td><td>No database query</td><td>Routine monitoring must not wake a scale-to-zero database.</td></tr>
+      <tr><td>Production routing</td><td>One CloudFront domain</td><td>Static pages and <code>/api/*</code> share an origin, avoiding production CORS complexity.</td></tr>
+      <tr><td>Infrastructure execution</td><td>Operator-driven Pulumi</td><td>Pulumi bootstraps infrastructure; it is not embedded in application CI/CD.</td></tr>
+      <tr><td>Tests</td><td>Development dependencies only</td><td>Vitest, pytest, coverage, and Ruff are never included in deployed artifacts.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Reviewable commit sequence</h2>
+  <ol>
+    <li>Move the existing Angular app into the monorepo layout.</li>
+    <li>Upgrade the supported frontend and unit-test toolchain.</li>
+    <li>Add the FastAPI/Lambda API and first PostgreSQL migration.</li>
+    <li>Add guarded AWS infrastructure without deploying it.</li>
+    <li>Connect the existing contact form to the API.</li>
+    <li>Add packaging, root workflows, and architecture documentation.</li>
+  </ol>
+
+  <div class="callout">
+    <h3>Deployment gate</h3>
+    <p>Do not run Pulumi until the real AWS account ID, Route 53 hosted zone, ACM certificate, and database decision are confirmed. The stack enforces the account and zone checks, but review is still required.</p>
+  </div>
+
+  <h2>Developer workflow</h2>
+  <pre><code>python3 scripts/project.py setup
+python3 scripts/project.py test
+
+# terminal 1
+python3 scripts/project.py backend-dev
+
+# terminal 2
+python3 scripts/project.py frontend-dev
+
+# deployment artifacts only; does not deploy
+python3 scripts/project.py build</code></pre>
+</main>
+</body>
+</html>

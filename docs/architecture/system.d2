@@ -1,0 +1,22 @@
+direction: right
+
+visitor: "Site visitor" {
+  shape: person
+}
+
+aws: "AWS account (guarded by expectedAccountId)" {
+  cloudfront: "CloudFront\nTLS + SPA routing + /api/*"
+  s3: "Private S3\nAngular assets"
+  gateway: "API Gateway\nHTTP API"
+  lambda: "Lambda arm64\nPython 3.14 + FastAPI"
+}
+
+postgres: "Serverless PostgreSQL\nProvider deferred" {
+  shape: cylinder
+}
+
+visitor -> aws.cloudfront: HTTPS
+aws.cloudfront -> aws.s3: static requests
+aws.cloudfront -> aws.gateway: /api/*
+aws.gateway -> aws.lambda: payload v2
+aws.lambda -> postgres: SQLAlchemy + psycopg

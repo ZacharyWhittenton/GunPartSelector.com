@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /cart
+
+# Once this site has a production domain and a sitemap, uncomment and update:
+# Sitemap: https://your-domain.com/sitemap.xml
