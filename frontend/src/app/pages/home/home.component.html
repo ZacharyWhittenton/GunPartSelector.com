@@ -1,649 +1,145 @@
-<main>
-
-
-    <!-- HERO -->
-    
-    <section
-    
-    class="
-    relative
-    overflow-hidden
-    bg-gray-900
-    "
-    
-    >
-
-    <app-hero-video></app-hero-video>
-
-    <div
-
-    class="
-    relative
-    z-10
-    mx-auto
-    max-w-7xl
-    px-6
-    py-24
-    lg:flex
-    lg:items-center
-    "
-    
-    >
-    
-    
-    <div
-    
-    class="
-    max-w-3xl
-    "
-    
-    >
-    
-    
-    <p
-    
-    class="
-    text-sm
-    font-semibold
-    uppercase
-    tracking-widest
-    text-orange-400
-    "
-    
-    >
-    
-    Web Design & Development, Done Right
-    
-    </p>
-    
-    
-    
-    <h1
-    
-    class="
-    mt-6
-    text-5xl
-    font-bold
-    leading-tight
-    text-white
-    
-    md:text-6xl
-    
-    "
-    
-    >
-    
-    Custom Web Solutions
-    Built To Last
-    
-    </h1>
-    
-    
-    
-    
-    <p
-    
-    class="
-    mt-6
-    text-xl
-    leading-relaxed
-    text-gray-300
-    "
-    
-    >
-    
-    WD Web Solutions provides professional website
-    design, web application development, e-commerce,
-    and ongoing support for growing businesses.
-    
-    </p>
-    
-    
-    
-    
-    <div
-    
-    class="
-    mt-10
-    flex
-    flex-wrap
-    gap-4
-    "
-    
-    >
-    
-    
-    <a
-    
-    routerLink="/contact"
-    
-    class="
-    rounded-lg
-    bg-blue-600
-    px-8
-    py-4
-    font-semibold
-    text-white
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-1
-    hover:bg-blue-700
-    hover:shadow-xl
-    "
-    
-    >
-    
-    Request Estimate
-    
-    </a>
-    
-    
-    
-    <a
-    
-    routerLink="/services"
-    
-    class="
-    rounded-lg
-    border
-    border-white
-    px-8
-    py-4
-    font-semibold
-    text-white
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-1
-    hover:bg-white
-    hover:text-gray-900
-    "
-    
-    >
-    
-    View Services
-    
-    </a>
-    
-    
-    </div>
-    
-    
-    
-    </div>
-    
-    
-    </div>
-    
-    
-    </section>
-    
-    
-    
-    
-    
-    <!-- TRUST -->
-
-    <section
-
-    class="
-    bg-white
-    pb-16
-    pt-40
-    "
-
-    >
-    
-    <div
-    
-    class="
-    mx-auto
-    grid
-    max-w-7xl
-    gap-8
-    px-6
-    
-    md:grid-cols-3
-    
-    "
-    
-    >
-    
-    
-    <div
-    
-    class="
-    rounded-xl
-    p-6
-    text-center
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-2
-    hover:shadow-xl
-    "
-    
-    >
-    
-    <h3
-    
-    class="
-    text-4xl
-    font-bold
-    text-blue-600
-    "
-    
-    >
-    10+
-    </h3>
-    
-    <p
-    
-    class="
-    mt-2
-    text-gray-600
-    "
-    
-    >
-    Years Experience
-    </p>
-    
-    </div>
-    
-    
-    
-    <div
-    
-    class="
-    rounded-xl
-    p-6
-    text-center
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-2
-    hover:shadow-xl
-    "
-    
-    >
-    
-    <h3
-    
-    class="
-    text-4xl
-    font-bold
-    text-blue-600
-    "
-    
-    >
-    500+
-    </h3>
-    
-    
-    <p
-    
-    class="
-    mt-2
-    text-gray-600
-    "
-    
-    >
-    Completed Projects
-    </p>
-    
-    
-    </div>
-    
-    
-    
-    
-    <div
-    
-    class="
-    rounded-xl
-    p-6
-    text-center
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-2
-    hover:shadow-xl
-    "
-    
-    >
-    
-    <h3
-    
-    class="
-    text-4xl
-    font-bold
-    text-blue-600
-    "
-    
-    >
-    100%
-    
-    </h3>
-    
-    
-    <p
-    
-    class="
-    mt-2
-    text-gray-600
-    "
-    
-    >
-    Customer Focus
-    </p>
-    
-    
-    </div>
-    
-    
-    </div>
-    
-    </section>
-    
-    
-    
-    
-    
-    
-    <!-- SERVICES -->
-    
-    <section
-    
-    class="
-    bg-gray-100
-    py-20
-    "
-    
-    >
-    
-    
-    <div
-    
-    class="
-    mx-auto
-    max-w-7xl
-    px-6
-    "
-    
-    >
-    
-    
-    <h2
-    
-    class="
-    text-center
-    text-4xl
-    font-bold
-    text-gray-900
-    "
-    
-    >
-    
-    Our Services
-    
-    </h2>
-    
-    
-    
-    <div
-    
-    class="
-    mt-12
-    grid
-    gap-8
-    
-    md:grid-cols-2
-    
-    lg:grid-cols-3
-    
-    "
-    
-    >
-    
-    
-    @for(service of services; track service.slug)
-    
-    {
-    
-    
-    <app-ui-card
-    
-    [title]="service.title"
-    
-    [category]="service.category"
-    
-    [description]="service.description"
-    
-    [icon]="service.icon"
-    
-    [image]="service.image"
-    
-    [link]="'/services/' + service.slug"
-    
-    >
-    
-    </app-ui-card>
-    
-    
-    }
-    
-    
-    </div>
-    
-    
-    </div>
-    
-    
-    </section>
-    
-    
-    
-    
-    
-    
-    <!-- WHY US -->
-    
-    <section
-    
-    class="
-    py-20
-    "
-    
-    >
-    
-    
-    <div
-    
-    class="
-    mx-auto
-    max-w-5xl
-    px-6
-    text-center
-    "
-    
-    >
-    
-    
-    <h2
-    
-    class="
-    text-4xl
-    font-bold
-    text-gray-900
-    "
-    
-    >
-    
-    Why Choose WD Web Solutions?
-    
-    </h2>
-    
-    
-    
-    <p
-    
-    class="
-    mt-6
-    text-lg
-    text-gray-600
-    "
-    
-    >
-    
-    We focus on clean code, clear communication, and
-    dependable service. Every project gets the same
-    attention to detail that built our reputation.
-    
-    </p>
-    
-    
-    </div>
-    
-    
-    </section>
-
-
-    <!-- TESTIMONIALS -->
-
-    <section
-
-    class="
-    bg-gray-100
-    py-20
-    "
-
-    >
-
-    <div
-
-    class="
-    mx-auto
-    max-w-7xl
-    px-6
-    "
-
-    >
-
-    <h2
-
-    class="
-    text-center
-    text-4xl
-    font-bold
-    text-gray-900
-    "
-
-    >
-
-    What Our Clients Say
-
-    </h2>
-
-    <div class="mt-12">
-
-    <app-testimonial-carousel></app-testimonial-carousel>
-
+<div class="forge-theme min-h-screen bg-forge-ink">
+  <section class="border-b border-forge-line">
+    <div class="mx-auto max-w-7xl px-6 pb-6 pt-28 sm:pt-32">
+      <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">The AR-15 Builder</p>
+      <h1 class="mt-2 text-3xl font-bold text-forge-text sm:text-4xl">Build Your Rifle, Part by Part</h1>
+      <p class="mt-2 max-w-xl text-sm text-forge-text-muted">
+        Click any part on the model, or pick a category below, to start assembling your build with live
+        compatibility checks and running totals.
+      </p>
     </div>
 
-    <p class="mt-10 text-center text-gray-600">
-
-    Worked with us?
-    <a routerLink="/testimonials/write" class="font-semibold text-blue-600 hover:underline">Share your experience</a>
-
-    </p>
-
+    <div class="relative mx-auto h-[420px] max-w-7xl px-6 sm:h-[500px]">
+      <app-ar15-viewer
+        class="block h-full w-full"
+        [selectedCategorySlugs]="selectedCategorySlugs()"
+        (categoryClick)="onViewerCategoryClick($event)"
+      />
+      <p class="pointer-events-none absolute bottom-3 left-9 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">
+        Drag to rotate — click a part to configure it
+      </p>
     </div>
+  </section>
 
-    </section>
+  <div class="mx-auto max-w-7xl px-6 py-8">
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[260px_1fr_320px]">
+      <!-- Category list -->
+      <aside class="flex flex-col gap-6">
+        <app-loading-spinner *ngIf="isLoadingCategories()" />
 
+        <div *ngFor="let group of sections()">
+          <h3 class="mb-2 font-mono text-[11px] uppercase tracking-widest text-forge-text-muted">{{ group.label }}</h3>
+          <div class="flex flex-col gap-1">
+            <button
+              type="button"
+              *ngFor="let category of group.categories"
+              (click)="openCategory(category.slug)"
+              class="flex items-center justify-between rounded-md border px-3 py-2 text-left text-sm transition"
+              [class.border-forge-accent]="activeCategorySlug() === category.slug"
+              [class.border-forge-line]="activeCategorySlug() !== category.slug"
+              [class.bg-forge-steel]="true"
+            >
+              <span class="text-forge-text">{{ category.name }}</span>
+              <span
+                class="font-mono text-[11px]"
+                [class.text-forge-success]="selectedProductFor(category)"
+                [class.text-forge-text-muted]="!selectedProductFor(category)"
+              >
+                {{ selectedProductFor(category) ? 'Selected' : '+ Add' }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </aside>
 
+      <!-- Active category picker -->
+      <div id="active-category-picker">
+        <div *ngIf="!activeCategorySlug()" class="flex h-full items-center justify-center rounded-lg border border-dashed border-forge-line p-10 text-center text-sm text-forge-text-muted">
+          Select a category to see part options.
+        </div>
 
+        <div *ngIf="activeCategory() as category">
+          <div class="mb-4 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-forge-text">{{ category.name }}</h2>
+            <a [routerLink]="['/parts', category.slug]" class="font-mono text-[11px] uppercase tracking-wide text-forge-accent hover:underline">
+              Browse all →
+            </a>
+          </div>
 
-    <!-- CTA -->
-    
-    <section
-    
-    class="
-    bg-blue-600
-    py-20
-    "
-    
-    >
-    
-    <div
-    
-    class="
-    mx-auto
-    max-w-5xl
-    px-6
-    text-center
-    "
-    
-    >
-    
-    
-    <h2
-    
-    class="
-    text-4xl
-    font-bold
-    text-white
-    "
-    
-    >
-    
-    Ready To Start Your Project?
-    
-    </h2>
-    
-    
-    
-    <a
-    
-    routerLink="/contact"
-    
-    class="
-    mt-8
-    inline-flex
-    rounded-lg
-    bg-white
-    px-8
-    py-4
-    
-    font-semibold
-    text-blue-600
-    
-    transition
-    duration-300
-    
-    hover:-translate-y-1
-    hover:shadow-xl
-    
-    "
-    
-    >
-    
-    Request Estimate
-    
-    </a>
-    
-    
+          <app-loading-spinner *ngIf="isLoadingProducts()" />
+
+          <div *ngIf="!isLoadingProducts()" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <app-part-card
+              *ngFor="let product of activeProducts()"
+              [product]="product"
+              [categorySlug]="category.slug"
+              [selected]="selectedProductFor(category)?.id === product.id"
+              (addToBuild)="addToBuild($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Build summary -->
+      <aside class="flex h-fit flex-col gap-4 rounded-lg border border-forge-line bg-forge-steel p-5 lg:sticky lg:top-6">
+        <div class="flex items-center justify-between">
+          <h3 class="font-mono text-xs uppercase tracking-wide text-forge-text-muted">Your Build</h3>
+          <button
+            type="button"
+            (click)="clearBuild()"
+            *ngIf="buildService.itemCount() > 0"
+            class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted hover:text-forge-danger"
+          >
+            Clear
+          </button>
+        </div>
+
+        <p *ngIf="buildService.itemCount() === 0" class="text-sm text-forge-text-muted">No parts selected yet.</p>
+
+        <div class="flex flex-col gap-2" *ngIf="buildService.itemCount() > 0">
+          <div
+            *ngFor="let part of buildService.parts()"
+            class="flex items-center justify-between gap-2 border-b border-forge-line pb-2 text-sm"
+          >
+            <div class="min-w-0">
+              <p class="truncate text-forge-text">{{ part.product.name }}</p>
+              <p class="font-mono text-[11px] text-forge-text-muted">{{ part.product.priceCents / 100 | currency }}</p>
+            </div>
+            <button type="button" (click)="removeFromBuild(part.categoryId)" class="shrink-0 text-forge-text-muted hover:text-forge-danger">
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <app-compatibility-banner [issues]="buildService.compatibilityIssues()" />
+
+        <div class="flex items-center justify-between border-t border-forge-line pt-3">
+          <span class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">Total</span>
+          <span class="font-mono text-2xl font-bold tabular-nums text-forge-text">{{ buildService.totalPriceCents() / 100 | currency }}</span>
+        </div>
+
+        <button
+          type="button"
+          (click)="buildService.toggleWeightUnit()"
+          class="flex items-center justify-between text-left"
+        >
+          <span class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">Weight</span>
+          <span class="font-mono text-sm text-forge-text">
+            {{ buildService.totalWeightDisplay().value | number: '1.1-1' }} {{ buildService.totalWeightDisplay().unit }}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          (click)="shareBuild()"
+          [disabled]="buildService.itemCount() === 0 || isSharing()"
+          class="rounded-md bg-forge-accent px-4 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110 disabled:opacity-40"
+        >
+          {{ isSharing() ? 'Sharing…' : 'Share Build' }}
+        </button>
+
+        <p *ngIf="shareError()" class="text-xs text-forge-danger">{{ shareError() }}</p>
+      </aside>
     </div>
-    
-    
-    </section>
-    
-    
-    
-    </main>
+  </div>
+</div>

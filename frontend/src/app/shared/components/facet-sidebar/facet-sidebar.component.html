@@ -1,0 +1,66 @@
+<div class="flex flex-col gap-6 rounded-lg border border-forge-line bg-forge-steel p-4" *ngIf="facets">
+  <div class="flex items-center justify-between">
+    <h3 class="font-mono text-xs uppercase tracking-wide text-forge-text-muted">Filters</h3>
+    <button
+      type="button"
+      (click)="clearAll()"
+      class="font-mono text-[11px] uppercase tracking-wide text-forge-accent hover:underline"
+    >
+      Clear
+    </button>
+  </div>
+
+  <div>
+    <label class="mb-2 block font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">
+      Price
+    </label>
+    <div class="flex items-center gap-2">
+      <input
+        type="number"
+        placeholder="Min"
+        (change)="setPriceMin($any($event.target).value)"
+        class="w-full rounded border border-forge-line bg-forge-ink px-2 py-1 font-mono text-sm text-forge-text"
+      />
+      <span class="text-forge-text-muted">–</span>
+      <input
+        type="number"
+        placeholder="Max"
+        (change)="setPriceMax($any($event.target).value)"
+        class="w-full rounded border border-forge-line bg-forge-ink px-2 py-1 font-mono text-sm text-forge-text"
+      />
+    </div>
+  </div>
+
+  <label class="flex items-center gap-2 text-sm text-forge-text">
+    <input
+      type="checkbox"
+      [checked]="query.stock === 'in_stock'"
+      (change)="toggleInStockOnly($any($event.target).checked)"
+    />
+    In stock only
+  </label>
+
+  <div *ngIf="facets.brands.length">
+    <h4 class="mb-2 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">Brand</h4>
+    <div class="flex max-h-48 flex-col gap-1.5 overflow-y-auto pr-1">
+      <label *ngFor="let brand of facets.brands" class="flex items-center gap-2 text-sm text-forge-text">
+        <input type="checkbox" [checked]="isBrandSelected(brand)" (change)="toggleBrand(brand)" />
+        {{ brand }}
+      </label>
+    </div>
+  </div>
+
+  <div *ngFor="let group of facets.attributeTagGroups | keyvalue">
+    <h4 class="mb-2 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">{{ group.key }}</h4>
+    <div class="flex flex-col gap-1.5">
+      <label *ngFor="let value of group.value" class="flex items-center gap-2 text-sm text-forge-text">
+        <input
+          type="checkbox"
+          [checked]="isTagSelected(group.key, value)"
+          (change)="toggleTag(group.key, value)"
+        />
+        {{ value }}
+      </label>
+    </div>
+  </div>
+</div>

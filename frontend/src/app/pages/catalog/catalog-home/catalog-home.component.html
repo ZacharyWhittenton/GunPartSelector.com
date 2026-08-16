@@ -1,0 +1,26 @@
+<div class="forge-theme min-h-screen bg-forge-ink py-10">
+  <app-page-container>
+    <h1 class="mb-1 text-2xl font-bold text-forge-text">Browse Parts</h1>
+    <p class="mb-8 text-sm text-forge-text-muted">Every category you need to build an AR platform from the ground up.</p>
+
+    <app-loading-spinner *ngIf="isLoading()" />
+
+    <p *ngIf="errorMessage()" class="text-forge-danger">{{ errorMessage() }}</p>
+
+    <div class="flex flex-col gap-10">
+      <div *ngFor="let group of sections()">
+        <h2 class="mb-3 font-mono text-xs uppercase tracking-widest text-forge-text-muted">{{ group.label }}</h2>
+        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <a
+            *ngFor="let category of group.categories"
+            [routerLink]="['/parts', category.slug]"
+            class="flex items-center justify-between rounded-lg border border-forge-line bg-forge-steel px-4 py-3 text-sm text-forge-text transition hover:border-forge-accent"
+          >
+            <span>{{ category.name }}</span>
+            <span class="font-mono text-xs text-forge-text-muted">{{ category.productCount }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </app-page-container>
+</div>

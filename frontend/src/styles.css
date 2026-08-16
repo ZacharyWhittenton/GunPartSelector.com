@@ -20,6 +20,35 @@
 
   --color-muted: #64748b;
 
+
+  /* Forge theme (AR-15 builder: /parts, /builder, /) */
+
+  --color-forge-ink: #0b0f14;
+
+  --color-forge-steel: #1c232c;
+
+  --color-forge-line: #2a323d;
+
+  --color-forge-accent: #ff5a1f;
+
+  --color-forge-brass: #c9a15a;
+
+  --color-forge-text: #f4f6f8;
+
+  --color-forge-text-muted: #8f9aa8;
+
+  --color-forge-success: #3ecf8e;
+
+  --color-forge-success-muted: #123024;
+
+  --color-forge-warn: #f5b942;
+
+  --color-forge-warn-muted: #332708;
+
+  --color-forge-danger: #ff6b6b;
+
+  --color-forge-danger-muted: #33161a;
+
 }
 
 
@@ -69,6 +98,11 @@ body {
 
 .skip-link:focus {
   transform: translateY(0);
+}
+
+
+.forge-theme {
+  color-scheme: dark;
 }
 
 

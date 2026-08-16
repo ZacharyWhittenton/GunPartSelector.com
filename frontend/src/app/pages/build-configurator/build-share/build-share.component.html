@@ -1,0 +1,47 @@
+<div class="forge-theme min-h-screen bg-forge-ink py-10">
+  <app-page-container>
+    <app-loading-spinner *ngIf="isLoading()" />
+
+    <p *ngIf="errorMessage()" class="text-forge-danger">{{ errorMessage() }}</p>
+
+    <div *ngIf="build() as b">
+      <h1 class="text-2xl font-bold text-forge-text">{{ b.name || 'Shared Build' }}</h1>
+      <p class="mt-1 font-mono text-xs text-forge-text-muted">{{ b.items.length }} parts</p>
+
+      <div class="mt-6 flex flex-col gap-2">
+        <div
+          *ngFor="let item of b.items"
+          class="flex items-center justify-between rounded-lg border border-forge-line bg-forge-steel px-4 py-3"
+        >
+          <div>
+            <p class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">{{ item.product.brand }}</p>
+            <p class="text-sm text-forge-text">{{ item.product.name }}</p>
+          </div>
+          <span class="font-mono text-sm tabular-nums text-forge-text">{{ item.product.priceCents / 100 | currency }}</span>
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-between border-t border-forge-line pt-4">
+        <span class="font-mono text-xs uppercase tracking-wide text-forge-text-muted">Total</span>
+        <span class="font-mono text-2xl font-bold tabular-nums text-forge-text">{{ totalPriceCents() / 100 | currency }}</span>
+      </div>
+
+      <div class="mt-6 flex gap-3">
+        <button
+          type="button"
+          (click)="copyLink()"
+          class="rounded-md border border-forge-line px-4 py-2 text-sm text-forge-text"
+        >
+          {{ copied() ? 'Copied!' : 'Copy Link' }}
+        </button>
+        <a
+          routerLink="/"
+          (click)="loadIntoMyBuilder()"
+          class="rounded-md bg-forge-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white"
+        >
+          Load Into My Builder
+        </a>
+      </div>
+    </div>
+  </app-page-container>
+</div>

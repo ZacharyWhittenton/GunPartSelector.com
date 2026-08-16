@@ -1,0 +1,40 @@
+<a
+  [routerLink]="['/parts', categorySlug, product.slug]"
+  class="group relative flex flex-col overflow-hidden rounded-lg border border-forge-line bg-forge-steel transition hover:border-forge-accent"
+  [class.border-forge-accent]="selected"
+>
+  <span
+    class="absolute inset-x-0 top-0 h-1"
+    [style.background]="'var(--color-forge-accent)'"
+    *ngIf="selected"
+  ></span>
+
+  <div class="flex flex-1 flex-col gap-2 p-4">
+    <div class="flex items-start justify-between gap-2">
+      <span class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">{{ product.brand }}</span>
+      <app-stock-status-badge [status]="product.stockStatus" />
+    </div>
+
+    <h3 class="text-sm font-semibold leading-snug text-forge-text">{{ product.name }}</h3>
+
+    <div class="mt-auto flex flex-wrap gap-1 pt-1">
+      <span
+        *ngFor="let tag of product.attributeTags.slice(0, 3)"
+        class="rounded border border-forge-line px-1.5 py-0.5 font-mono text-[10px] text-forge-text-muted"
+      >
+        {{ tag }}
+      </span>
+    </div>
+
+    <div class="flex items-center justify-between pt-2">
+      <span class="font-mono text-base font-bold tabular-nums text-forge-text">{{ product.priceCents / 100 | currency }}</span>
+      <button
+        type="button"
+        (click)="onAddToBuild($event)"
+        class="rounded-md bg-forge-accent px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+      >
+        Add to Build
+      </button>
+    </div>
+  </div>
+</a>

@@ -1,0 +1,59 @@
+<div class="forge-theme min-h-screen bg-forge-ink py-10">
+  <app-page-container>
+    <app-loading-spinner *ngIf="isLoading()" />
+
+    <p *ngIf="errorMessage()" class="text-forge-danger">{{ errorMessage() }}</p>
+
+    <div *ngIf="product() as p" class="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_360px]">
+      <div>
+        <nav class="mb-4 font-mono text-xs uppercase tracking-wide text-forge-text-muted">
+          <a routerLink="/parts" class="hover:text-forge-accent">Parts</a>
+          <span class="mx-1">/</span>
+          <a [routerLink]="['/parts', categorySlug()]" class="hover:text-forge-accent">{{ categorySlug() }}</a>
+        </nav>
+
+        <span class="font-mono text-xs uppercase tracking-wide text-forge-text-muted">{{ p.brand }}</span>
+        <h1 class="mt-1 text-2xl font-bold text-forge-text">{{ p.name }}</h1>
+        <p class="mt-1 font-mono text-xs text-forge-text-muted" *ngIf="p.sku">SKU {{ p.sku }}</p>
+
+        <p class="mt-4 text-sm leading-relaxed text-forge-text">{{ p.description }}</p>
+
+        <div class="mt-6 flex flex-wrap gap-2">
+          <span
+            *ngFor="let tag of p.attributeTags"
+            class="rounded border border-forge-line px-2 py-1 font-mono text-[11px] text-forge-text-muted"
+          >
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+
+      <aside class="flex h-fit flex-col gap-4 rounded-lg border border-forge-line bg-forge-steel p-5">
+        <app-stock-status-badge [status]="p.stockStatus" />
+        <div class="font-mono text-3xl font-bold tabular-nums text-forge-text">{{ p.priceCents / 100 | currency }}</div>
+        <p class="font-mono text-xs text-forge-text-muted">{{ p.weightOz }} oz</p>
+
+        <button
+          type="button"
+          (click)="addToBuild()"
+          class="rounded-md bg-forge-accent px-4 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+        >
+          {{ added() ? 'Added to Build' : 'Add to Build' }}
+        </button>
+
+        <a
+          *ngIf="p.affiliateUrl !== '#'; else placeholderLink"
+          [href]="p.affiliateUrl"
+          target="_blank"
+          rel="noopener"
+          class="text-center text-xs text-forge-text-muted underline"
+        >
+          View at {{ p.affiliateRetailerName || 'retailer' }}
+        </a>
+        <ng-template #placeholderLink>
+          <span class="text-center text-xs text-forge-text-muted">Retailer link coming soon</span>
+        </ng-template>
+      </aside>
+    </div>
+  </app-page-container>
+</div>

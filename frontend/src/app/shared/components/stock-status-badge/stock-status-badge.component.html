@@ -1,0 +1,11 @@
+<span
+  class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-mono uppercase tracking-wide"
+  [class.bg-forge-success-muted]="status === 'in_stock'"
+  [class.text-forge-success]="status === 'in_stock'"
+  [class.bg-forge-danger-muted]="status === 'out_of_stock'"
+  [class.text-forge-danger]="status === 'out_of_stock'"
+  [class.bg-forge-line]="status === 'unknown'"
+  [class.text-forge-text-muted]="status === 'unknown'"
+>
+  {{ label }}
+</span>

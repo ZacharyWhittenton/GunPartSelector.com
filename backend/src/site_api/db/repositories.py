@@ -1240,6 +1240,8 @@ class SqlAlchemyBuildRepository:
 
     async def add(self, build: Build) -> None:
         self._session.add(BuildRecord(id=build.id, slug=build.slug, name=build.name))
+        await self._session.flush()
+
         for item in build.items:
             self._session.add(
                 BuildItemRecord(

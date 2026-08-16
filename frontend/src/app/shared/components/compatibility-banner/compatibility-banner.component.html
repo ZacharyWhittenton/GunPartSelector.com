@@ -1,0 +1,20 @@
+<div *ngIf="issues.length" class="flex flex-col gap-2">
+  <div
+    *ngFor="let issue of issues"
+    class="rounded-lg border p-3 text-sm"
+    [class.border-forge-danger]="issue.severity === 'error'"
+    [class.bg-forge-danger-muted]="issue.severity === 'error'"
+    [class.border-forge-warn]="issue.severity === 'warning'"
+    [class.bg-forge-warn-muted]="issue.severity === 'warning'"
+  >
+    <p class="font-semibold" [class.text-forge-danger]="issue.severity === 'error'" [class.text-forge-warn]="issue.severity === 'warning'">
+      {{ issue.label }} mismatch
+    </p>
+    <ul class="mt-1 flex flex-col gap-0.5 text-forge-text-muted">
+      <li *ngFor="let entry of issue.values">
+        <span class="font-mono text-xs uppercase">{{ entry.value }}</span>
+        — {{ entry.partNames.join(', ') }}
+      </li>
+    </ul>
+  </div>
+</div>

@@ -132,6 +132,46 @@ export const routes: Routes = [
 
 
       {
+        path: 'parts',
+
+        loadComponent: () =>
+          import('./pages/catalog/catalog-home/catalog-home.component')
+            .then(m => m.CatalogHomeComponent)
+
+      },
+
+
+      {
+        path: 'parts/:categorySlug',
+
+        loadComponent: () =>
+          import('./pages/catalog/category-browse/category-browse.component')
+            .then(m => m.CategoryBrowseComponent)
+
+      },
+
+
+      {
+        path: 'parts/:categorySlug/:productSlug',
+
+        loadComponent: () =>
+          import('./pages/catalog/product-detail/product-detail.component')
+            .then(m => m.ProductDetailComponent)
+
+      },
+
+
+      {
+        path: 'builder/share/:slug',
+
+        loadComponent: () =>
+          import('./pages/build-configurator/build-share/build-share.component')
+            .then(m => m.BuildShareComponent)
+
+      },
+
+
+      {
         path: 'marketplace',
 
         loadComponent: () =>

@@ -1,0 +1,55 @@
+<div class="forge-theme min-h-screen bg-forge-ink py-10">
+  <app-page-container>
+    <nav class="mb-4 font-mono text-xs uppercase tracking-wide text-forge-text-muted">
+      <a routerLink="/parts" class="hover:text-forge-accent">Parts</a>
+      <span class="mx-1">/</span>
+      <span>{{ categoryName() }}</span>
+    </nav>
+
+    <div class="mb-6 flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-forge-text">{{ categoryName() }}</h1>
+      <span class="font-mono text-xs text-forge-text-muted">{{ total() }} results</span>
+    </div>
+
+    <p *ngIf="errorMessage()" class="mb-4 text-forge-danger">{{ errorMessage() }}</p>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-[240px_1fr]">
+      <app-facet-sidebar [facets]="facets()" [query]="query()" (queryChange)="onQueryChange($event)" />
+
+      <div>
+        <app-loading-spinner *ngIf="isLoading()" />
+
+        <div *ngIf="!isLoading()" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <app-part-card
+            *ngFor="let product of products()"
+            [product]="product"
+            [categorySlug]="categorySlug()"
+            [selected]="addedSlug() === product.slug"
+            (addToBuild)="addToBuild($event)"
+          />
+        </div>
+
+        <div *ngIf="!isLoading() && products().length === 0" class="py-16 text-center text-forge-text-muted">
+          No parts match these filters yet.
+        </div>
+
+        <div class="mt-8 flex items-center justify-between" *ngIf="total() > 24">
+          <button
+            type="button"
+            (click)="previousPage()"
+            class="rounded border border-forge-line px-3 py-1.5 text-sm text-forge-text disabled:opacity-40"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            (click)="nextPage()"
+            class="rounded border border-forge-line px-3 py-1.5 text-sm text-forge-text disabled:opacity-40"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </app-page-container>
+</div>
