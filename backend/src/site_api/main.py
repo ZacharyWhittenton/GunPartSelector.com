@@ -14,6 +14,8 @@ from site_api.api.dependencies import (
     get_analytics_service,
     get_auth_service,
     get_blog_service,
+    get_build_service,
+    get_catalog_service,
     get_chat_service,
     get_contact_request_service,
     get_dashboard_service,
@@ -31,6 +33,8 @@ from site_api.api.routes import (
     auth,
     blog,
     blog_admin,
+    builds,
+    catalog,
     chat,
     contact_requests,
     contact_requests_admin,
@@ -52,6 +56,8 @@ from site_api.services.admin import AdminService
 from site_api.services.analytics import AnalyticsService
 from site_api.services.auth import AuthService
 from site_api.services.blog import BlogService
+from site_api.services.builds import BuildService
+from site_api.services.catalog import CatalogService
 from site_api.services.chat import ChatService
 from site_api.services.contact_requests import ContactRequestService
 from site_api.services.dashboard import DashboardService
@@ -74,6 +80,8 @@ EmailServiceProvider = Callable[[], EmailService]
 DashboardServiceProvider = Callable[[], DashboardService]
 DiscountCodeServiceProvider = Callable[[], DiscountCodeService]
 AnalyticsServiceProvider = Callable[[], AnalyticsService]
+CatalogServiceProvider = Callable[[], CatalogService]
+BuildServiceProvider = Callable[[], BuildService]
 
 
 def create_app(
@@ -91,6 +99,8 @@ def create_app(
     dashboard_service_provider: DashboardServiceProvider | None = None,
     discount_code_service_provider: DiscountCodeServiceProvider | None = None,
     analytics_service_provider: AnalyticsServiceProvider | None = None,
+    catalog_service_provider: CatalogServiceProvider | None = None,
+    build_service_provider: BuildServiceProvider | None = None,
 ) -> FastAPI:
     resolved_settings = settings or Settings()
     configure_logging(resolved_settings.log_level)
@@ -164,6 +174,8 @@ def create_app(
     application.include_router(discount_codes_admin.router, prefix=resolved_settings.api_prefix)
     application.include_router(analytics.router, prefix=resolved_settings.api_prefix)
     application.include_router(analytics_admin.router, prefix=resolved_settings.api_prefix)
+    application.include_router(catalog.router, prefix=resolved_settings.api_prefix)
+    application.include_router(builds.router, prefix=resolved_settings.api_prefix)
 
     if contact_service_provider is not None:
         application.dependency_overrides[get_contact_request_service] = contact_service_provider
@@ -203,6 +215,12 @@ def create_app(
 
     if analytics_service_provider is not None:
         application.dependency_overrides[get_analytics_service] = analytics_service_provider
+
+    if catalog_service_provider is not None:
+        application.dependency_overrides[get_catalog_service] = catalog_service_provider
+
+    if build_service_provider is not None:
+        application.dependency_overrides[get_build_service] = build_service_provider
 
     return application
 

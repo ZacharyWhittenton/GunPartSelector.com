@@ -8,6 +8,8 @@ from site_api.db.models import (
     AccountNoteRecord,
     AppointmentRecord,
     BlogPostRecord,
+    BuildItemRecord,
+    BuildRecord,
     ClickEventRecord,
     CommentRecord,
     ContactRequestRecord,
@@ -17,6 +19,8 @@ from site_api.db.models import (
     OrderItemRecord,
     OrderRecord,
     PageViewRecord,
+    PartCategoryRecord,
+    ProductRecord,
     TagSubscriptionRecord,
     TestimonialRecord,
     UserRecord,
@@ -31,6 +35,16 @@ from site_api.domain.blog import (
     PostNotFoundError,
     PostStatus,
     TagSubscription,
+)
+from site_api.domain.builds import Build, BuildItem
+from site_api.domain.catalog import (
+    CategoryWithCount,
+    PartCategory,
+    Product,
+    ProductFacets,
+    ProductFilter,
+    ProductSort,
+    StockStatus,
 )
 from site_api.domain.contacts import (
     ContactRequest,
@@ -1067,3 +1081,207 @@ class SqlAlchemyAnalyticsRepository:
             )
         )
         return [_to_domain_click(record) for record in result.scalars().all()]
+
+
+def _to_domain_category(record: PartCategoryRecord) -> PartCategory:
+    return PartCategory(
+        id=record.id,
+        slug=record.slug,
+        name=record.name,
+        section=record.section,
+        sort_order=record.sort_order,
+        created_at=record.created_at,
+    )
+
+
+class SqlAlchemyPartCategoryRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list_with_counts(self) -> list[CategoryWithCount]:
+        result = await self._session.execute(
+            select(
+                PartCategoryRecord,
+                func.count(ProductRecord.id).label("product_count"),
+            )
+            .outerjoin(
+                ProductRecord,
+                (ProductRecord.category_id == PartCategoryRecord.id)
+                & (ProductRecord.is_active.is_(True)),
+            )
+            .group_by(PartCategoryRecord.id)
+            .order_by(PartCategoryRecord.sort_order)
+        )
+        return [
+            CategoryWithCount(category=_to_domain_category(record), product_count=count)
+            for record, count in result.all()
+        ]
+
+    async def get_by_slug(self, slug: str) -> PartCategory | None:
+        result = await self._session.execute(
+            select(PartCategoryRecord).where(PartCategoryRecord.slug == slug)
+        )
+        record = result.scalar_one_or_none()
+        return None if record is None else _to_domain_category(record)
+
+
+def _to_domain_product(record: ProductRecord) -> Product:
+    return Product(
+        id=record.id,
+        category_id=record.category_id,
+        brand=record.brand,
+        name=record.name,
+        slug=record.slug,
+        sku=record.sku,
+        description=record.description,
+        price_cents=record.price_cents,
+        weight_oz=record.weight_oz,
+        image_url=record.image_url,
+        affiliate_url=record.affiliate_url,
+        affiliate_retailer_name=record.affiliate_retailer_name,
+        stock_status=StockStatus(record.stock_status),
+        attribute_tags=list(record.attribute_tags),
+        is_active=record.is_active,
+        created_at=record.created_at,
+        updated_at=record.updated_at,
+    )
+
+
+class SqlAlchemyProductRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list_filtered(self, product_filter: ProductFilter) -> tuple[list[Product], int]:
+        query = select(ProductRecord).where(ProductRecord.is_active.is_(True))
+
+        if product_filter.category_slug is not None:
+            query = query.join(
+                PartCategoryRecord, ProductRecord.category_id == PartCategoryRecord.id
+            ).where(PartCategoryRecord.slug == product_filter.category_slug)
+        if product_filter.brand:
+            query = query.where(ProductRecord.brand.in_(product_filter.brand))
+        if product_filter.price_min_cents is not None:
+            query = query.where(ProductRecord.price_cents >= product_filter.price_min_cents)
+        if product_filter.price_max_cents is not None:
+            query = query.where(ProductRecord.price_cents <= product_filter.price_max_cents)
+        if product_filter.stock_status is not None:
+            query = query.where(ProductRecord.stock_status == product_filter.stock_status.value)
+        if product_filter.attribute_tags:
+            query = query.where(
+                ProductRecord.attribute_tags.contains(product_filter.attribute_tags)
+            )
+        if product_filter.search:
+            like = f"%{product_filter.search.lower()}%"
+            query = query.where(func.lower(ProductRecord.name).like(like))
+
+        count_result = await self._session.execute(
+            select(func.count()).select_from(query.subquery())
+        )
+        total = count_result.scalar_one()
+
+        if product_filter.sort is ProductSort.PRICE_ASC:
+            query = query.order_by(ProductRecord.price_cents.asc())
+        elif product_filter.sort is ProductSort.PRICE_DESC:
+            query = query.order_by(ProductRecord.price_cents.desc())
+        elif product_filter.sort is ProductSort.NAME_ASC:
+            query = query.order_by(ProductRecord.name.asc())
+        else:
+            query = query.order_by(ProductRecord.created_at.desc())
+
+        query = query.limit(product_filter.limit).offset(product_filter.offset)
+        result = await self._session.execute(query)
+        products = [_to_domain_product(record) for record in result.scalars().all()]
+        return products, total
+
+    async def get_by_slug(self, slug: str) -> Product | None:
+        result = await self._session.execute(
+            select(ProductRecord).where(ProductRecord.slug == slug)
+        )
+        record = result.scalar_one_or_none()
+        return None if record is None else _to_domain_product(record)
+
+    async def get_by_id(self, product_id: UUID) -> Product | None:
+        record = await self._session.get(ProductRecord, product_id)
+        return None if record is None else _to_domain_product(record)
+
+    async def list_distinct_facets(self, category_id: UUID) -> ProductFacets:
+        result = await self._session.execute(
+            select(
+                ProductRecord.brand, ProductRecord.price_cents, ProductRecord.attribute_tags
+            ).where(ProductRecord.category_id == category_id, ProductRecord.is_active.is_(True))
+        )
+        rows = result.all()
+
+        brands: set[str] = set()
+        tag_groups: dict[str, set[str]] = {}
+        prices: list[int] = []
+        for brand, price_cents, attribute_tags in rows:
+            brands.add(brand)
+            prices.append(price_cents)
+            for tag in attribute_tags:
+                prefix, _, value = tag.partition(":")
+                if not value:
+                    continue
+                tag_groups.setdefault(prefix, set()).add(value)
+
+        return ProductFacets(
+            brands=sorted(brands),
+            attribute_tag_groups={
+                prefix: sorted(values) for prefix, values in sorted(tag_groups.items())
+            },
+            price_min_cents=min(prices) if prices else 0,
+            price_max_cents=max(prices) if prices else 0,
+        )
+
+
+class SqlAlchemyBuildRepository:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def add(self, build: Build) -> None:
+        self._session.add(BuildRecord(id=build.id, slug=build.slug, name=build.name))
+        for item in build.items:
+            self._session.add(
+                BuildItemRecord(
+                    id=item.id,
+                    build_id=build.id,
+                    product_id=item.product.id,
+                    quantity=item.quantity,
+                )
+            )
+        await self._session.flush()
+
+    async def slug_exists(self, slug: str) -> bool:
+        result = await self._session.execute(select(BuildRecord.id).where(BuildRecord.slug == slug))
+        return result.scalar_one_or_none() is not None
+
+    async def get_by_slug(self, slug: str) -> Build | None:
+        build_result = await self._session.execute(
+            select(BuildRecord).where(BuildRecord.slug == slug)
+        )
+        build_record = build_result.scalar_one_or_none()
+        if build_record is None:
+            return None
+
+        items_result = await self._session.execute(
+            select(BuildItemRecord, ProductRecord)
+            .join(ProductRecord, BuildItemRecord.product_id == ProductRecord.id)
+            .where(BuildItemRecord.build_id == build_record.id)
+        )
+        items = [
+            BuildItem(
+                id=item_record.id,
+                build_id=item_record.build_id,
+                product=_to_domain_product(product_record),
+                quantity=item_record.quantity,
+            )
+            for item_record, product_record in items_result.all()
+        ]
+
+        return Build(
+            id=build_record.id,
+            slug=build_record.slug,
+            name=build_record.name,
+            created_at=build_record.created_at,
+            items=items,
+        )

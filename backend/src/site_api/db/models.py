@@ -313,6 +313,75 @@ class PageViewRecord(Base):
     )
 
 
+class PartCategoryRecord(Base):
+    __tablename__ = "catalog_categories"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(60), unique=True)
+    name: Mapped[str] = mapped_column(String(100))
+    section: Mapped[str] = mapped_column(String(30))
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
+class ProductRecord(Base):
+    __tablename__ = "catalog_products"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
+    category_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True), ForeignKey("catalog_categories.id"), index=True
+    )
+    brand: Mapped[str] = mapped_column(String(100), index=True)
+    name: Mapped[str] = mapped_column(String(200))
+    slug: Mapped[str] = mapped_column(String(220), unique=True)
+    sku: Mapped[str | None] = mapped_column(String(100))
+    description: Mapped[str] = mapped_column(Text)
+    price_cents: Mapped[int] = mapped_column(Integer)
+    weight_oz: Mapped[float] = mapped_column(Float)
+    image_url: Mapped[str | None] = mapped_column(String(500))
+    affiliate_url: Mapped[str] = mapped_column(String(500))
+    affiliate_retailer_name: Mapped[str | None] = mapped_column(String(100))
+    stock_status: Mapped[str] = mapped_column(String(20), default="in_stock")
+    attribute_tags: Mapped[list[str]] = mapped_column(ARRAY(String(60)), default=list)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
+class BuildRecord(Base):
+    __tablename__ = "catalog_builds"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
+    slug: Mapped[str] = mapped_column(String(16), unique=True)
+    name: Mapped[str | None] = mapped_column(String(120))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
+class BuildItemRecord(Base):
+    __tablename__ = "catalog_build_items"
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
+    build_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True), ForeignKey("catalog_builds.id"), index=True
+    )
+    product_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True), ForeignKey("catalog_products.id"), index=True
+    )
+    quantity: Mapped[int] = mapped_column(Integer, default=1)
+
+
 class ClickEventRecord(Base):
     __tablename__ = "click_events"
     __table_args__ = (Index("ix_click_events_path_created_at", "path", "created_at"),)

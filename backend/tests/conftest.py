@@ -17,6 +17,15 @@ from site_api.domain.blog import (
     PostNotFoundError,
     TagSubscription,
 )
+from site_api.domain.builds import Build
+from site_api.domain.catalog import (
+    CategoryWithCount,
+    PartCategory,
+    Product,
+    ProductFacets,
+    ProductFilter,
+    ProductSort,
+)
 from site_api.domain.contacts import (
     ContactRequest,
     ContactRequestNotFoundError,
@@ -40,6 +49,8 @@ from site_api.services.admin import AdminService
 from site_api.services.analytics import AnalyticsService
 from site_api.services.auth import AuthService
 from site_api.services.blog import BlogService
+from site_api.services.builds import BuildService
+from site_api.services.catalog import CatalogService
 from site_api.services.chat import ChatService
 from site_api.services.contact_requests import ContactRequestService
 from site_api.services.dashboard import DashboardService
@@ -658,6 +669,132 @@ class FakeFileStorage:
         return f"/api/uploads/blog/fake-{len(self.saved)}.jpg"
 
 
+class InMemoryPartCategoryRepository:
+    def __init__(self) -> None:
+        self.categories: list[PartCategory] = []
+        self.product_counts: dict[UUID, int] = {}
+
+    async def list_with_counts(self) -> list[CategoryWithCount]:
+        return [
+            CategoryWithCount(
+                category=category, product_count=self.product_counts.get(category.id, 0)
+            )
+            for category in sorted(self.categories, key=lambda c: c.sort_order)
+        ]
+
+    async def get_by_slug(self, slug: str) -> PartCategory | None:
+        for category in self.categories:
+            if category.slug == slug:
+                return category
+        return None
+
+
+class InMemoryProductRepository:
+    def __init__(self) -> None:
+        self.products: list[Product] = []
+        self._category_slugs: dict[UUID, str] = {}
+
+    def register_category_slug(self, category_id: UUID, slug: str) -> None:
+        self._category_slugs[category_id] = slug
+
+    async def list_filtered(self, product_filter: ProductFilter) -> tuple[list[Product], int]:
+        matches = [product for product in self.products if product.is_active]
+
+        if product_filter.category_slug is not None:
+            matches = [
+                product
+                for product in matches
+                if self._category_slugs.get(product.category_id) == product_filter.category_slug
+            ]
+        if product_filter.brand:
+            matches = [product for product in matches if product.brand in product_filter.brand]
+        if product_filter.price_min_cents is not None:
+            price_min = product_filter.price_min_cents
+            matches = [product for product in matches if product.price_cents >= price_min]
+        if product_filter.price_max_cents is not None:
+            price_max = product_filter.price_max_cents
+            matches = [product for product in matches if product.price_cents <= price_max]
+        if product_filter.stock_status is not None:
+            stock_status = product_filter.stock_status
+            matches = [product for product in matches if product.stock_status == stock_status]
+        if product_filter.attribute_tags:
+            required = set(product_filter.attribute_tags)
+            matches = [
+                product for product in matches if required.issubset(set(product.attribute_tags))
+            ]
+        if product_filter.search:
+            needle = product_filter.search.lower()
+            matches = [product for product in matches if needle in product.name.lower()]
+
+        total = len(matches)
+
+        if product_filter.sort is ProductSort.PRICE_ASC:
+            matches.sort(key=lambda p: p.price_cents)
+        elif product_filter.sort is ProductSort.PRICE_DESC:
+            matches.sort(key=lambda p: p.price_cents, reverse=True)
+        elif product_filter.sort is ProductSort.NAME_ASC:
+            matches.sort(key=lambda p: p.name)
+        else:
+            matches.sort(key=lambda p: p.created_at, reverse=True)
+
+        page = matches[product_filter.offset : product_filter.offset + product_filter.limit]
+        return page, total
+
+    async def get_by_slug(self, slug: str) -> Product | None:
+        for product in self.products:
+            if product.slug == slug:
+                return product
+        return None
+
+    async def get_by_id(self, product_id: UUID) -> Product | None:
+        for product in self.products:
+            if product.id == product_id:
+                return product
+        return None
+
+    async def list_distinct_facets(self, category_id: UUID) -> ProductFacets:
+        matches = [
+            product
+            for product in self.products
+            if product.category_id == category_id and product.is_active
+        ]
+        brands = sorted({product.brand for product in matches})
+        tag_groups: dict[str, set[str]] = {}
+        for product in matches:
+            for tag in product.attribute_tags:
+                prefix, _, value = tag.partition(":")
+                if not value:
+                    continue
+                tag_groups.setdefault(prefix, set()).add(value)
+        prices = [product.price_cents for product in matches]
+
+        return ProductFacets(
+            brands=brands,
+            attribute_tag_groups={
+                prefix: sorted(values) for prefix, values in sorted(tag_groups.items())
+            },
+            price_min_cents=min(prices) if prices else 0,
+            price_max_cents=max(prices) if prices else 0,
+        )
+
+
+class InMemoryBuildRepository:
+    def __init__(self) -> None:
+        self.builds: list[Build] = []
+
+    async def add(self, build: Build) -> None:
+        self.builds.append(build)
+
+    async def slug_exists(self, slug: str) -> bool:
+        return any(build.slug == slug for build in self.builds)
+
+    async def get_by_slug(self, slug: str) -> Build | None:
+        for build in self.builds:
+            if build.slug == slug:
+                return build
+        return None
+
+
 @pytest.fixture
 def repository() -> InMemoryContactRequestRepository:
     return InMemoryContactRequestRepository()
@@ -868,6 +1005,37 @@ def dashboard_service(
 
 
 @pytest.fixture
+def part_category_repository() -> InMemoryPartCategoryRepository:
+    return InMemoryPartCategoryRepository()
+
+
+@pytest.fixture
+def product_repository() -> InMemoryProductRepository:
+    return InMemoryProductRepository()
+
+
+@pytest.fixture
+def catalog_service(
+    part_category_repository: InMemoryPartCategoryRepository,
+    product_repository: InMemoryProductRepository,
+) -> CatalogService:
+    return CatalogService(part_category_repository, product_repository)
+
+
+@pytest.fixture
+def build_repository() -> InMemoryBuildRepository:
+    return InMemoryBuildRepository()
+
+
+@pytest.fixture
+def build_service(
+    build_repository: InMemoryBuildRepository,
+    product_repository: InMemoryProductRepository,
+) -> BuildService:
+    return BuildService(build_repository, product_repository)
+
+
+@pytest.fixture
 def app(
     contact_service: ContactRequestService,
     auth_service: AuthService,
@@ -881,6 +1049,8 @@ def app(
     dashboard_service: DashboardService,
     discount_code_service: DiscountCodeService,
     analytics_service: AnalyticsService,
+    catalog_service: CatalogService,
+    build_service: BuildService,
 ) -> FastAPI:
     settings = Settings(environment="test", cors_origins=[], database_url=None)
     return create_app(
@@ -897,6 +1067,8 @@ def app(
         dashboard_service_provider=lambda: dashboard_service,
         discount_code_service_provider=lambda: discount_code_service,
         analytics_service_provider=lambda: analytics_service,
+        catalog_service_provider=lambda: catalog_service,
+        build_service_provider=lambda: build_service,
     )
 
 

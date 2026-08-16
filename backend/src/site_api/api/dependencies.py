@@ -18,12 +18,15 @@ from site_api.db.repositories import (
     SqlAlchemyAnalyticsRepository,
     SqlAlchemyAppointmentRepository,
     SqlAlchemyBlogPostRepository,
+    SqlAlchemyBuildRepository,
     SqlAlchemyCommentRepository,
     SqlAlchemyContactRequestRepository,
     SqlAlchemyDiscountCodeRepository,
     SqlAlchemyLeadNoteRepository,
     SqlAlchemyMarketplaceItemRepository,
     SqlAlchemyOrderRepository,
+    SqlAlchemyPartCategoryRepository,
+    SqlAlchemyProductRepository,
     SqlAlchemyTagSubscriptionRepository,
     SqlAlchemyTestimonialRepository,
     SqlAlchemyUserRepository,
@@ -34,6 +37,8 @@ from site_api.services.admin import AdminService
 from site_api.services.analytics import AnalyticsService
 from site_api.services.auth import AuthService
 from site_api.services.blog import BlogService
+from site_api.services.builds import BuildService
+from site_api.services.catalog import CatalogService
 from site_api.services.chat import ChatService
 from site_api.services.contact_requests import ContactRequestService
 from site_api.services.dashboard import DashboardService
@@ -349,6 +354,40 @@ def get_testimonial_service(
     repository: Annotated[SqlAlchemyTestimonialRepository, Depends(get_testimonial_repository)],
 ) -> TestimonialService:
     return TestimonialService(repository)
+
+
+def get_part_category_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SqlAlchemyPartCategoryRepository:
+    return SqlAlchemyPartCategoryRepository(session)
+
+
+def get_product_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SqlAlchemyProductRepository:
+    return SqlAlchemyProductRepository(session)
+
+
+def get_catalog_service(
+    category_repository: Annotated[
+        SqlAlchemyPartCategoryRepository, Depends(get_part_category_repository)
+    ],
+    product_repository: Annotated[SqlAlchemyProductRepository, Depends(get_product_repository)],
+) -> CatalogService:
+    return CatalogService(category_repository, product_repository)
+
+
+def get_build_repository(
+    session: Annotated[AsyncSession, Depends(get_session)],
+) -> SqlAlchemyBuildRepository:
+    return SqlAlchemyBuildRepository(session)
+
+
+def get_build_service(
+    build_repository: Annotated[SqlAlchemyBuildRepository, Depends(get_build_repository)],
+    product_repository: Annotated[SqlAlchemyProductRepository, Depends(get_product_repository)],
+) -> BuildService:
+    return BuildService(build_repository, product_repository)
 
 
 def get_dashboard_service(
