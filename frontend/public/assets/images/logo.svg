@@ -1,105 +1,96 @@
-<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 1264 855" xmlns="http://www.w3.org/2000/svg">
 
-  <!-- Base badge / scope lens rings -->
-  <circle cx="200" cy="200" r="190" fill="#15171a" stroke="#3450d6" stroke-width="6"/>
-  <circle cx="200" cy="200" r="178" fill="none" stroke="#3450d6" stroke-width="1.5" opacity="0.6"/>
-  <circle cx="200" cy="200" r="165" fill="none" stroke="#3450d6" stroke-width="1.5" opacity="0.5"/>
+  <!-- Flag mark -->
+  <g>
+    <polygon points="210,150 460,150 420,282 170,282" fill="#132a4c"/>
+    <polygon points="335,167 343.6,193.2 371.1,193.3 348.9,209.5 357.3,235.7 335,219.6 312.7,235.7 321.1,209.5 298.9,193.3 326.4,193.2" fill="#ffffff"/>
 
-  <!-- Rivets -->
-  <g fill="#3450d6">
-    <circle cx="200" cy="16"  r="4"/>
-    <circle cx="200" cy="384" r="4"/>
-    <circle cx="16"  cy="200" r="4"/>
-    <circle cx="384" cy="200" r="4"/>
-    <circle cx="66"  cy="66"  r="3.5"/>
-    <circle cx="334" cy="66"  r="3.5"/>
-    <circle cx="66"  cy="334" r="3.5"/>
-    <circle cx="334" cy="334" r="3.5"/>
+    <polygon points="472,152 900,152 860,190 432,190" fill="#a11d2b"/>
+    <polygon points="452,198 860,198 820,236 412,236" fill="#a11d2b"/>
+    <polygon points="432,244 830,244 790,282 392,282" fill="#a11d2b"/>
   </g>
 
-  <!-- Sniper-scope duplex crosshair, open center where the rifle sits -->
-  <g stroke="#3450d6" stroke-linecap="square">
-    <line x1="200" y1="90"  x2="200" y2="133" stroke-width="7"/>
-    <line x1="200" y1="133" x2="200" y2="168" stroke-width="3"/>
-    <line x1="200" y1="310" x2="200" y2="267" stroke-width="7"/>
-    <line x1="200" y1="267" x2="200" y2="232" stroke-width="3"/>
-    <line x1="90"  y1="205" x2="133" y2="205" stroke-width="7"/>
-    <line x1="133" y1="205" x2="168" y2="205" stroke-width="3"/>
-    <line x1="310" y1="205" x2="267" y2="205" stroke-width="7"/>
-    <line x1="267" y1="205" x2="232" y2="205" stroke-width="3"/>
-    <g stroke-width="3">
-      <line x1="193" y1="105" x2="207" y2="105"/>
-      <line x1="193" y1="120" x2="207" y2="120"/>
-      <line x1="193" y1="295" x2="207" y2="295"/>
-      <line x1="193" y1="280" x2="207" y2="280"/>
-      <line x1="105" y1="198" x2="105" y2="212"/>
-      <line x1="120" y1="198" x2="120" y2="212"/>
-      <line x1="295" y1="198" x2="295" y2="212"/>
-      <line x1="280" y1="198" x2="280" y2="212"/>
-    </g>
-  </g>
-
-  <!-- Arc paths for curved text -->
-  <path id="topArc" d="M 50,200 A 150,150 0 0 1 350,200" fill="none"/>
-  <path id="bottomArc" d="M 50,200 A 150,150 0 0 0 350,200" fill="none"/>
-
-  <text font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="46"
-        letter-spacing="8" fill="#ffffff" stroke="#3450d6" stroke-width="1.5">
-    <textPath href="#topArc" startOffset="50%" text-anchor="middle">GPS</textPath>
+  <!-- GPS wordmark -->
+  <text
+    x="632" y="610"
+    font-family="Arial Black, Arial, sans-serif"
+    font-weight="900"
+    font-size="330"
+    text-anchor="middle"
+  >
+    <tspan fill="#132a4c">G</tspan><tspan fill="#1b1b1b">P</tspan><tspan fill="#a11d2b">S</tspan>
   </text>
 
-  <text font-family="Arial, sans-serif" font-weight="700" font-size="15"
-        letter-spacing="2.5" fill="#5b7cf0">
-    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">GUN • PART • SELECTOR</textPath>
-  </text>
-
-  <circle cx="50" cy="200" r="4.5" fill="#3450d6"/>
-  <circle cx="350" cy="200" r="4.5" fill="#3450d6"/>
-
-  <!-- AR15 silhouette: blocky, right-angle only, no tapers or points -->
-  <g transform="translate(200,205) scale(0.35) translate(-315,-103)" fill="#ffffff">
-    <!-- stock, made taller/more prominent than the buffer tube -->
+  <!-- AR-15 silhouette running through the wordmark -->
+  <g transform="translate(600,505) scale(1.3) translate(-315,-103)" fill="#f7f8fa">
+    <!-- adjustable buttstock -->
     <rect x="10" y="45" width="75" height="48"/>
-    <!-- buttpad separator -->
-    <rect x="16" y="45" width="4" height="48" fill="#15171a"/>
-    <!-- adjustment notches -->
-    <g fill="#15171a">
+    <g fill="#132a4c">
       <rect x="35" y="50" width="4" height="10"/>
       <rect x="50" y="50" width="4" height="10"/>
       <rect x="65" y="50" width="4" height="10"/>
     </g>
+
     <!-- buffer tube -->
     <rect x="85" y="64" width="65" height="12"/>
-    <!-- main body: lower receiver + upper receiver + handguard as one continuous block -->
+
+    <!-- upper receiver + handguard, continuous band -->
     <rect x="150" y="50" width="400" height="34"/>
-    <!-- top rail -->
     <rect x="235" y="38" width="315" height="12"/>
-    <!-- charging handle -->
     <rect x="245" y="28" width="18" height="10"/>
+
     <!-- barrel -->
     <rect x="550" y="58" width="40" height="8"/>
-    <!-- muzzle device -->
-    <rect x="590" y="50" width="30" height="20"/>
-    <!-- pistol grip -->
+
+    <!-- muzzle device with twin ports -->
+    <rect x="590" y="50" width="34" height="20"/>
+    <circle cx="601" cy="60" r="3" fill="#1b1b1b"/>
+    <circle cx="613" cy="60" r="3" fill="#1b1b1b"/>
+
+    <!-- pistol grip + trigger guard -->
     <rect x="170" y="84" width="26" height="55"/>
-    <!-- trigger guard -->
-    <rect x="200" y="84" width="28" height="18" fill="none" stroke="#ffffff" stroke-width="6"/>
+    <rect x="200" y="84" width="28" height="18" fill="none" stroke="#f7f8fa" stroke-width="6"/>
+
     <!-- magazine -->
     <rect x="255" y="84" width="55" height="75"/>
     <rect x="262" y="159" width="40" height="18"/>
-    <!-- handguard slots -->
-    <g fill="#15171a">
+
+    <!-- handguard rail ribs -->
+    <g fill="#a11d2b">
       <rect x="345" y="58" width="20" height="8"/>
       <rect x="385" y="58" width="20" height="8"/>
       <rect x="425" y="58" width="20" height="8"/>
       <rect x="465" y="58" width="20" height="8"/>
       <rect x="505" y="58" width="20" height="8"/>
     </g>
+
     <!-- magazine rib lines -->
-    <g fill="#15171a">
+    <g fill="#c9cdd3">
       <rect x="270" y="90" width="4" height="60"/>
       <rect x="285" y="90" width="4" height="60"/>
     </g>
+  </g>
+
+  <!-- GUN PART SELECTOR -->
+  <text
+    x="632" y="700"
+    font-family="Arial, sans-serif"
+    font-weight="800"
+    font-size="66"
+    letter-spacing="16"
+    text-anchor="middle"
+    fill="#1b1b1b"
+  >
+    GUN PART SELECTOR
+  </text>
+
+  <!-- Tagline -->
+  <g font-family="Arial, sans-serif" font-weight="700" font-size="30" letter-spacing="4">
+    <line x1="150" y1="775" x2="330" y2="775" stroke="#132a4c" stroke-width="3"/>
+    <text x="632" y="786" text-anchor="middle">
+      <tspan fill="#132a4c">BUILD IT. </tspan><tspan fill="#a11d2b">YOUR WAY.</tspan>
+    </text>
+    <line x1="934" y1="775" x2="1114" y2="775" stroke="#a11d2b" stroke-width="3"/>
   </g>
 
 </svg>
