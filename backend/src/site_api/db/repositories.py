@@ -14,6 +14,7 @@ from site_api.db.models import (
     CommentRecord,
     ContactRequestRecord,
     DiscountCodeRecord,
+    ItemVariantRecord,
     LeadNoteRecord,
     MarketplaceItemRecord,
     OrderItemRecord,
@@ -55,11 +56,14 @@ from site_api.domain.discount_codes import DiscountCode, DiscountCodeNotFoundErr
 from site_api.domain.lead_notes import LeadNote
 from site_api.domain.marketplace import (
     ItemNotFoundError,
+    ItemVariant,
     MarketplaceItem,
     Order,
     OrderItem,
     OrderNotFoundError,
     OrderStatus,
+    VariantInput,
+    VariantStockStatus,
     WishlistItem,
 )
 from site_api.domain.scheduling import Appointment, AppointmentStatus, SlotNotFoundError
@@ -598,6 +602,18 @@ def _to_domain_item(record: MarketplaceItemRecord) -> MarketplaceItem:
     )
 
 
+def _to_domain_variant(record: ItemVariantRecord) -> ItemVariant:
+    return ItemVariant(
+        id=record.id,
+        marketplace_item_id=record.marketplace_item_id,
+        label=record.label,
+        sort_order=record.sort_order,
+        stock_status=VariantStockStatus(record.stock_status),
+        created_at=record.created_at,
+        updated_at=record.updated_at,
+    )
+
+
 class SqlAlchemyMarketplaceItemRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
@@ -671,6 +687,51 @@ class SqlAlchemyMarketplaceItemRepository:
         )
         return [_to_domain_item(record) for record in result.scalars().all()]
 
+    async def list_variants_for_item(self, item_id: UUID) -> list[ItemVariant]:
+        result = await self._session.execute(
+            select(ItemVariantRecord)
+            .where(ItemVariantRecord.marketplace_item_id == item_id)
+            .order_by(ItemVariantRecord.sort_order, ItemVariantRecord.label)
+        )
+        return [_to_domain_variant(record) for record in result.scalars().all()]
+
+    async def get_variant_by_id(self, variant_id: UUID) -> ItemVariant | None:
+        record = await self._session.get(ItemVariantRecord, variant_id)
+        return None if record is None else _to_domain_variant(record)
+
+    async def add_variant(self, variant: ItemVariant) -> ItemVariant:
+        self._session.add(
+            ItemVariantRecord(
+                id=variant.id,
+                marketplace_item_id=variant.marketplace_item_id,
+                label=variant.label,
+                sort_order=variant.sort_order,
+                stock_status=variant.stock_status.value,
+                created_at=variant.created_at,
+                updated_at=variant.updated_at,
+            )
+        )
+        await self._session.flush()
+        return variant
+
+    async def update_variant(self, variant: ItemVariant) -> ItemVariant:
+        record = await self._session.get(ItemVariantRecord, variant.id)
+        if record is None:
+            raise ItemNotFoundError
+        record.label = variant.label
+        record.sort_order = variant.sort_order
+        record.stock_status = variant.stock_status.value
+        record.updated_at = variant.updated_at
+        await self._session.flush()
+        return _to_domain_variant(record)
+
+    async def delete_variant(self, variant_id: UUID) -> None:
+        record = await self._session.get(ItemVariantRecord, variant_id)
+        if record is None:
+            return
+        await self._session.delete(record)
+        await self._session.flush()
+
 
 def _to_domain_order(record: OrderRecord) -> Order:
     return Order(
@@ -693,6 +754,8 @@ def _to_domain_order_item(record: OrderItemRecord) -> OrderItem:
         id=record.id,
         order_id=record.order_id,
         marketplace_item_id=record.marketplace_item_id,
+        variant_id=record.variant_id,
+        variant_label=record.variant_label,
         item_name=record.item_name,
         unit_price_cents=record.unit_price_cents,
         quantity=record.quantity,
@@ -726,6 +789,8 @@ class SqlAlchemyOrderRepository:
                     id=item.id,
                     order_id=item.order_id,
                     marketplace_item_id=item.marketplace_item_id,
+                    variant_id=item.variant_id,
+                    variant_label=item.variant_label,
                     item_name=item.item_name,
                     unit_price_cents=item.unit_price_cents,
                     quantity=item.quantity,
