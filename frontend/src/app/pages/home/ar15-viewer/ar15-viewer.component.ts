@@ -24,8 +24,8 @@ type MaterialKind = 'metal' | 'polymer' | 'glass';
 
 const COLOR_NEUTRAL_METAL = 0x7a828c;
 const COLOR_NEUTRAL_POLYMER = 0x2b2f33;
-const COLOR_SELECTED = 0xff5a1f;
-const COLOR_HOVER = 0xff9d6b;
+const COLOR_SELECTED = 0xc0262f;
+const COLOR_HOVER = 0xe06068;
 const COLOR_DETAIL_METAL = 0x565d64;
 const COLOR_DETAIL_POLYMER = 0x34383c;
 

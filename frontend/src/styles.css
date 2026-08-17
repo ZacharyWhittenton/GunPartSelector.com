@@ -21,21 +21,21 @@
   --color-muted: #64748b;
 
 
-  /* Forge theme (AR-15 builder: /parts, /builder, /) */
+  /* Forge theme (AR-15 builder: /parts, /builder, /) -- navy & red, matching the logo */
 
-  --color-forge-ink: #0b0f14;
+  --color-forge-ink: #0a0e1a;
 
-  --color-forge-steel: #1c232c;
+  --color-forge-steel: #161c2c;
 
-  --color-forge-line: #2a323d;
+  --color-forge-line: #262f47;
 
-  --color-forge-accent: #ff5a1f;
+  --color-forge-accent: #c0262f;
 
-  --color-forge-brass: #c9a15a;
+  --color-forge-brass: #3d5fa8;
 
   --color-forge-text: #f4f6f8;
 
-  --color-forge-text-muted: #8f9aa8;
+  --color-forge-text-muted: #92a0ba;
 
   --color-forge-success: #3ecf8e;
 
@@ -45,7 +45,7 @@
 
   --color-forge-warn-muted: #332708;
 
-  --color-forge-danger: #ff6b6b;
+  --color-forge-danger: #ff5c5c;
 
   --color-forge-danger-muted: #33161a;
 
