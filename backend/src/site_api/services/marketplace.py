@@ -15,11 +15,14 @@ from site_api.domain.discount_codes import (
     DiscountType,
 )
 from site_api.domain.marketplace import (
+    DuplicateVariantLabelError,
     EmptyCartError,
+    EmptyVariantsError,
     InvalidWebhookSignatureError,
     ItemHasOrdersError,
     ItemNotFoundError,
     ItemNotPurchasableError,
+    ItemVariant,
     MarketplaceItem,
     MarketplaceItemRepository,
     MarketplaceNotConfiguredError,
@@ -28,6 +31,10 @@ from site_api.domain.marketplace import (
     OrderNotFoundError,
     OrderRepository,
     OrderStatus,
+    VariantInput,
+    VariantNotFoundError,
+    VariantOutOfStockError,
+    VariantStockStatus,
     WishlistItem,
     WishlistRepository,
 )
@@ -44,6 +51,7 @@ class CreateItem:
     price_cents: int
     image_url: str | None
     created_by_admin_id: UUID
+    variants: list[VariantInput]
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,11 +60,13 @@ class UpdateItem:
     description: str
     price_cents: int
     image_url: str | None
+    variants: list[VariantInput]
 
 
 @dataclass(frozen=True, slots=True)
 class CartLine:
     item_id: UUID
+    variant_id: UUID
     quantity: int
 
 
@@ -100,6 +110,7 @@ class MarketplaceService:
     # --- Catalog ---------------------------------------------------------
 
     async def create_item(self, command: CreateItem) -> MarketplaceItem:
+        self._validate_variants(command.variants)
         slug = await self._unique_slug(command.name)
         now = self._clock()
         item = MarketplaceItem(
@@ -115,10 +126,12 @@ class MarketplaceService:
             updated_at=now,
         )
         saved = await self._items.add(item)
+        await self._sync_variants(saved.id, command.variants)
         logger.bind(item_id=str(saved.id)).info("Marketplace item created")
         return saved
 
     async def update_item(self, item_id: UUID, command: UpdateItem) -> MarketplaceItem:
+        self._validate_variants(command.variants)
         item = await self._items.get_by_id(item_id)
         if item is None:
             raise ItemNotFoundError
@@ -135,7 +148,67 @@ class MarketplaceService:
             created_at=item.created_at,
             updated_at=self._clock(),
         )
-        return await self._items.update(updated)
+        saved = await self._items.update(updated)
+        await self._sync_variants(saved.id, command.variants)
+        return saved
+
+    async def list_variants_for_item(self, item_id: UUID) -> list[ItemVariant]:
+        return await self._items.list_variants_for_item(item_id)
+
+    @staticmethod
+    def _validate_variants(variants: list[VariantInput]) -> None:
+        if not variants:
+            raise EmptyVariantsError
+
+        seen = {variant.label.strip().lower() for variant in variants}
+        if len(seen) != len(variants):
+            raise DuplicateVariantLabelError
+
+    async def _sync_variants(
+        self, item_id: UUID, desired: list[VariantInput]
+    ) -> list[ItemVariant]:
+        existing = await self._items.list_variants_for_item(item_id)
+        existing_by_label = {variant.label.strip().lower(): variant for variant in existing}
+        desired_labels = {variant.label.strip().lower() for variant in desired}
+
+        for variant in existing:
+            if variant.label.strip().lower() not in desired_labels:
+                await self._items.delete_variant(variant.id)
+
+        now = self._clock()
+        results: list[ItemVariant] = []
+        for input_variant in desired:
+            key = input_variant.label.strip().lower()
+            current = existing_by_label.get(key)
+            if current is None:
+                results.append(
+                    await self._items.add_variant(
+                        ItemVariant(
+                            id=self._id_factory(),
+                            marketplace_item_id=item_id,
+                            label=input_variant.label,
+                            sort_order=input_variant.sort_order,
+                            stock_status=input_variant.stock_status,
+                            created_at=now,
+                            updated_at=now,
+                        )
+                    )
+                )
+            else:
+                results.append(
+                    await self._items.update_variant(
+                        ItemVariant(
+                            id=current.id,
+                            marketplace_item_id=item_id,
+                            label=input_variant.label,
+                            sort_order=input_variant.sort_order,
+                            stock_status=input_variant.stock_status,
+                            created_at=current.created_at,
+                            updated_at=now,
+                        )
+                    )
+                )
+        return results
 
     async def set_item_active(self, item_id: UUID, is_active: bool) -> MarketplaceItem:
         item = await self._items.get_by_id(item_id)
@@ -188,10 +261,11 @@ class MarketplaceService:
         if not command.lines:
             raise EmptyCartError
 
-        merged_quantities: dict[UUID, int] = {}
+        merged_quantities: dict[tuple[UUID, UUID], int] = {}
         for line in command.lines:
             quantity = min(max(line.quantity, 1), MAX_LINE_QUANTITY)
-            merged_quantities[line.item_id] = merged_quantities.get(line.item_id, 0) + quantity
+            key = (line.item_id, line.variant_id)
+            merged_quantities[key] = merged_quantities.get(key, 0) + quantity
 
         stripe_line_items = []
         order_items: list[OrderItem] = []
@@ -199,12 +273,18 @@ class MarketplaceService:
         now = self._clock()
         order_id = self._id_factory()
 
-        for item_id, quantity in merged_quantities.items():
+        for (item_id, variant_id), quantity in merged_quantities.items():
             item = await self._items.get_by_id(item_id)
             if item is None:
                 raise ItemNotFoundError
             if not item.is_active:
                 raise ItemNotPurchasableError
+
+            variant = await self._items.get_variant_by_id(variant_id)
+            if variant is None or variant.marketplace_item_id != item.id:
+                raise VariantNotFoundError
+            if variant.stock_status is not VariantStockStatus.IN_STOCK:
+                raise VariantOutOfStockError
 
             line_total = item.price_cents * quantity
             total_cents += line_total
@@ -214,7 +294,7 @@ class MarketplaceService:
                     "price_data": {
                         "currency": self._currency,
                         "unit_amount": item.price_cents,
-                        "product_data": {"name": item.name},
+                        "product_data": {"name": f"{item.name} — {variant.label}"},
                     },
                     "quantity": quantity,
                 }
@@ -224,6 +304,8 @@ class MarketplaceService:
                     id=self._id_factory(),
                     order_id=order_id,
                     marketplace_item_id=item.id,
+                    variant_id=variant.id,
+                    variant_label=variant.label,
                     item_name=item.name,
                     unit_price_cents=item.price_cents,
                     quantity=quantity,
