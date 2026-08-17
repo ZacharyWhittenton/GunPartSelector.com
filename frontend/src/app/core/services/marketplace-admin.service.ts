@@ -2,14 +2,21 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { AdminItemSummary } from '../models/marketplace-item.model';
+import { AdminItemSummary, VariantStockStatus } from '../models/marketplace-item.model';
 import { OrderStatus, OrderSummary } from '../models/order.model';
+
+export interface VariantWritePayload {
+  label: string;
+  sortOrder: number;
+  stockStatus: VariantStockStatus;
+}
 
 export interface ItemWritePayload {
   name: string;
   description: string;
   priceCents: number;
   imageUrl: string | null;
+  variants: VariantWritePayload[];
 }
 
 export interface ImageUploadResponse {
