@@ -153,6 +153,46 @@ export const routes: Routes = [
 
 
       {
+        path: 'merch/success',
+
+        loadComponent: () =>
+          import('./pages/merch/checkout-success/checkout-success.component')
+            .then(m => m.CheckoutSuccessComponent)
+
+      },
+
+
+      {
+        path: 'merch',
+
+        loadComponent: () =>
+          import('./pages/merch/merch-list/merch-list.component')
+            .then(m => m.MerchListComponent)
+
+      },
+
+
+      {
+        path: 'merch/:slug',
+
+        loadComponent: () =>
+          import('./pages/merch/merch-detail/merch-detail.component')
+            .then(m => m.MerchDetailComponent)
+
+      },
+
+
+      {
+        path: 'cart',
+
+        loadComponent: () =>
+          import('./pages/cart/cart.component')
+            .then(m => m.CartComponent)
+
+      },
+
+
+      {
         path: 'admin',
 
         canActivate: [adminGuard],

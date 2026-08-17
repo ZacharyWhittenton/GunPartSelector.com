@@ -1,0 +1,52 @@
+<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+  <app-page-container>
+
+    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Store</p>
+    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
+      Gear up
+    </h1>
+    <p class="mt-4 max-w-2xl text-forge-text-muted">
+      Hoodies and tees with the GunPartSelector.com mark.
+    </p>
+
+    @if (errorMessage()) {
+      <p class="mt-8 rounded-lg border border-forge-danger bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">
+        {{ errorMessage() }}
+      </p>
+    }
+
+    @if (isLoading()) {
+      <p class="mt-12 text-forge-text-muted">Loading…</p>
+    } @else {
+      <div class="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        @for (item of items(); track item.id) {
+          <a
+            [routerLink]="['/merch', item.slug]"
+            class="flex flex-col overflow-hidden rounded-lg border border-forge-line bg-forge-steel transition hover:border-forge-accent"
+          >
+            @if (item.imageUrl) {
+              <div class="flex aspect-square items-center justify-center bg-forge-ink p-6">
+                <img [src]="item.imageUrl" [alt]="item.name" class="h-full w-full object-contain">
+              </div>
+            }
+
+            <div class="flex flex-1 flex-col gap-2 p-5">
+              <h2 class="font-semibold text-forge-text">{{ item.name }}</h2>
+              <p class="line-clamp-2 text-sm text-forge-text-muted">{{ item.description }}</p>
+
+              <div class="mt-auto flex items-center justify-between pt-3">
+                <span class="font-mono text-lg font-bold tabular-nums text-forge-text">
+                  {{ item.priceCents / 100 | currency }}
+                </span>
+                <span class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">
+                  {{ item.variants.length }} sizes
+                </span>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+
+  </app-page-container>
+</div>

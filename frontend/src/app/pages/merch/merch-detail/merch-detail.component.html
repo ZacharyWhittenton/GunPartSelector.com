@@ -1,0 +1,90 @@
+<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+
+@if (notFound()) {
+<app-page-container>
+  <div class="py-24 text-center">
+    <h1 class="text-3xl font-bold text-forge-text">Item not found</h1>
+    <a routerLink="/merch" class="mt-6 inline-block font-semibold text-forge-accent hover:brightness-110">
+      Back to the store
+    </a>
+  </div>
+</app-page-container>
+}
+@else if (isLoading()) {
+<app-page-container>
+  <p class="py-24 text-center text-forge-text-muted">Loading…</p>
+</app-page-container>
+}
+@else if (item(); as currentItem) {
+<app-page-container>
+
+  <a routerLink="/merch" class="text-sm font-semibold text-forge-accent hover:brightness-110">
+    &larr; Back to the store
+  </a>
+
+  <div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-2">
+
+    <div class="flex aspect-square items-center justify-center rounded-lg border border-forge-line bg-forge-steel p-10">
+      @if (currentItem.imageUrl) {
+        <img [src]="currentItem.imageUrl" [alt]="currentItem.name" class="h-full w-full object-contain">
+      }
+    </div>
+
+    <div>
+      <h1 class="text-3xl font-bold text-forge-text">{{ currentItem.name }}</h1>
+      <p class="mt-2 font-mono text-2xl font-bold tabular-nums text-forge-text">
+        {{ currentItem.priceCents / 100 | currency }}
+      </p>
+      <p class="mt-4 text-forge-text-muted">{{ currentItem.description }}</p>
+
+      <div class="mt-8">
+        <p class="font-mono text-xs uppercase tracking-wide text-forge-text-muted">Size</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          @for (variant of currentItem.variants; track variant.id) {
+            <button
+              type="button"
+              (click)="selectVariant(variant)"
+              [disabled]="variant.stockStatus === 'out_of_stock'"
+              class="min-w-[3.5rem] rounded-md border px-4 py-2 text-sm font-semibold transition"
+              [class.border-forge-accent]="selectedVariantId() === variant.id"
+              [class.bg-forge-accent]="selectedVariantId() === variant.id"
+              [class.text-white]="selectedVariantId() === variant.id"
+              [class.border-forge-line]="selectedVariantId() !== variant.id"
+              [class.text-forge-text]="selectedVariantId() !== variant.id && variant.stockStatus === 'in_stock'"
+              [class.text-forge-text-muted]="variant.stockStatus === 'out_of_stock'"
+              [class.opacity-40]="variant.stockStatus === 'out_of_stock'"
+              [class.cursor-not-allowed]="variant.stockStatus === 'out_of_stock'"
+              [class.line-through]="variant.stockStatus === 'out_of_stock'"
+            >
+              {{ variant.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="addToCart()"
+        [disabled]="!selectedVariantId()"
+        class="mt-8 w-full rounded-md bg-forge-accent px-6 py-3 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {{ justAdded() ? 'Added ✓' : 'Add to Cart' }}
+      </button>
+
+      @if (justAdded()) {
+        <button
+          type="button"
+          (click)="goToCart()"
+          class="mt-3 w-full rounded-md border border-forge-line px-6 py-3 text-sm font-semibold text-forge-text transition hover:border-forge-accent"
+        >
+          View Cart
+        </button>
+      }
+    </div>
+
+  </div>
+
+</app-page-container>
+}
+
+</div>

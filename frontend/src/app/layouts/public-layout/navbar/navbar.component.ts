@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
 
 import { AuthService } from '../../../core/services/auth.service';
+import { CartService } from '../../../core/services/cart.service';
 
 export type NavDropdown = 'guides' | 'company' | null;
 
@@ -17,9 +18,11 @@ export type NavDropdown = 'guides' | 'company' | null;
 })
 export class NavbarComponent {
   private readonly authService = inject(AuthService);
+  private readonly cartService = inject(CartService);
   private readonly router = inject(Router);
 
   readonly currentUser = this.authService.currentUser;
+  readonly cartItemCount = this.cartService.itemCount;
   readonly openDropdown = signal<NavDropdown>(null);
 
   mobileMenuOpen = false;
