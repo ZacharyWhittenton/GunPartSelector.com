@@ -17,16 +17,28 @@ from site_api.domain.marketplace import (
     InvalidWebhookSignatureError,
     ItemNotFoundError,
     ItemNotPurchasableError,
+    ItemVariant,
     MarketplaceItem,
     MarketplaceNotConfiguredError,
     Order,
     OrderItem,
     OrderNotFoundError,
+    VariantNotFoundError,
+    VariantOutOfStockError,
 )
 from site_api.domain.users import AuthenticatedUser
 from site_api.services.marketplace import CartLine, CreateCheckoutSession, MarketplaceService
 
 router = APIRouter(prefix="/marketplace", tags=["marketplace"])
+
+
+class VariantSummary(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    id: UUID
+    label: str
+    sort_order: int
+    stock_status: str
 
 
 class ItemSummary(BaseModel):
@@ -38,12 +50,14 @@ class ItemSummary(BaseModel):
     description: str
     price_cents: int
     image_url: str | None
+    variants: list[VariantSummary]
 
 
 class CheckoutLineRequest(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     item_id: UUID
+    variant_id: UUID
     quantity: int = Field(ge=1, le=20)
 
 
@@ -64,6 +78,7 @@ class OrderItemSummary(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     item_name: str
+    variant_label: str
     unit_price_cents: int
     quantity: int
     line_total_cents: int
@@ -95,7 +110,16 @@ class WishlistItemResponse(BaseModel):
     created_at: datetime
 
 
-def to_item_summary(item: MarketplaceItem) -> ItemSummary:
+def to_variant_summary(variant: ItemVariant) -> VariantSummary:
+    return VariantSummary(
+        id=variant.id,
+        label=variant.label,
+        sort_order=variant.sort_order,
+        stock_status=variant.stock_status.value,
+    )
+
+
+def to_item_summary(item: MarketplaceItem, variants: list[ItemVariant]) -> ItemSummary:
     return ItemSummary(
         id=item.id,
         name=item.name,
@@ -103,6 +127,7 @@ def to_item_summary(item: MarketplaceItem) -> ItemSummary:
         description=item.description,
         price_cents=item.price_cents,
         image_url=item.image_url,
+        variants=[to_variant_summary(variant) for variant in variants],
     )
 
 
@@ -117,6 +142,7 @@ def to_order_summary(order: Order, items: list[OrderItem]) -> OrderSummary:
         items=[
             OrderItemSummary(
                 item_name=item.item_name,
+                variant_label=item.variant_label,
                 unit_price_cents=item.unit_price_cents,
                 quantity=item.quantity,
                 line_total_cents=item.line_total_cents,
@@ -131,7 +157,11 @@ async def list_items(
     service: Annotated[MarketplaceService, Depends(get_marketplace_service)],
 ) -> list[ItemSummary]:
     items = await service.list_active_items()
-    return [to_item_summary(item) for item in items]
+    summaries = []
+    for item in items:
+        variants = await service.list_variants_for_item(item.id)
+        summaries.append(to_item_summary(item, variants))
+    return summaries
 
 
 @router.get("/items/{slug}", response_model=ItemSummary, response_model_by_alias=True)
@@ -147,7 +177,8 @@ async def get_item(
             detail="Item not found",
         ) from error
 
-    return to_item_summary(item)
+    variants = await service.list_variants_for_item(item.id)
+    return to_item_summary(item, variants)
 
 
 @router.post(
@@ -164,7 +195,12 @@ async def create_checkout_session(
         _, checkout_url = await service.create_checkout_session(
             CreateCheckoutSession(
                 lines=[
-                    CartLine(item_id=line.item_id, quantity=line.quantity) for line in payload.items
+                    CartLine(
+                        item_id=line.item_id,
+                        variant_id=line.variant_id,
+                        quantity=line.quantity,
+                    )
+                    for line in payload.items
                 ],
                 customer_id=current_user.id if current_user else None,
                 customer_email=current_user.email_address if current_user else None,
@@ -190,6 +226,16 @@ async def create_checkout_session(
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="One of the items in your cart is no longer available",
+        ) from error
+    except VariantNotFoundError as error:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="One of the selected sizes no longer exists",
+        ) from error
+    except VariantOutOfStockError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="One of the selected sizes is out of stock",
         ) from error
     except (DiscountCodeNotFoundError, DiscountCodeInvalidError) as error:
         raise HTTPException(

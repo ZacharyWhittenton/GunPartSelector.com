@@ -337,7 +337,7 @@ def get_marketplace_service(
         stripe_client,
         settings.stripe_webhook_secret,
         settings.marketplace_currency,
-        f"{settings.public_site_url}/marketplace/success?session_id={{CHECKOUT_SESSION_ID}}",
+        f"{settings.public_site_url}/merch/success?session_id={{CHECKOUT_SESSION_ID}}",
         f"{settings.public_site_url}/cart",
         email_service,
         discount_code_repository,
