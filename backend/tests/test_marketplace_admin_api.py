@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi.testclient import TestClient
 
-from site_api.domain.marketplace import MarketplaceItem
+from site_api.domain.marketplace import ItemVariant, MarketplaceItem, VariantStockStatus
 from site_api.domain.users import UserRole
 from tests.conftest import InMemoryMarketplaceItemRepository, InMemoryUserRepository
 
@@ -54,11 +54,27 @@ def _make_item(**overrides: object) -> MarketplaceItem:
     return MarketplaceItem(**defaults)
 
 
+def _make_variant(**overrides: object) -> ItemVariant:
+    now = datetime.now(UTC)
+    defaults: dict[str, object] = {
+        "id": UUID(int=1000),
+        "marketplace_item_id": UUID(int=1),
+        "label": "One Size",
+        "sort_order": 0,
+        "stock_status": VariantStockStatus.IN_STOCK,
+        "created_at": now,
+        "updated_at": now,
+    }
+    defaults.update(overrides)
+    return ItemVariant(**defaults)
+
+
 _ITEM_PAYLOAD = {
     "name": "Website Audit",
     "description": "A full technical and SEO audit.",
     "priceCents": 5000,
     "imageUrl": None,
+    "variants": [{"label": "One Size", "sortOrder": 0, "stockStatus": "in_stock"}],
 }
 
 
@@ -202,9 +218,14 @@ async def test_delete_item_conflict_when_it_has_orders(
 ) -> None:
     token = await _make_admin_token(client, user_repository)
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
 
     response = client.delete(
@@ -269,9 +290,14 @@ async def test_list_all_orders_filters_by_status(
 ) -> None:
     token = await _make_admin_token(client, user_repository)
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
 
     open_response = client.get(

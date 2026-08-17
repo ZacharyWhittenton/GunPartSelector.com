@@ -72,6 +72,8 @@ def _make_order_items() -> list[OrderItem]:
             id=UUID(int=10),
             order_id=UUID(int=1),
             marketplace_item_id=UUID(int=20),
+            variant_id=UUID(int=30),
+            variant_label="One Size",
             item_name="Website Audit",
             unit_price_cents=5000,
             quantity=1,

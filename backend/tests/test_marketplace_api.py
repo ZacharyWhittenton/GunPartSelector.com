@@ -9,7 +9,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from site_api.domain.discount_codes import DiscountCode, DiscountType
-from site_api.domain.marketplace import MarketplaceItem
+from site_api.domain.marketplace import ItemVariant, MarketplaceItem, VariantStockStatus
 from tests.conftest import InMemoryDiscountCodeRepository, InMemoryMarketplaceItemRepository
 
 WEBHOOK_SECRET = "whsec_test_secret"
@@ -72,6 +72,21 @@ def _make_item(**overrides: object) -> MarketplaceItem:
     return MarketplaceItem(**defaults)
 
 
+def _make_variant(**overrides: object) -> ItemVariant:
+    now = datetime.now(UTC)
+    defaults: dict[str, object] = {
+        "id": UUID(int=1000),
+        "marketplace_item_id": UUID(int=1),
+        "label": "One Size",
+        "sort_order": 0,
+        "stock_status": VariantStockStatus.IN_STOCK,
+        "created_at": now,
+        "updated_at": now,
+    }
+    defaults.update(overrides)
+    return ItemVariant(**defaults)
+
+
 def test_list_items_only_returns_active(
     client: TestClient,
     marketplace_item_repository: InMemoryMarketplaceItemRepository,
@@ -112,10 +127,15 @@ def test_checkout_as_guest_returns_checkout_url(
     marketplace_item_repository: InMemoryMarketplaceItemRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
 
     response = client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
 
     assert response.status_code == 200
@@ -131,7 +151,11 @@ def test_checkout_rejects_empty_cart(client: TestClient) -> None:
 def test_checkout_rejects_unknown_item(client: TestClient) -> None:
     response = client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=999)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=999)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
 
     assert response.status_code == 404
@@ -145,7 +169,11 @@ def test_checkout_rejects_inactive_item(
 
     response = client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
 
     assert response.status_code == 409
@@ -175,12 +203,15 @@ def test_checkout_with_valid_discount_code_succeeds(
     discount_code_repository: InMemoryDiscountCodeRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     discount_code_repository.discount_codes.append(_make_discount_code())
 
     response = client.post(
         "/api/marketplace/checkout",
         json={
-            "items": [{"itemId": str(UUID(int=1)), "quantity": 1}],
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ],
             "discountCode": "save10",
         },
     )
@@ -194,11 +225,14 @@ def test_checkout_rejects_unknown_discount_code(
     marketplace_item_repository: InMemoryMarketplaceItemRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
 
     response = client.post(
         "/api/marketplace/checkout",
         json={
-            "items": [{"itemId": str(UUID(int=1)), "quantity": 1}],
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ],
             "discountCode": "MISSING",
         },
     )
@@ -212,6 +246,7 @@ def test_checkout_rejects_expired_discount_code(
     discount_code_repository: InMemoryDiscountCodeRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     discount_code_repository.discount_codes.append(
         _make_discount_code(expires_at=datetime.now(UTC) - timedelta(days=1))
     )
@@ -219,7 +254,9 @@ def test_checkout_rejects_expired_discount_code(
     response = client.post(
         "/api/marketplace/checkout",
         json={
-            "items": [{"itemId": str(UUID(int=1)), "quantity": 1}],
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ],
             "discountCode": "SAVE10",
         },
     )
@@ -250,9 +287,14 @@ def test_webhook_updates_order_status_and_is_visible_by_session(
     marketplace_item_repository: InMemoryMarketplaceItemRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     checkout_response = client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
     )
     assert checkout_response.status_code == 200
 
@@ -287,12 +329,17 @@ def test_list_my_orders_returns_only_own(
     marketplace_item_repository: InMemoryMarketplaceItemRepository,
 ) -> None:
     marketplace_item_repository.items.append(_make_item())
+    marketplace_item_repository.variants.append(_make_variant())
     owner = _register(client, "owner@example.com")
     other = _register(client, "other@example.com")
 
     client.post(
         "/api/marketplace/checkout",
-        json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+        json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
         headers=_auth_headers(owner["accessToken"]),
     )
 
@@ -380,7 +427,11 @@ async def test_checkout_unconfigured_returns_503(
     try:
         response = client.post(
             "/api/marketplace/checkout",
-            json={"items": [{"itemId": str(UUID(int=1)), "quantity": 1}]},
+            json={
+            "items": [
+                {"itemId": str(UUID(int=1)), "variantId": str(UUID(int=1000)), "quantity": 1}
+            ]
+        },
         )
     finally:
         del client.app.dependency_overrides[get_marketplace_service]

@@ -35,6 +35,7 @@ from site_api.domain.discount_codes import DiscountCode, DiscountCodeNotFoundErr
 from site_api.domain.lead_notes import LeadNote
 from site_api.domain.marketplace import (
     ItemNotFoundError,
+    ItemVariant,
     MarketplaceItem,
     Order,
     OrderItem,
@@ -315,6 +316,7 @@ class InMemoryAppointmentRepository:
 class InMemoryMarketplaceItemRepository:
     def __init__(self) -> None:
         self.items: list[MarketplaceItem] = []
+        self.variants: list[ItemVariant] = []
 
     async def add(self, item: MarketplaceItem) -> MarketplaceItem:
         self.items.append(item)
@@ -354,6 +356,32 @@ class InMemoryMarketplaceItemRepository:
 
     async def list_all(self) -> list[MarketplaceItem]:
         return list(self.items)
+
+    async def list_variants_for_item(self, item_id: UUID) -> list[ItemVariant]:
+        return sorted(
+            (variant for variant in self.variants if variant.marketplace_item_id == item_id),
+            key=lambda variant: (variant.sort_order, variant.label),
+        )
+
+    async def get_variant_by_id(self, variant_id: UUID) -> ItemVariant | None:
+        for variant in self.variants:
+            if variant.id == variant_id:
+                return variant
+        return None
+
+    async def add_variant(self, variant: ItemVariant) -> ItemVariant:
+        self.variants.append(variant)
+        return variant
+
+    async def update_variant(self, variant: ItemVariant) -> ItemVariant:
+        for index, existing in enumerate(self.variants):
+            if existing.id == variant.id:
+                self.variants[index] = variant
+                return variant
+        raise ItemNotFoundError
+
+    async def delete_variant(self, variant_id: UUID) -> None:
+        self.variants = [variant for variant in self.variants if variant.id != variant_id]
 
 
 class InMemoryOrderRepository:

@@ -15,7 +15,9 @@ from site_api.domain.discount_codes import (
     DiscountType,
 )
 from site_api.domain.marketplace import (
+    DuplicateVariantLabelError,
     EmptyCartError,
+    EmptyVariantsError,
     InvalidWebhookSignatureError,
     ItemHasOrdersError,
     ItemNotFoundError,
@@ -23,6 +25,10 @@ from site_api.domain.marketplace import (
     MarketplaceNotConfiguredError,
     OrderNotFoundError,
     OrderStatus,
+    VariantInput,
+    VariantNotFoundError,
+    VariantOutOfStockError,
+    VariantStockStatus,
 )
 from site_api.services.discount_codes import CreateDiscountCode, DiscountCodeService
 from site_api.services.email import EmailService
@@ -83,6 +89,10 @@ def discount_service(
     return DiscountCodeService(discount_code_repository, clock=lambda: NOW)
 
 
+def _default_variants() -> list[VariantInput]:
+    return [VariantInput(label="One Size", sort_order=0, stock_status=VariantStockStatus.IN_STOCK)]
+
+
 def _create_command(**overrides: object) -> CreateItem:
     defaults: dict[str, object] = {
         "name": "Website Audit",
@@ -90,6 +100,7 @@ def _create_command(**overrides: object) -> CreateItem:
         "price_cents": 5000,
         "image_url": None,
         "created_by_admin_id": ADMIN_ID,
+        "variants": _default_variants(),
     }
     defaults.update(overrides)
     return CreateItem(**defaults)
@@ -133,11 +144,107 @@ async def test_create_item_is_active_and_slugified(service: MarketplaceService) 
 
 
 @pytest.mark.asyncio
+async def test_create_item_rejects_empty_variants(service: MarketplaceService) -> None:
+    with pytest.raises(EmptyVariantsError):
+        await service.create_item(_create_command(variants=[]))
+
+
+@pytest.mark.asyncio
+async def test_create_item_rejects_duplicate_variant_labels(
+    service: MarketplaceService,
+) -> None:
+    with pytest.raises(DuplicateVariantLabelError):
+        await service.create_item(
+            _create_command(
+                variants=[
+                    VariantInput(label="M", sort_order=0, stock_status=VariantStockStatus.IN_STOCK),
+                    VariantInput(label="m", sort_order=1, stock_status=VariantStockStatus.IN_STOCK),
+                ]
+            )
+        )
+
+
+@pytest.mark.asyncio
+async def test_checkout_rejects_variant_from_a_different_item(
+    service: MarketplaceService,
+) -> None:
+    item = await service.create_item(_create_command())
+    other_item = await service.create_item(_create_command(name="Other Item"))
+    other_variant_id = (await service.list_variants_for_item(other_item.id))[0].id
+
+    with pytest.raises(VariantNotFoundError):
+        await service.create_checkout_session(
+            CreateCheckoutSession(
+                lines=[CartLine(item_id=item.id, variant_id=other_variant_id, quantity=1)],
+                customer_id=None,
+                customer_email=None,
+            )
+        )
+
+
+@pytest.mark.asyncio
+async def test_checkout_rejects_out_of_stock_variant(service: MarketplaceService) -> None:
+    item = await service.create_item(
+        _create_command(
+            variants=[
+                VariantInput(
+                    label="XXL", sort_order=0, stock_status=VariantStockStatus.OUT_OF_STOCK
+                )
+            ]
+        )
+    )
+    variant_id = (await service.list_variants_for_item(item.id))[0].id
+
+    with pytest.raises(VariantOutOfStockError):
+        await service.create_checkout_session(
+            CreateCheckoutSession(
+                lines=[CartLine(item_id=item.id, variant_id=variant_id, quantity=1)],
+                customer_id=None,
+                customer_email=None,
+            )
+        )
+
+
+@pytest.mark.asyncio
+async def test_update_item_syncs_variants_add_and_remove(
+    service: MarketplaceService,
+) -> None:
+    item = await service.create_item(
+        _create_command(
+            variants=[
+                VariantInput(label="S", sort_order=0, stock_status=VariantStockStatus.IN_STOCK),
+                VariantInput(label="M", sort_order=1, stock_status=VariantStockStatus.IN_STOCK),
+            ]
+        )
+    )
+
+    await service.update_item(
+        item.id,
+        UpdateItem(
+            name=item.name,
+            description=item.description,
+            price_cents=item.price_cents,
+            image_url=item.image_url,
+            variants=[
+                VariantInput(label="M", sort_order=0, stock_status=VariantStockStatus.IN_STOCK),
+                VariantInput(label="L", sort_order=1, stock_status=VariantStockStatus.IN_STOCK),
+            ],
+        ),
+    )
+
+    labels = {variant.label for variant in await service.list_variants_for_item(item.id)}
+    assert labels == {"M", "L"}
+
+
+@pytest.mark.asyncio
 async def test_update_item_raises_when_missing(service: MarketplaceService) -> None:
     with pytest.raises(ItemNotFoundError):
         await service.update_item(
             UUID(int=999),
-            UpdateItem(name="X", description="Y", price_cents=100, image_url=None),
+            UpdateItem(
+                name="X", description="Y", price_cents=100, image_url=None,
+                variants=_default_variants(),
+            ),
         )
 
 
@@ -167,7 +274,7 @@ async def test_delete_item_rejects_when_orders_exist(service: MarketplaceService
     item = await service.create_item(_create_command())
     await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -184,12 +291,15 @@ async def test_checkout_uses_current_item_price_not_stale_client_value(
     item = await service.create_item(_create_command(price_cents=5000))
     await service.update_item(
         item.id,
-        UpdateItem(name=item.name, description=item.description, price_cents=9900, image_url=None),
+        UpdateItem(
+            name=item.name, description=item.description, price_cents=9900, image_url=None,
+            variants=_default_variants(),
+        ),
     )
 
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=2)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=2)],
             customer_id=None,
             customer_email=None,
         )
@@ -204,7 +314,7 @@ async def test_checkout_clamps_quantity_to_max(service: MarketplaceService) -> N
 
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=999)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=999)],
             customer_id=None,
             customer_email=None,
         )
@@ -219,7 +329,7 @@ async def test_checkout_clamps_quantity_to_min(service: MarketplaceService) -> N
 
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=0)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=0)],
             customer_id=None,
             customer_email=None,
         )
@@ -241,7 +351,7 @@ async def test_checkout_rejects_unknown_item(service: MarketplaceService) -> Non
     with pytest.raises(ItemNotFoundError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=UUID(int=999), quantity=1)],
+                lines=[CartLine(item_id=UUID(int=999), variant_id=UUID(int=1), quantity=1)],
                 customer_id=None,
                 customer_email=None,
             )
@@ -256,7 +366,7 @@ async def test_checkout_rejects_inactive_item(service: MarketplaceService) -> No
     with pytest.raises(ItemNotPurchasableError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=item.id, quantity=1)],
+                lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
                 customer_id=None,
                 customer_email=None,
             )
@@ -283,7 +393,7 @@ async def test_checkout_raises_when_stripe_not_configured(
     with pytest.raises(MarketplaceNotConfiguredError):
         await unconfigured.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=UUID(int=1), quantity=1)],
+                lines=[CartLine(item_id=UUID(int=1), variant_id=UUID(int=1), quantity=1)],
                 customer_id=None,
                 customer_email=None,
             )
@@ -324,7 +434,7 @@ async def test_webhook_completed_marks_order_paid(service: MarketplaceService) -
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -352,7 +462,7 @@ async def test_webhook_completed_sends_confirmation_and_admin_emails(
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -378,7 +488,7 @@ async def test_webhook_expired_does_not_send_order_emails(
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -395,7 +505,7 @@ async def test_webhook_expired_marks_order_expired(service: MarketplaceService) 
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -415,7 +525,7 @@ async def test_webhook_async_payment_failed_marks_order_cancelled(
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -449,7 +559,7 @@ async def test_webhook_is_idempotent_on_duplicate_delivery(service: MarketplaceS
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -475,7 +585,7 @@ async def test_duplicate_completed_delivery_only_emails_once(
     item = await service.create_item(_create_command())
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
         )
@@ -499,14 +609,14 @@ async def test_list_my_orders_returns_only_own(service: MarketplaceService) -> N
     item = await service.create_item(_create_command())
     await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=CUSTOMER_ID,
             customer_email="customer@example.com",
         )
     )
     await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=OTHER_CUSTOMER_ID,
             customer_email="other@example.com",
         )
@@ -564,7 +674,7 @@ async def test_checkout_applies_percent_discount(
 
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
             discount_code="save10",
@@ -596,7 +706,7 @@ async def test_checkout_applies_fixed_discount_clamped_to_subtotal(
 
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
             discount_code="BIGDISCOUNT",
@@ -615,7 +725,7 @@ async def test_checkout_rejects_unknown_discount_code(service: MarketplaceServic
     with pytest.raises(DiscountCodeNotFoundError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=item.id, quantity=1)],
+                lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
                 customer_id=None,
                 customer_email=None,
                 discount_code="NOPE",
@@ -643,7 +753,7 @@ async def test_checkout_rejects_inactive_discount_code(
     with pytest.raises(DiscountCodeInvalidError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=item.id, quantity=1)],
+                lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
                 customer_id=None,
                 customer_email=None,
                 discount_code="OFF",
@@ -670,7 +780,7 @@ async def test_checkout_rejects_expired_discount_code(
     with pytest.raises(DiscountCodeInvalidError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=item.id, quantity=1)],
+                lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
                 customer_id=None,
                 customer_email=None,
                 discount_code="EXPIRED",
@@ -700,7 +810,7 @@ async def test_checkout_rejects_exhausted_discount_code(
     with pytest.raises(DiscountCodeInvalidError):
         await service.create_checkout_session(
             CreateCheckoutSession(
-                lines=[CartLine(item_id=item.id, quantity=1)],
+                lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
                 customer_id=None,
                 customer_email=None,
                 discount_code="LIMITED",
@@ -726,7 +836,7 @@ async def test_webhook_completed_increments_discount_redemption_count(
     )
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
             discount_code="SAVE10",
@@ -759,7 +869,7 @@ async def test_duplicate_webhook_delivery_does_not_double_increment_redemption(
     )
     order, _ = await service.create_checkout_session(
         CreateCheckoutSession(
-            lines=[CartLine(item_id=item.id, quantity=1)],
+            lines=[CartLine(item_id=item.id, variant_id=(await service.list_variants_for_item(item.id))[0].id, quantity=1)],
             customer_id=None,
             customer_email=None,
             discount_code="SAVE10",
