@@ -35,7 +35,8 @@ export class AdminMarketplaceComponent implements OnInit {
   itemForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
     description: ['', [Validators.required]],
-    priceDollars: [0, [Validators.required, Validators.min(0)]]
+    priceDollars: [0, [Validators.required, Validators.min(0)]],
+    sizesText: ['One Size', [Validators.required]]
   });
 
   ngOnInit(): void {
@@ -61,7 +62,12 @@ export class AdminMarketplaceComponent implements OnInit {
     this.itemForm.setValue({
       name: item.name,
       description: item.description,
-      priceDollars: item.priceCents / 100
+      priceDollars: item.priceCents / 100,
+      sizesText: item.variants
+        .slice()
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(variant => variant.label)
+        .join(', ')
     });
     this.saveError.set('');
   }
@@ -69,7 +75,7 @@ export class AdminMarketplaceComponent implements OnInit {
   cancelEdit(): void {
     this.editingId.set(null);
     this.imageUrl.set(null);
-    this.itemForm.reset({ name: '', description: '', priceDollars: 0 });
+    this.itemForm.reset({ name: '', description: '', priceDollars: 0, sizesText: 'One Size' });
     this.saveError.set('');
   }
 
@@ -99,17 +105,36 @@ export class AdminMarketplaceComponent implements OnInit {
       return;
     }
 
-    const { name, description, priceDollars } = this.itemForm.getRawValue();
+    const { name, description, priceDollars, sizesText } = this.itemForm.getRawValue();
+    const editingId = this.editingId();
+    const existingItem = this.items().find(item => item.id === editingId);
+    const existingStockByLabel = new Map(
+      (existingItem?.variants ?? []).map(variant => [variant.label.trim().toLowerCase(), variant.stockStatus])
+    );
+
+    const labels = Array.from(
+      new Set(
+        sizesText
+          .split(',')
+          .map(label => label.trim())
+          .filter(label => label.length > 0)
+      )
+    );
+
     const payload = {
       name,
       description,
       priceCents: Math.round(priceDollars * 100),
-      imageUrl: this.imageUrl()
+      imageUrl: this.imageUrl(),
+      variants: labels.map((label, index) => ({
+        label,
+        sortOrder: index,
+        stockStatus: existingStockByLabel.get(label.toLowerCase()) ?? 'in_stock'
+      }))
     };
 
     this.isSaving.set(true);
 
-    const editingId = this.editingId();
     const request$ = editingId
       ? this.marketplaceAdminService.updateItem(editingId, payload)
       : this.marketplaceAdminService.createItem(payload);
