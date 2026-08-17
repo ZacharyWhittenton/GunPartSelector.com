@@ -12,6 +12,11 @@ class OrderStatus(StrEnum):
     CANCELLED = "cancelled"
 
 
+class VariantStockStatus(StrEnum):
+    IN_STOCK = "in_stock"
+    OUT_OF_STOCK = "out_of_stock"
+
+
 @dataclass(frozen=True, slots=True)
 class MarketplaceItem:
     id: UUID
@@ -27,10 +32,32 @@ class MarketplaceItem:
 
 
 @dataclass(frozen=True, slots=True)
+class ItemVariant:
+    id: UUID
+    marketplace_item_id: UUID
+    label: str
+    sort_order: int
+    stock_status: VariantStockStatus
+    created_at: datetime
+    updated_at: datetime
+
+
+@dataclass(frozen=True, slots=True)
+class VariantInput:
+    """Desired state of one variant, as submitted by an admin write."""
+
+    label: str
+    sort_order: int
+    stock_status: VariantStockStatus
+
+
+@dataclass(frozen=True, slots=True)
 class OrderItem:
     id: UUID
     order_id: UUID
     marketplace_item_id: UUID | None
+    variant_id: UUID | None
+    variant_label: str
     item_name: str
     unit_price_cents: int
     quantity: int
@@ -72,6 +99,22 @@ class ItemHasOrdersError(Exception):
     """Raised when an admin tries to hard-delete an item that has order history."""
 
 
+class VariantNotFoundError(Exception):
+    """Raised when a referenced item variant does not exist or belongs to a different item."""
+
+
+class VariantOutOfStockError(Exception):
+    """Raised when a cart line references a variant that is currently out of stock."""
+
+
+class EmptyVariantsError(Exception):
+    """Raised when an admin submits an item with no variants."""
+
+
+class DuplicateVariantLabelError(Exception):
+    """Raised when an admin submits two variants with the same label for one item."""
+
+
 class EmptyCartError(Exception):
     """Raised when checkout is attempted with no line items."""
 
@@ -104,6 +147,16 @@ class MarketplaceItemRepository(Protocol):
     async def list_active(self) -> list[MarketplaceItem]: ...
 
     async def list_all(self) -> list[MarketplaceItem]: ...
+
+    async def list_variants_for_item(self, item_id: UUID) -> list[ItemVariant]: ...
+
+    async def get_variant_by_id(self, variant_id: UUID) -> ItemVariant | None: ...
+
+    async def add_variant(self, variant: ItemVariant) -> ItemVariant: ...
+
+    async def update_variant(self, variant: ItemVariant) -> ItemVariant: ...
+
+    async def delete_variant(self, variant_id: UUID) -> None: ...
 
 
 class OrderRepository(Protocol):

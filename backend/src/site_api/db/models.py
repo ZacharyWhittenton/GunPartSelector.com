@@ -198,6 +198,31 @@ class MarketplaceItemRecord(Base):
     )
 
 
+class ItemVariantRecord(Base):
+    __tablename__ = "item_variants"
+    __table_args__ = (
+        UniqueConstraint("marketplace_item_id", "label", name="uq_item_variants_item_label"),
+    )
+
+    id: Mapped[UUID] = mapped_column(PostgresUUID(as_uuid=True), primary_key=True)
+    marketplace_item_id: Mapped[UUID] = mapped_column(
+        PostgresUUID(as_uuid=True),
+        ForeignKey("marketplace_items.id", ondelete="CASCADE"),
+        index=True,
+    )
+    label: Mapped[str] = mapped_column(String(40))
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+    stock_status: Mapped[str] = mapped_column(String(20), default="in_stock")
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+    )
+
+
 class OrderRecord(Base):
     __tablename__ = "orders"
 
@@ -232,6 +257,10 @@ class OrderItemRecord(Base):
     marketplace_item_id: Mapped[UUID | None] = mapped_column(
         PostgresUUID(as_uuid=True), ForeignKey("marketplace_items.id")
     )
+    variant_id: Mapped[UUID | None] = mapped_column(
+        PostgresUUID(as_uuid=True), ForeignKey("item_variants.id", ondelete="SET NULL")
+    )
+    variant_label: Mapped[str] = mapped_column(String(40), default="")
     item_name: Mapped[str] = mapped_column(String(200))
     unit_price_cents: Mapped[int] = mapped_column(Integer)
     quantity: Mapped[int] = mapped_column(Integer)
