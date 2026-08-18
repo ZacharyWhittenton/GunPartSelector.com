@@ -1,16 +1,18 @@
-<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+<div class="forge-theme min-h-screen bg-forge-ink pb-20">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/red-rock-desert.jpg"
+    imageAlt=""
+    eyebrow="Blog"
+    title="Build Write-Ups & Part News"
+    subtitle="Comparisons, build breakdowns, and whatever else is worth knowing before you buy."
+    height="short"
+  ></app-page-hero>
+
   <app-page-container>
 
-    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Blog</p>
-    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
-      Build write-ups &amp; part news
-    </h1>
-    <p class="mt-4 max-w-2xl text-forge-text-muted">
-      Comparisons, build breakdowns, and whatever else is worth knowing before you buy.
-    </p>
-
     @if (tags().length > 0) {
-      <div class="mt-10 flex flex-wrap gap-2">
+      <div class="mt-12 flex flex-wrap gap-2">
         <button
           type="button"
           (click)="selectTag(null)"

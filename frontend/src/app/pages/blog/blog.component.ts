@@ -7,11 +7,12 @@ import { BlogPostSummary } from '../../core/models/blog.model';
 import { BlogService } from '../../core/services/blog.service';
 import { SeoService } from '../../core/services/seo.service';
 import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
+import { PageHeroComponent } from '../../shared/components/page-hero/page-hero.component';
 
 @Component({
   selector: 'app-blog',
   standalone: true,
-  imports: [RouterLink, DatePipe, PageContainerComponent],
+  imports: [RouterLink, DatePipe, PageContainerComponent, PageHeroComponent],
   templateUrl: './blog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './blog.component.css'
