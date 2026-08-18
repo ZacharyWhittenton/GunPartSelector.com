@@ -518,10 +518,10 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       const inch = TARGET_LENGTH / 30;
       const center = dustCover
         ? {
-            x: (dustCover.min.x + dustCover.max.x) / 2,
-            y: (dustCover.min.y + dustCover.max.y) / 2 + inch * 0.4
+            x: (dustCover.min.x + dustCover.max.x) / 2 - inch * 0.5,
+            y: (dustCover.min.y + dustCover.max.y) / 2 + inch * 0.75
           }
-        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2 + inch * 0.4 };
+        : { x: (upper.min.x + upper.max.x) / 2 - inch * 0.5, y: (upper.min.y + upper.max.y) / 2 + inch * 0.75 };
       const size = dustCover
         ? {
             x: (dustCover.max.x - dustCover.min.x) * 0.7 + pad,
