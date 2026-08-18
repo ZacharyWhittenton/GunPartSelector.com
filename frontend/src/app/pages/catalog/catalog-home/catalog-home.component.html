@@ -1,7 +1,16 @@
-<div class="forge-theme min-h-screen bg-forge-ink py-10">
+<div class="forge-theme min-h-screen bg-forge-ink">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/autumn-meadow-peaks.jpg"
+    imageAlt=""
+    eyebrow="Parts"
+    title="Browse Parts"
+    subtitle="Every category you need to build an AR platform from the ground up."
+    height="short"
+  ></app-page-hero>
+
   <app-page-container>
-    <h1 class="mb-1 text-2xl font-bold text-forge-text">Browse Parts</h1>
-    <p class="mb-8 text-sm text-forge-text-muted">Every category you need to build an AR platform from the ground up.</p>
+    <div class="py-10">
 
     <app-loading-spinner *ngIf="isLoading()" />
 
@@ -21,6 +30,7 @@
           </a>
         </div>
       </div>
+    </div>
     </div>
   </app-page-container>
 </div>

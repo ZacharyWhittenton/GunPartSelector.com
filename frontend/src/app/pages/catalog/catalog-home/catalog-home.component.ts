@@ -7,6 +7,7 @@ import { CatalogSection, PartCategory } from '../../../core/models/catalog.model
 import { CatalogService } from '../../../core/services/catalog.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
 import { PageContainerComponent } from '../../../shared/components/page-container/page-container.component';
+import { PageHeroComponent } from '../../../shared/components/page-hero/page-hero.component';
 
 const SECTION_LABELS: Record<CatalogSection, string> = {
   upper: 'Upper Parts',
@@ -21,7 +22,7 @@ const SECTION_ORDER: CatalogSection[] = ['upper', 'lower', 'stock', 'optics', 'a
 @Component({
   selector: 'app-catalog-home',
   standalone: true,
-  imports: [NgFor, NgIf, RouterLink, LoadingSpinnerComponent, PageContainerComponent],
+  imports: [NgFor, NgIf, RouterLink, LoadingSpinnerComponent, PageContainerComponent, PageHeroComponent],
   templateUrl: './catalog-home.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })

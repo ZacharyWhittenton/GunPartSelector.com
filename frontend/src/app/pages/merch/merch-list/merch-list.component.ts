@@ -7,11 +7,12 @@ import { ItemSummary } from '../../../core/models/marketplace-item.model';
 import { MarketplaceService } from '../../../core/services/marketplace.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { PageContainerComponent } from '../../../shared/components/page-container/page-container.component';
+import { PageHeroComponent } from '../../../shared/components/page-hero/page-hero.component';
 
 @Component({
   selector: 'app-merch-list',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, PageContainerComponent],
+  imports: [RouterLink, CurrencyPipe, PageContainerComponent, PageHeroComponent],
   templateUrl: './merch-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
