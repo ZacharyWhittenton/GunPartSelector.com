@@ -77,13 +77,10 @@ const GLTF_DETAIL_NODE_NAMES = [
 const STANDIN_CATEGORIES = new Set([
   'optic-mount',
   'optic',
-  'foregrip',
   'buffer-tube',
   'buffer-kit',
   'bolt-carrier-group',
-  'gas-system',
-  'forward-assist',
-  'ejection-port-cover'
+  'gas-system'
 ]);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
@@ -190,15 +187,12 @@ const PART_CONFIGS: PartMeshConfig[] = [
   },
   { categorySlug: 'barrel', build: () => [tube(6.3, 0, 0, 4.2, 0.11)] },
   { categorySlug: 'handguard', build: () => [tube(3.4, 0, 0, 3.4, 0.28, 0.28, 8)] },
-  { categorySlug: 'foregrip', build: () => [box(2.6, -0.62, 0, 0.22, 0.4, 0.22)] },
   { categorySlug: 'upper-receiver', build: () => [box(0.3, 0.05, 0, 2.2, 0.55, 0.5)] },
   { categorySlug: 'charging-handle', build: () => [box(-0.55, 0.38, 0, 0.35, 0.12, 0.2)] },
   { categorySlug: 'bolt-carrier-group', build: () => [box(0.05, 0.05, 0.3, 1.6, 0.2, 0.08)] },
   { categorySlug: 'optic-mount', build: () => [box(0.15, 0.36, 0, 0.9, 0.12, 0.35)] },
   { categorySlug: 'optic', build: () => [tube(0.15, 0.72, 0, 0.9, 0.16)] },
   { categorySlug: 'gas-system', build: () => [tube(2.1, 0.14, 0, 0.65, 0.05), box(1.85, 0.16, 0, 0.14, 0.14, 0.16)] },
-  { categorySlug: 'forward-assist', build: () => [box(-0.15, 0.05, 0.28, 0.16, 0.14, 0.1)] },
-  { categorySlug: 'ejection-port-cover', build: () => [box(0.2, 0.08, 0.27, 0.55, 0.28, 0.05)] },
   { categorySlug: 'magazine', build: () => [buildMagazineMesh()] },
   {
     categorySlug: 'lower-receiver',
@@ -229,9 +223,7 @@ const METAL_CATEGORIES = new Set([
   'trigger',
   'buffer-tube',
   'buffer-kit',
-  'gas-system',
-  'forward-assist',
-  'ejection-port-cover'
+  'gas-system'
 ]);
 
 function materialKindFor(categorySlug: string): MaterialKind {
@@ -496,26 +488,13 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
         'bolt-carrier-group',
         box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
       );
-
-      const midY = (upper.min.y + upper.max.y) / 2;
-      const side = upper.max.z + height * 0.05;
-      const forwardAssistX = THREE.MathUtils.lerp(upper.min.x, upper.max.x, 0.22);
-      addStandin('forward-assist', box(forwardAssistX, midY, side, height * 0.22, height * 0.22, height * 0.16));
-
-      const portX = THREE.MathUtils.lerp(upper.min.x, upper.max.x, 0.42);
-      addStandin('ejection-port-cover', box(portX, midY, side, height * 0.9, height * 0.5, height * 0.08));
     }
 
-    if (handguard) {
-      const x = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.32);
+    if (handguard && barrel) {
       const height = handguard.max.y - handguard.min.y;
-      addStandin('foregrip', box(x, handguard.min.y - height * 0.55, 0, height * 0.55, height * 1.1, height * 0.55));
-
-      if (barrel) {
-        const gasX = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.82);
-        const barrelY = (barrel.min.y + barrel.max.y) / 2;
-        addStandin('gas-system', tube(gasX, barrelY, 0, height * 1.6, height * 0.16));
-      }
+      const gasX = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.82);
+      const barrelY = (barrel.min.y + barrel.max.y) / 2;
+      addStandin('gas-system', tube(gasX, barrelY, 0, height * 1.6, height * 0.16));
     }
 
     if (lower && stock) {
