@@ -30,8 +30,8 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.updatePage(
-      'My Account | WD Web Solutions',
-      'View your order history with WD Web Solutions.'
+      'My Account | GunPartSelector.com',
+      'View your order history and saved builds.'
     );
 
     if (this.isAuthenticated) {

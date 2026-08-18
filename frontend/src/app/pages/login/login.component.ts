@@ -30,8 +30,8 @@ export class LoginComponent {
 
   constructor() {
     this.seoService.updatePage(
-      'Log In | WD Web Solutions',
-      'Log in to your WD Web Solutions account to manage bookings, orders, and more.'
+      'Log In | GunPartSelector.com',
+      'Log in to your GunPartSelector.com account to manage orders and saved builds.'
     );
   }
 

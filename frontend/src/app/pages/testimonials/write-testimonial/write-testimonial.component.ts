@@ -35,8 +35,8 @@ export class WriteTestimonialComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.updatePage(
-      'Share Your Experience | WD Web Solutions',
-      'Tell us about your experience working with WD Web Solutions.'
+      'Share Your Experience | GunPartSelector.com',
+      'Tell us about your experience using GunPartSelector.com to plan your build.'
     );
 
     if (!this.isAuthenticated) {

@@ -47,8 +47,8 @@ export class RegisterComponent {
 
   constructor() {
     this.seoService.updatePage(
-      'Create Account | WD Web Solutions',
-      'Create a WD Web Solutions account to book consultations, track orders, and more.'
+      'Create Account | GunPartSelector.com',
+      'Create a GunPartSelector.com account to save builds and track orders.'
     );
   }
 

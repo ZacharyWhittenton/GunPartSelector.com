@@ -42,7 +42,7 @@ private seoService: SeoService
 
 this.seoService.updatePage(
 
-'Page Not Found | WD Web Solutions',
+'Page Not Found | GunPartSelector.com',
 
 'The page you are looking for could not be found.'
 

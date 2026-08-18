@@ -1,18 +1,18 @@
-<section class="flex min-h-screen items-center justify-center bg-gray-50 px-6">
+<section class="forge-theme flex min-h-screen items-center justify-center bg-forge-ink px-6">
 
-    <div class="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+    <div class="w-full max-w-md rounded-xl border border-forge-line bg-forge-steel p-8 shadow-sm">
 
-      <h1 class="text-center text-3xl font-bold text-gray-900">
+      <h1 class="text-center text-3xl font-bold text-forge-text">
         Create Account
       </h1>
 
-      <p class="mt-2 text-center text-gray-500">
-        Register for WD Web Solutions.
+      <p class="mt-2 text-center text-forge-text-muted">
+        Register for GunPartSelector.com.
       </p>
 
       @if(errorMessage())
       {
-      <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+      <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">
         {{ errorMessage() }}
       </p>
       }
@@ -23,10 +23,10 @@
           <input
             formControlName="fullName"
             placeholder="Full Name"
-            class="w-full rounded-lg border px-4 py-3">
+            class="w-full rounded-lg border border-forge-line bg-forge-ink px-4 py-3 text-forge-text">
           @if(hasError('fullName'))
           {
-          <p class="mt-1 text-sm text-red-600">Full name is required.</p>
+          <p class="mt-1 text-sm text-forge-danger">Full name is required.</p>
           }
         </div>
 
@@ -35,10 +35,10 @@
             type="email"
             formControlName="emailAddress"
             placeholder="Email"
-            class="w-full rounded-lg border px-4 py-3">
+            class="w-full rounded-lg border border-forge-line bg-forge-ink px-4 py-3 text-forge-text">
           @if(hasError('emailAddress'))
           {
-          <p class="mt-1 text-sm text-red-600">A valid email address is required.</p>
+          <p class="mt-1 text-sm text-forge-danger">A valid email address is required.</p>
           }
         </div>
 
@@ -47,10 +47,10 @@
             type="password"
             formControlName="password"
             placeholder="Password"
-            class="w-full rounded-lg border px-4 py-3">
+            class="w-full rounded-lg border border-forge-line bg-forge-ink px-4 py-3 text-forge-text">
           @if(hasError('password'))
           {
-          <p class="mt-1 text-sm text-red-600">Password must be at least 8 characters.</p>
+          <p class="mt-1 text-sm text-forge-danger">Password must be at least 8 characters.</p>
           }
         </div>
 
@@ -59,10 +59,10 @@
             type="password"
             formControlName="confirmPassword"
             placeholder="Confirm Password"
-            class="w-full rounded-lg border px-4 py-3">
+            class="w-full rounded-lg border border-forge-line bg-forge-ink px-4 py-3 text-forge-text">
           @if(passwordsMismatch)
           {
-          <p class="mt-1 text-sm text-red-600">Passwords do not match.</p>
+          <p class="mt-1 text-sm text-forge-danger">Passwords do not match.</p>
           }
         </div>
 
@@ -72,19 +72,20 @@
           class="
           w-full
           rounded-lg
-          bg-blue-700
+          bg-forge-accent
           py-3
           font-semibold
           text-white
-          hover:bg-blue-800
+          transition
+          hover:brightness-110
           disabled:cursor-not-allowed
           disabled:opacity-60">
           {{ isSubmitting() ? 'Creating account…' : 'Register' }}
         </button>
 
-        <p class="text-center text-sm text-gray-500">
+        <p class="text-center text-sm text-forge-text-muted">
           Already have an account?
-          <a routerLink="/login" class="font-semibold text-blue-600 hover:text-blue-800">Login</a>
+          <a routerLink="/login" class="font-semibold text-forge-accent hover:underline">Login</a>
         </p>
 
       </form>
