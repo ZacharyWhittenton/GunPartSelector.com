@@ -10,14 +10,25 @@
     </div>
 
     <div class="relative mx-auto h-[420px] max-w-7xl px-6 sm:h-[500px]">
-      <app-ar15-viewer
-        class="block h-full w-full"
-        [selectedCategorySlugs]="selectedCategorySlugs()"
-        (categoryClick)="onViewerCategoryClick($event)"
-      />
-      <p class="pointer-events-none absolute bottom-3 left-9 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">
-        Drag to rotate — click a part to configure it
-      </p>
+      @if (webglUnavailable()) {
+        <div class="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-forge-line bg-forge-steel text-center">
+          <p class="font-medium text-forge-text">3D preview isn't available in this browser</p>
+          <p class="max-w-sm text-sm text-forge-text-muted">
+            Your browser or device has 3D graphics (WebGL) disabled. You can still browse and build
+            using the category list below.
+          </p>
+        </div>
+      } @else {
+        <app-ar15-viewer
+          class="block h-full w-full"
+          [selectedCategorySlugs]="selectedCategorySlugs()"
+          (categoryClick)="onViewerCategoryClick($event)"
+          (webglUnavailable)="webglUnavailable.set(true)"
+        />
+        <p class="pointer-events-none absolute bottom-3 left-9 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">
+          Drag to rotate — click a part to configure it
+        </p>
+      }
     </div>
   </section>
 

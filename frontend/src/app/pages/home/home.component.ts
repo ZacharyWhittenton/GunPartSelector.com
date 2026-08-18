@@ -46,6 +46,8 @@ export class HomeComponent implements OnInit {
   readonly buildService = inject(BuildService);
 
   readonly categories = signal<PartCategory[]>([]);
+  readonly webglUnavailable = signal(false);
+
   readonly isLoadingCategories = signal(false);
 
   readonly activeCategorySlug = signal<string | null>(null);

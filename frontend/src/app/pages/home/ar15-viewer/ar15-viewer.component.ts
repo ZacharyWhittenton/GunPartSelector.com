@@ -190,6 +190,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   @Input() selectedCategorySlugs: string[] = [];
   @Input() activeCategorySlug: string | null = null;
   @Output() categoryClick = new EventEmitter<string>();
+  @Output() webglUnavailable = new EventEmitter<void>();
 
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
@@ -207,7 +208,13 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private pmremGenerator?: THREE.PMREMGenerator;
 
   ngAfterViewInit(): void {
-    this.initScene();
+    try {
+      this.initScene();
+    } catch (error) {
+      console.error('3D viewer unavailable:', error);
+      this.webglUnavailable.emit();
+      return;
+    }
     this.initialized = true;
     this.applySelectionColors();
   }
