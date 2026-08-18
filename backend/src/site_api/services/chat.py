@@ -3,38 +3,41 @@ from datetime import UTC, datetime
 
 from anthropic import AsyncAnthropic
 
-from site_api.db.repositories import (
-    SqlAlchemyAppointmentRepository,
-    SqlAlchemyBlogPostRepository,
-    SqlAlchemyUserRepository,
-)
+from site_api.db.repositories import SqlAlchemyBlogPostRepository, SqlAlchemyUserRepository
 from site_api.domain.blog import PostStatus
 from site_api.domain.chat import ChatNotConfiguredError, ChatTurn
-from site_api.domain.scheduling import AppointmentStatus
 from site_api.domain.users import AuthenticatedUser, UserRole
 
 MAX_RESPONSE_TOKENS = 1024
 
 SITE_MAP = """
 Pages available on the site:
-- Home (/) — overview and hero
-- About (/about) — company story
-- Services (/services) — service listings, each with a detail page at /services/:slug
-- Gallery (/gallery) — portfolio/project examples
-- Resources (/resources) — articles and guides
+- Home (/) — interactive 3D AR-15 build configurator
+- Parts catalog (/parts) — browse parts by category, each category at /parts/:categorySlug
+  and each product at /parts/:categorySlug/:productSlug
+- Store (/merch) — apparel and merch, each item at /merch/:slug
+- About (/about) — what GunPartSelector.com is and how it works
+- Support (/services) — help topics
+- Guides (/resources) — build guides and articles
 - Blog (/blog) — blog posts, each at /blog/:slug
-- Contact (/contact) — contact form for project inquiries
-- Schedule (/schedule) — book a meeting time
+- Contact (/contact) — contact form
+- Cart (/cart) and checkout
 - Login (/login) and Register (/register) — account access
-- Admin dashboard (/admin), Admin blog (/admin/blog), Admin schedule (/admin/schedule) — admin-only
+- Admin dashboard (/admin) and admin sections for the parts catalog, blog, and store
+  orders — admin-only
 """.strip()
 
 BASE_INSTRUCTIONS = """
-You are the site assistant for WD Web Solutions, a web design and development agency.
+You are the site assistant for GunPartSelector.com, an AR-15 build configurator and
+parts catalog. Visitors browse parts by category, add them to a build with live
+compatibility checks, and can share their build with a link. GunPartSelector.com is
+an affiliate site: "Add to Build" and product links send the visitor to a retailer to
+complete the purchase — GunPartSelector.com does not hold inventory or ship parts.
 Answer questions about the business and help visitors find their way around the site.
 Be concise and friendly. Only state facts you were given in this prompt or the
 conversation — if you don't know something, say so and point the person to the
-Contact page rather than guessing.
+Contact page rather than guessing. Never give legal advice about firearm regulations;
+point those questions to the Contact page or a qualified professional instead.
 """.strip()
 
 
@@ -43,14 +46,12 @@ class ChatService:
         self,
         client: AsyncAnthropic | None,
         blog_repository: SqlAlchemyBlogPostRepository,
-        appointment_repository: SqlAlchemyAppointmentRepository,
         user_repository: SqlAlchemyUserRepository,
         model: str,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
     ) -> None:
         self._client = client
         self._blog_repository = blog_repository
-        self._appointment_repository = appointment_repository
         self._user_repository = user_repository
         self._model = model
         self._clock = clock
@@ -88,65 +89,36 @@ class ChatService:
             sections.append(f"Recently published blog posts:\n{titles}")
 
         if current_user is None:
-            sections.append(await self._visitor_context())
+            sections.append(self._visitor_context())
         elif current_user.role is UserRole.ADMIN:
             sections.append(await self._admin_context(current_user))
         else:
-            sections.append(await self._customer_context(current_user))
+            sections.append(self._customer_context(current_user))
 
         if page_context:
             sections.append(f"The person is currently viewing: {page_context}")
 
         return "\n\n".join(sections)
 
-    async def _visitor_context(self) -> str:
-        open_slots = await self._appointment_repository.list_open_upcoming(self._clock())
-        availability = (
-            f"There are currently {len(open_slots)} open meeting time(s) at /schedule."
-            if open_slots
-            else "There are no open meeting times right now — check back soon."
-        )
+    def _visitor_context(self) -> str:
         return (
-            "You are speaking with a visitor who has not registered or logged in.\n"
-            "They must register (/register) or log in (/login) before they can book a "
-            f"meeting on the Schedule page.\n{availability}"
+            "You are speaking with a visitor who has not registered or logged in. "
+            "Registering (/register) or logging in (/login) lets them save a build "
+            "and view their order history, but browsing the catalog and using the "
+            "builder does not require an account."
         )
 
-    async def _customer_context(self, current_user: AuthenticatedUser) -> str:
-        open_slots = await self._appointment_repository.list_open_upcoming(self._clock())
-        my_appointments = await self._appointment_repository.list_for_client(current_user.id)
-        upcoming = [
-            appointment
-            for appointment in my_appointments
-            if appointment.status is AppointmentStatus.BOOKED
-        ]
-        upcoming_text = (
-            "\n".join(f"- {a.starts_at.isoformat()} UTC" for a in upcoming[:5])
-            if upcoming
-            else "none"
-        )
-        return (
-            f"You are speaking with a logged-in client named {current_user.full_name}.\n"
-            f"There are {len(open_slots)} open meeting time(s) at /schedule.\n"
-            f"Their upcoming booked appointments (UTC):\n{upcoming_text}"
-        )
+    def _customer_context(self, current_user: AuthenticatedUser) -> str:
+        return f"You are speaking with a logged-in customer named {current_user.full_name}."
 
     async def _admin_context(self, current_user: AuthenticatedUser) -> str:
         users = await self._user_repository.list_all()
-        all_appointments = await self._appointment_repository.list_all(status=None)
-        open_count = sum(
-            1 for a in all_appointments if a.status is AppointmentStatus.OPEN
-        )
-        booked_count = sum(
-            1 for a in all_appointments if a.status is AppointmentStatus.BOOKED
-        )
         all_posts = await self._blog_repository.list_all()
         draft_count = sum(1 for p in all_posts if p.status is PostStatus.DRAFT)
         return (
             f"You are speaking with an admin named {current_user.full_name}. They can "
-            "manage accounts at /admin, blog posts at /admin/blog, and scheduling at "
-            "/admin/schedule.\n"
-            f"Current stats: {len(users)} registered account(s), {open_count} open "
-            f"meeting slot(s), {booked_count} booked appointment(s), {draft_count} "
-            "draft blog post(s)."
+            "manage the parts catalog and store at /admin, blog posts at /admin/blog, "
+            "and store orders at /admin/marketplace/orders.\n"
+            f"Current stats: {len(users)} registered account(s), {draft_count} draft "
+            "blog post(s)."
         )

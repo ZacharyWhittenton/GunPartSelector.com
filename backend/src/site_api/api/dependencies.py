@@ -260,15 +260,10 @@ def get_anthropic_client(request: Request) -> AsyncAnthropic | None:
 def get_chat_service(
     client: Annotated[AsyncAnthropic | None, Depends(get_anthropic_client)],
     blog_repository: Annotated[SqlAlchemyBlogPostRepository, Depends(get_blog_post_repository)],
-    appointment_repository: Annotated[
-        SqlAlchemyAppointmentRepository, Depends(get_appointment_repository)
-    ],
     user_repository: Annotated[SqlAlchemyUserRepository, Depends(get_user_repository)],
     settings: Annotated[Settings, Depends(get_settings)],
 ) -> ChatService:
-    return ChatService(
-        client, blog_repository, appointment_repository, user_repository, settings.chat_model
-    )
+    return ChatService(client, blog_repository, user_repository, settings.chat_model)
 
 
 def get_stripe_client(request: Request) -> stripe.StripeClient | None:
