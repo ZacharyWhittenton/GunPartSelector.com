@@ -528,7 +528,9 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
             y: (dustCover.max.y - dustCover.min.y) * 0.7 + pad
           }
         : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.4 };
-      const zCenter = (upper.min.z + upper.max.z) / 2;
+      // Ejection-port side (+Z, facing the default camera) shifted toward the
+      // opposite side / gun's own centerline, per feedback against the live model.
+      const zCenter = (upper.min.z + upper.max.z) / 2 - inch * 0.5;
       // Depth (how far it pokes toward/away from the viewer) sized off the dust
       // cover's own real thickness rather than the receiver's full width -- that
       // read as sitting proud of the surface instead of embedded in the body.
