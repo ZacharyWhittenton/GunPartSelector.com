@@ -1,18 +1,19 @@
-<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+<div class="forge-theme min-h-screen bg-forge-ink pb-20">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/olive-grove-golden-hour.jpg"
+    imageAlt=""
+    eyebrow="Builds"
+    title="Featured Builds"
+    subtitle="A few complete builds assembled with the configurator, start to finish."
+  ></app-page-hero>
+
   <app-page-container>
 
-    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Builds</p>
-    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
-      Featured builds
-    </h1>
-    <p class="mt-4 max-w-2xl text-forge-text-muted">
-      A few complete builds assembled with the configurator, start to finish.
-    </p>
-
     @if (isLoading()) {
-      <p class="mt-12 text-forge-text-muted">Loading builds…</p>
+      <p class="mt-16 text-forge-text-muted">Loading builds…</p>
     } @else {
-      <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3" appScrollReveal>
         @for (featured of featuredBuilds(); track featured.slug) {
           <a
             [routerLink]="['/builder/share', featured.slug]"

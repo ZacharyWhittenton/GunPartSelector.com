@@ -1,15 +1,16 @@
-<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+<div class="forge-theme min-h-screen bg-forge-ink pb-20">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/alpine-forest-lake.jpg"
+    imageAlt=""
+    eyebrow="Guides"
+    title="Buying & Compatibility Guides"
+    subtitle="The background behind the compatibility checks the builder makes for you."
+  ></app-page-hero>
+
   <app-page-container>
 
-    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Guides</p>
-    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
-      Buying &amp; compatibility guides
-    </h1>
-    <p class="mt-4 max-w-2xl text-forge-text-muted">
-      The background behind the compatibility checks the builder makes for you.
-    </p>
-
-    <div class="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="mt-16 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3" appScrollReveal>
       @for (resource of resources; track resource.slug) {
         <div class="rounded-lg border border-forge-line bg-forge-steel p-6">
           <i class="fa-solid fa-{{ resource.icon }} text-lg text-forge-accent" aria-hidden="true"></i>

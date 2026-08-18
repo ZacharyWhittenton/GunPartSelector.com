@@ -1,15 +1,16 @@
-<div class="forge-theme min-h-screen bg-forge-ink pb-20 pt-16">
+<div class="forge-theme min-h-screen bg-forge-ink pb-20">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/red-rock-desert.jpg"
+    imageAlt=""
+    eyebrow="Support"
+    title="Orders, Transfers & Builds"
+    subtitle="A few things worth knowing before you check out on a retailer's site."
+  ></app-page-hero>
+
   <app-page-container>
 
-    <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">Support</p>
-    <h1 class="mt-2 max-w-2xl text-3xl font-bold text-forge-text sm:text-4xl">
-      Questions about orders, transfers, and builds
-    </h1>
-    <p class="mt-4 max-w-2xl text-forge-text-muted">
-      A few things worth knowing before you check out on a retailer's site.
-    </p>
-
-    <div class="mt-12 flex flex-col gap-4">
+    <div class="mt-16 flex flex-col gap-4" appScrollReveal>
       @for (topic of topics; track topic.question) {
         <div class="rounded-lg border border-forge-line bg-forge-steel p-6">
           <h2 class="font-semibold text-forge-text">{{ topic.question }}</h2>

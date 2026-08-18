@@ -7,6 +7,8 @@ import { BuildShareResponse } from '../../core/models/build.model';
 import { BuildsApiService } from '../../core/services/builds-api.service';
 import { SeoService } from '../../core/services/seo.service';
 import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
+import { PageHeroComponent } from '../../shared/components/page-hero/page-hero.component';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 interface FeaturedBuildMeta {
   slug: string;
@@ -37,7 +39,7 @@ export interface FeaturedBuild extends FeaturedBuildMeta {
 @Component({
   selector: 'app-gallery',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe, PageContainerComponent],
+  imports: [RouterLink, CurrencyPipe, PageContainerComponent, PageHeroComponent, ScrollRevealDirective],
   templateUrl: './gallery.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './gallery.component.css'

@@ -3,6 +3,8 @@ import { RouterLink } from '@angular/router';
 
 import { SeoService } from '../../core/services/seo.service';
 import { PageContainerComponent } from '../../shared/components/page-container/page-container.component';
+import { PageHeroComponent } from '../../shared/components/page-hero/page-hero.component';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 interface SupportTopic {
   question: string;
@@ -35,7 +37,7 @@ const SUPPORT_TOPICS: SupportTopic[] = [
 @Component({
   selector: 'app-services',
   standalone: true,
-  imports: [RouterLink, PageContainerComponent],
+  imports: [RouterLink, PageContainerComponent, PageHeroComponent, ScrollRevealDirective],
   templateUrl: './services.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './services.component.css'
