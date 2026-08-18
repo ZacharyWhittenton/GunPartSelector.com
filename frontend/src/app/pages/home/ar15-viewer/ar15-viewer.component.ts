@@ -460,24 +460,53 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     const handguard = boundsByCategory.get('handguard');
     const barrel = boundsByCategory.get('barrel');
 
-    const addStandin = (categorySlug: string, mesh: THREE.Mesh): void => {
+    const addStandin = (categorySlug: string, mesh: THREE.Mesh, materialOverride?: THREE.Material): void => {
       const kind = materialKindFor(categorySlug);
-      mesh.material = this.createMaterial(kind, COLOR_NEUTRAL_METAL);
+      const material = materialOverride ?? this.createMaterial(kind, COLOR_NEUTRAL_METAL);
+      mesh.material = material;
       mesh.userData['categorySlug'] = categorySlug;
       this.scene.add(mesh);
       this.clickableMeshes.push(mesh);
       this.allMeshes.push(mesh);
       this.meshesBySlug.set(categorySlug, [
-        { mesh, neutralColor: new THREE.Color(COLOR_NEUTRAL_METAL), recolorable: kind !== 'glass' }
+        {
+          mesh,
+          neutralColor: (material as THREE.MeshStandardMaterial).color.clone(),
+          recolorable: kind !== 'glass'
+        }
       ]);
     };
 
     if (upper) {
       const centerX = (upper.min.x + upper.max.x) / 2;
       const height = upper.max.y - upper.min.y;
+      const receiverMaterial = this.meshesBySlug.get('upper-receiver')?.[0]?.mesh.material as
+        | THREE.MeshStandardMaterial
+        | undefined;
+      // Nested fully inside the receiver's solid shell, this hit target was reachable
+      // only through whatever incidental gaps exist in the mesh -- a sliver so thin it
+      // read as "can't select the BCG at all". Instead, extend it a hair past the
+      // shell's own outer surface so raycasting always hits it first, from any
+      // rotation, across a generous area. Clone the receiver's own material (color,
+      // roughness, metalness) rather than the generic metal preset -- the preset reads
+      // noticeably shinier than the receiver's own surface, so it stood out as a
+      // bright patch instead of blending in.
+      const material = receiverMaterial
+        ? (receiverMaterial.clone() as THREE.MeshStandardMaterial)
+        : this.createMaterial('metal', COLOR_NEUTRAL_METAL);
+      const margin = height * 0.03;
+      const centerZ = (upper.min.z + upper.max.z) / 2;
       addStandin(
         'bolt-carrier-group',
-        box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
+        box(
+          centerX,
+          (upper.min.y + upper.max.y) / 2,
+          centerZ,
+          (upper.max.x - upper.min.x) * 0.65,
+          height * 0.4,
+          upper.max.z - upper.min.z + margin * 2
+        ),
+        material
       );
     }
 
