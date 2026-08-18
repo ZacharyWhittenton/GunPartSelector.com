@@ -61,21 +61,20 @@ const GLTF_PART_NODE_TO_CATEGORY: Record<string, string> = {
   uar15_handguard_17: 'handguard',
   'ar15_30rnd_mag_(zbroyar)_14': 'magazine',
   // Single mesh spanning both the front and rear sight positions.
-  uar15_iron_sight_18: 'optic'
+  uar15_iron_sight_18: 'optic',
+  // The dust cover is the only part of the BCG assembly actually exposed on the
+  // model's surface -- using it as the pick target (rather than a box buried inside
+  // the solid receiver shell, which raycasting could barely reach) gives full,
+  // reliable hover coverage over the area a user would associate with the BCG.
+  uar15_dust_cover_3: 'bolt-carrier-group'
 };
 
 /** Extra real meshes kept for visual richness but not tied to a pickable category. */
-const GLTF_DETAIL_NODE_NAMES = [
-  'uar15_selector_1',
-  'uar15_mag_catch_2',
-  'uar15_dust_cover_3',
-  'uar15_bolt_catch_5',
-  'uar15_bolt_6'
-];
+const GLTF_DETAIL_NODE_NAMES = ['uar15_selector_1', 'uar15_mag_catch_2', 'uar15_bolt_catch_5', 'uar15_bolt_6'];
 
 /** Categories the loaded model has no part for -- built procedurally and anchored to
  * the loaded model's own geometry once it's known, rather than guessed coordinates. */
-const STANDIN_CATEGORIES = new Set(['bolt-carrier-group', 'gas-system']);
+const STANDIN_CATEGORIES = new Set(['gas-system']);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
  * detail meshes (rail ridges, M-LOK slots) don't round away into blobs while large
@@ -456,7 +455,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
    * positioned from the real geometry's own bounding boxes instead of guessed
    * coordinates, so they stay correctly anchored regardless of model proportions. */
   private buildStandinParts(boundsByCategory: Map<string, THREE.Box3>): void {
-    const upper = boundsByCategory.get('upper-receiver');
     const handguard = boundsByCategory.get('handguard');
     const barrel = boundsByCategory.get('barrel');
 
@@ -471,15 +469,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
         { mesh, neutralColor: new THREE.Color(COLOR_NEUTRAL_METAL), recolorable: kind !== 'glass' }
       ]);
     };
-
-    if (upper) {
-      const centerX = (upper.min.x + upper.max.x) / 2;
-      const height = upper.max.y - upper.min.y;
-      addStandin(
-        'bolt-carrier-group',
-        box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
-      );
-    }
 
     if (handguard && barrel) {
       const height = handguard.max.y - handguard.min.y;
