@@ -37,6 +37,7 @@ const SECTION_ORDER: CatalogSection[] = ['upper', 'lower', 'stock', 'optics', 'a
     LoadingSpinnerComponent
   ],
   templateUrl: './home.component.html',
+  styleUrl: './home.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HomeComponent implements OnInit {

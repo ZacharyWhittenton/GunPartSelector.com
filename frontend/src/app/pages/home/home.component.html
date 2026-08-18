@@ -1,6 +1,13 @@
 <div class="forge-theme min-h-screen bg-forge-ink">
-  <section class="border-b border-forge-line">
-    <div class="mx-auto max-w-7xl px-6 py-10">
+  <section class="relative overflow-hidden border-b border-forge-line">
+    <img
+      src="/assets/images/scenery/red-rock-desert.jpg"
+      alt=""
+      class="hero-backdrop absolute inset-0 h-full w-full object-cover"
+    >
+    <div class="absolute inset-0 bg-gradient-to-b from-[#2b2116]/25 via-[#f1e3ca]/35 to-forge-ink"></div>
+
+    <div class="relative z-10 mx-auto max-w-7xl px-6 py-10">
       <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">The AR-15 Builder</p>
       <h1 class="mt-2 text-3xl font-bold text-forge-text sm:text-4xl">Build Your Rifle, Part by Part</h1>
       <p class="mt-2 max-w-xl text-sm text-forge-text-muted">
@@ -9,7 +16,7 @@
       </p>
     </div>
 
-    <div class="relative mx-auto h-[420px] max-w-7xl px-6 sm:h-[500px]">
+    <div class="relative z-10 mx-auto h-[420px] max-w-7xl px-6 sm:h-[500px]">
       @if (webglUnavailable()) {
         <div class="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border border-forge-line bg-forge-steel text-center">
           <p class="font-medium text-forge-text">3D preview isn't available in this browser</p>

@@ -1,0 +1,20 @@
+.hero-backdrop {
+  animation: home-hero-zoom 10s var(--ease-editorial, ease-out) forwards;
+  transform: scale(1.06);
+}
+
+@keyframes home-hero-zoom {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-backdrop {
+    animation: none;
+    transform: none;
+  }
+}
