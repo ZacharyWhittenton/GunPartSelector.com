@@ -59,7 +59,9 @@ const GLTF_PART_NODE_TO_CATEGORY: Record<string, string> = {
   uar15_grip_15: 'pistol-grip',
   uar15_stock_16: 'stock-brace',
   uar15_handguard_17: 'handguard',
-  'ar15_30rnd_mag_(zbroyar)_14': 'magazine'
+  'ar15_30rnd_mag_(zbroyar)_14': 'magazine',
+  // Single mesh spanning both the front and rear sight positions.
+  uar15_iron_sight_18: 'optic'
 };
 
 /** Extra real meshes kept for visual richness but not tied to a pickable category. */
@@ -68,20 +70,12 @@ const GLTF_DETAIL_NODE_NAMES = [
   'uar15_mag_catch_2',
   'uar15_dust_cover_3',
   'uar15_bolt_catch_5',
-  'uar15_bolt_6',
-  'uar15_iron_sight_18'
+  'uar15_bolt_6'
 ];
 
 /** Categories the loaded model has no part for -- built procedurally and anchored to
  * the loaded model's own geometry once it's known, rather than guessed coordinates. */
-const STANDIN_CATEGORIES = new Set([
-  'optic-mount',
-  'optic',
-  'buffer-tube',
-  'buffer-kit',
-  'bolt-carrier-group',
-  'gas-system'
-]);
+const STANDIN_CATEGORIES = new Set(['buffer-tube', 'buffer-kit', 'bolt-carrier-group', 'gas-system']);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
  * detail meshes (rail ridges, M-LOK slots) don't round away into blobs while large
@@ -190,8 +184,10 @@ const PART_CONFIGS: PartMeshConfig[] = [
   { categorySlug: 'upper-receiver', build: () => [box(0.3, 0.05, 0, 2.2, 0.55, 0.5)] },
   { categorySlug: 'charging-handle', build: () => [box(-0.55, 0.38, 0, 0.35, 0.12, 0.2)] },
   { categorySlug: 'bolt-carrier-group', build: () => [box(0.05, 0.05, 0.3, 1.6, 0.2, 0.08)] },
-  { categorySlug: 'optic-mount', build: () => [box(0.15, 0.36, 0, 0.9, 0.12, 0.35)] },
-  { categorySlug: 'optic', build: () => [tube(0.15, 0.72, 0, 0.9, 0.16)] },
+  {
+    categorySlug: 'optic',
+    build: () => [box(0.15, 0.36, 0, 0.9, 0.12, 0.35), tube(0.15, 0.72, 0, 0.9, 0.16)]
+  },
   { categorySlug: 'gas-system', build: () => [tube(2.1, 0.14, 0, 0.65, 0.05), box(1.85, 0.16, 0, 0.14, 0.14, 0.16)] },
   { categorySlug: 'magazine', build: () => [buildMagazineMesh()] },
   {
@@ -218,7 +214,6 @@ const METAL_CATEGORIES = new Set([
   'upper-receiver',
   'charging-handle',
   'bolt-carrier-group',
-  'optic-mount',
   'lower-receiver',
   'trigger',
   'buffer-tube',
@@ -480,10 +475,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     if (upper) {
       const centerX = (upper.min.x + upper.max.x) / 2;
-      const topY = upper.max.y;
       const height = upper.max.y - upper.min.y;
-      addStandin('optic-mount', box(centerX, topY + height * 0.1, 0, (upper.max.x - centerX) * 0.9, height * 0.14, height * 0.85));
-      addStandin('optic', tube(centerX, topY + height * 0.42, 0, height * 1.05, height * 0.18));
       addStandin(
         'bolt-carrier-group',
         box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
