@@ -511,28 +511,28 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       // it's reachable from either side after the model has been rotated, not only
       // from the exact angle it loads at.
       const dustCover = boundsByCategory.get('dust-cover');
-      const pad = height * 0.05;
-      const zMargin = height * 0.01;
+      const pad = height * 0.07;
       // Roughly an inch in this model's units (TARGET_LENGTH spans the whole rifle,
       // ~30in overall) -- used below to nudge the hitbox per feedback against the real
-      // rendered model: up a touch (it read low against the dust cover), then pulled
-      // back down and inward (it was standing proud above the rail and poking out
-      // past the receiver's real surface).
+      // rendered model: raised up to sit on the dust cover rather than below it.
       const inch = TARGET_LENGTH / 30;
       const center = dustCover
         ? {
             x: (dustCover.min.x + dustCover.max.x) / 2,
-            y: (dustCover.min.y + dustCover.max.y) / 2 + inch * 0.15
+            y: (dustCover.min.y + dustCover.max.y) / 2 + inch * 0.4
           }
-        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2 + inch * 0.15 };
+        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2 + inch * 0.4 };
       const size = dustCover
         ? {
             x: (dustCover.max.x - dustCover.min.x) * 0.7 + pad,
-            y: (dustCover.max.y - dustCover.min.y) * 0.5 + pad
+            y: (dustCover.max.y - dustCover.min.y) * 0.7 + pad
           }
-        : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.3 };
+        : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.4 };
       const zCenter = (upper.min.z + upper.max.z) / 2;
-      const zSize = Math.max(upper.max.z - upper.min.z + zMargin * 2 - inch * 0.7, size.y);
+      // Depth (how far it pokes toward/away from the viewer) sized off the dust
+      // cover's own real thickness rather than the receiver's full width -- that
+      // read as sitting proud of the surface instead of embedded in the body.
+      const zSize = dustCover ? (dustCover.max.z - dustCover.min.z) * 1.3 : size.y;
       addStandin(
         'bolt-carrier-group',
         box(center.x, center.y, zCenter, size.x, size.y, zSize),
