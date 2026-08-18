@@ -515,10 +515,12 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       // Shrink to 70% of the dust cover's own bounding box before padding -- that box
       // still came out visibly larger than the raised panel itself (likely includes a
       // hinge/mounting tab extending past the visible part), so padding it directly
-      // was still oversized.
+      // was still oversized. The hitbox itself is invisible until hovered/selected
+      // (see hiddenWhenNeutral below), so a more generous pad here costs nothing
+      // visually while making the target easier to actually click with a real mouse.
       const shrink = 0.7;
-      const pad = height * 0.03;
-      const zPad = height * 0.02;
+      const pad = height * 0.07;
+      const zPad = height * 0.05;
       const center = dustCover
         ? {
             x: (dustCover.min.x + dustCover.max.x) / 2,
