@@ -501,43 +501,41 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     if (upper) {
       const height = upper.max.y - upper.min.y;
       // Nested fully inside the receiver's solid shell, this hit target was reachable
-      // only through whatever incidental gaps exist in the mesh -- a sliver so thin it
-      // read as "can't select the BCG at all". Raycasting doesn't care whether a mesh
-      // actually renders any pixels, so keep it fully transparent (colorWrite/
-      // depthWrite off) until hovered or selected -- full coverage with nothing
-      // visible to look wrong. Sized and centered on the dust cover (the one part of
-      // the BCG assembly actually exposed on the surface) with only a small margin,
-      // rather than the upper receiver's full bounding box -- that box is both taller
-      // and deeper than the visible body at this point (other geometry elsewhere
-      // along the rail skews it), so using it produced a hitbox many times larger
-      // than the gun itself, especially obvious from a top-down view.
+      // only through whatever incidental gaps exist in the mesh. Raycasting doesn't
+      // care whether a mesh actually renders any pixels, so keep it fully transparent
+      // (colorWrite/depthWrite off) until hovered or selected -- that means size costs
+      // nothing visually when idle, so there's no reason to hug one side only. Sizing
+      // it to the real dust cover panel's X/Y (so the hover highlight, when it does
+      // show, reads as roughly the right part and place) but wrapping the FULL Z depth
+      // of the receiver -- rather than just the one side the dust cover sits on -- so
+      // it's reachable from either side after the model has been rotated, not only
+      // from the exact angle it loads at.
       const dustCover = boundsByCategory.get('dust-cover');
-      // Shrink to 70% of the dust cover's own bounding box before padding -- that box
-      // still came out visibly larger than the raised panel itself (likely includes a
-      // hinge/mounting tab extending past the visible part), so padding it directly
-      // was still oversized. The hitbox itself is invisible until hovered/selected
-      // (see hiddenWhenNeutral below), so a more generous pad here costs nothing
-      // visually while making the target easier to actually click with a real mouse.
-      const shrink = 0.7;
-      const pad = height * 0.07;
-      const zPad = height * 0.05;
+      const pad = height * 0.05;
+      const zMargin = height * 0.01;
+      // Roughly an inch in this model's units (TARGET_LENGTH spans the whole rifle,
+      // ~30in overall) -- used below to nudge the hitbox per feedback against the real
+      // rendered model: up a touch (it read low against the dust cover), then pulled
+      // back down and inward (it was standing proud above the rail and poking out
+      // past the receiver's real surface).
+      const inch = TARGET_LENGTH / 30;
       const center = dustCover
         ? {
             x: (dustCover.min.x + dustCover.max.x) / 2,
-            y: (dustCover.min.y + dustCover.max.y) / 2,
-            z: (dustCover.min.z + dustCover.max.z) / 2
+            y: (dustCover.min.y + dustCover.max.y) / 2 + inch * 0.15
           }
-        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2, z: (upper.min.z + upper.max.z) / 2 };
+        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2 + inch * 0.15 };
       const size = dustCover
         ? {
-            x: (dustCover.max.x - dustCover.min.x) * shrink + pad,
-            y: (dustCover.max.y - dustCover.min.y) * shrink + pad,
-            z: (dustCover.max.z - dustCover.min.z) * shrink + zPad
+            x: (dustCover.max.x - dustCover.min.x) * 0.7 + pad,
+            y: (dustCover.max.y - dustCover.min.y) * 0.5 + pad
           }
-        : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.4, z: upper.max.z - upper.min.z + height * 0.06 };
+        : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.3 };
+      const zCenter = (upper.min.z + upper.max.z) / 2;
+      const zSize = Math.max(upper.max.z - upper.min.z + zMargin * 2 - inch * 0.7, size.y);
       addStandin(
         'bolt-carrier-group',
-        box(center.x, center.y, center.z, size.x, size.y, size.z),
+        box(center.x, center.y, zCenter, size.x, size.y, zSize),
         { hiddenWhenNeutral: true }
       );
     }
