@@ -14,6 +14,7 @@ import {
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 interface PartMeshConfig {
   categorySlug: string;
@@ -22,12 +23,22 @@ interface PartMeshConfig {
 
 type MaterialKind = 'metal' | 'polymer' | 'glass';
 
-const COLOR_NEUTRAL_METAL = 0x7a828c;
-const COLOR_NEUTRAL_POLYMER = 0x2b2f33;
+// Matte anodized aluminum / phosphate-finish tones rather than raw silvery grey --
+// real AR-15 receivers and barrels read much darker than bare metal.
+const COLOR_NEUTRAL_METAL = 0x35383d;
+const COLOR_NEUTRAL_POLYMER = 0x1f2225;
 const COLOR_SELECTED = 0xc0262f;
 const COLOR_HOVER = 0xe06068;
-const COLOR_DETAIL_METAL = 0x565d64;
-const COLOR_DETAIL_POLYMER = 0x34383c;
+const COLOR_DETAIL_METAL = 0x26282c;
+const COLOR_DETAIL_POLYMER = 0x1a1c1f;
+
+/** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
+ * detail meshes (rail ridges, M-LOK slots) don't round away into blobs while large
+ * receivers/grips get a visible, light-catching chamfer like a machined part would. */
+function bevelRadiusFor(w: number, h: number, d: number): number {
+  const smallest = Math.min(w, h, d);
+  return Math.min(0.03, Math.max(0.006, smallest * 0.12));
+}
 
 function box(
   x: number,
@@ -38,7 +49,8 @@ function box(
   d: number,
   rotZ = 0
 ): THREE.Mesh {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d, 2, 2, 2));
+  const radius = bevelRadiusFor(w, h, d);
+  const mesh = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 2, radius));
   mesh.position.set(x, y, z);
   mesh.rotation.z = rotZ;
   return mesh;
@@ -206,6 +218,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private frameId = 0;
   private initialized = false;
   private pmremGenerator?: THREE.PMREMGenerator;
+  private surfaceNoiseTexture?: THREE.Texture;
 
   ngAfterViewInit(): void {
     try {
@@ -232,6 +245,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     this.renderer?.dispose();
     this.controls?.dispose();
     this.pmremGenerator?.dispose();
+    this.surfaceNoiseTexture?.dispose();
     for (const mesh of this.allMeshes) {
       mesh.geometry.dispose();
       (mesh.material as THREE.Material).dispose();
@@ -255,6 +269,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
     this.scene.environment = this.pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    this.surfaceNoiseTexture = this.createSurfaceNoiseTexture();
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
@@ -344,6 +359,9 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
         clearcoat: 0.15,
         clearcoatRoughness: 0.4,
         envMapIntensity: 0.6,
+        roughnessMap: this.surfaceNoiseTexture,
+        bumpMap: this.surfaceNoiseTexture,
+        bumpScale: 0.006,
         side: THREE.DoubleSide
       });
     }
@@ -354,8 +372,35 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       clearcoat: 0.25,
       clearcoatRoughness: 0.3,
       envMapIntensity: 1,
+      roughnessMap: this.surfaceNoiseTexture,
+      bumpMap: this.surfaceNoiseTexture,
+      bumpScale: 0.004,
       side: THREE.DoubleSide
     });
+  }
+
+  /** Small tiled grayscale noise applied as a roughness/bump map so machined-metal and
+   * polymer surfaces catch light unevenly instead of reading as flat plastic. */
+  private createSurfaceNoiseTexture(): THREE.Texture {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext('2d')!;
+    const imageData = ctx.createImageData(size, size);
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const value = 165 + Math.floor(Math.random() * 60);
+      imageData.data[i] = value;
+      imageData.data[i + 1] = value;
+      imageData.data[i + 2] = value;
+      imageData.data[i + 3] = 255;
+    }
+    ctx.putImageData(imageData, 0, 0);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(6, 6);
+    return texture;
   }
 
   private createRadialShadowTexture(): THREE.Texture {
