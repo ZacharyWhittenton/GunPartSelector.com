@@ -17,7 +17,8 @@ import {
   ContactFormPayload
 } from './contact.service';
 
-import { HeroVideoComponent } from '../../shared/components/hero-video/hero-video.component';
+import { PageHeroComponent } from '../../shared/components/page-hero/page-hero.component';
+import { ScrollRevealDirective } from '../../shared/directives/scroll-reveal.directive';
 
 import { SeoService } from '../../core/services/seo.service';
 
@@ -31,7 +32,8 @@ import { SeoService } from '../../core/services/seo.service';
 
   imports: [
     ReactiveFormsModule,
-    HeroVideoComponent
+    PageHeroComponent,
+    ScrollRevealDirective
 ],
 
   templateUrl:
@@ -60,15 +62,15 @@ export class ContactComponent {
 
   services = [
 
-    'Website Design',
+    'Product question',
 
-    'Web Application Development',
+    'Build compatibility help',
 
-    'E-Commerce Solutions',
+    'Order / affiliate link issue',
 
-    'Website Maintenance & Support',
+    'Report incorrect part data',
 
-    'Branding',
+    'Retailer partnership',
 
     'Other'
 
@@ -89,9 +91,9 @@ export class ContactComponent {
 
     this.seoService.updatePage(
 
-      'Contact | WD Web Solutions',
+      'Contact | GunPartSelector.com',
 
-      'Get in touch with WD Web Solutions to discuss your website design, development, or e-commerce project.'
+      'Get in touch with GunPartSelector.com about parts, build compatibility, or your order.'
 
     );
 

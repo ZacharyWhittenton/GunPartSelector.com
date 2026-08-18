@@ -33,8 +33,7 @@ export class ContactService {
       .post<ContactApiResponse>('/api/contact-requests', payload)
       .pipe(
         map(() => ({
-          message:
-            'Your estimate request has been received. WD Web Solutions will contact you soon.'
+          message: "Thanks — we've got your message and will get back to you soon."
         }))
       );
   }

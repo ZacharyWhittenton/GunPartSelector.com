@@ -1,0 +1,37 @@
+.hero-image {
+  animation: page-hero-zoom 6s var(--ease-editorial, ease-out) forwards;
+  transform: scale(1.08);
+}
+
+.hero-copy {
+  animation: page-hero-reveal 900ms var(--ease-editorial, ease-out) 200ms both;
+}
+
+@keyframes page-hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes page-hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-image,
+  .hero-copy {
+    animation: none;
+    transform: none;
+    opacity: 1;
+  }
+}

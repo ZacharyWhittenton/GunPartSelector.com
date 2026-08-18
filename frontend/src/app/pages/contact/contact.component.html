@@ -1,653 +1,169 @@
-<!-- Contact Hero -->
+<div class="forge-theme bg-forge-ink">
 
-<section
-  class="
-    relative
-    overflow-hidden
-    bg-gray-900
-    py-24
-  "
->
+  <app-page-hero
+    imageUrl="/assets/images/scenery/alpine-forest-lake.jpg"
+    imageAlt=""
+    eyebrow="Contact"
+    title="Get in Touch"
+    subtitle="Questions about a part, a build, or an order — we're listening."
+    height="short"
+  ></app-page-hero>
 
-  <app-hero-video></app-hero-video>
+  <section class="py-20">
 
-  <div
-    class="
-      relative
-      z-10
-      mx-auto
-      max-w-7xl
-      px-6
-      text-center
-    "
-  >
+    <div class="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-2">
 
-    <p
-      class="
-        text-sm
-        font-semibold
-        uppercase
-        tracking-widest
-        text-orange-400
-      "
-    >
-      WD Web Solutions
-    </p>
+      <!-- Contact Information -->
+      <div appScrollReveal>
 
+        <h2 class="text-4xl font-bold text-forge-text">Let's Talk About Your Build</h2>
 
-    <h1
-      class="
-        mt-4
-        text-5xl
-        font-bold
-        text-white
-        md:text-6xl
-      "
-    >
-      Request a Project Estimate
-    </h1>
+        <p class="mt-6 text-lg leading-relaxed text-forge-text-muted">
+          GunPartSelector.com is a parts catalog and build configurator — we help you plan
+          a compatible AR-15 build and point you to the retailer for checkout. Have a
+          question about a part, a compatibility check, or an order you placed with a
+          retailer we linked to? Send it over.
+        </p>
 
+        <div class="mt-8 space-y-5">
 
-    <p
-      class="
-        mx-auto
-        mt-6
-        max-w-3xl
-        text-xl
-        text-gray-300
-      "
-    >
-      Tell us about your website, web app, e-commerce,
-      or ongoing support project.
-    </p>
+          <div>
+            <h3 class="font-semibold text-forge-text">Location</h3>
+            <p class="text-forge-text-muted">Austin, TX</p>
+          </div>
 
-
-  </div>
-
-</section>
-
-
-
-
-<!-- Contact Form -->
-
-<section
-  class="
-    py-20
-  "
->
-
-  <div
-    class="
-      mx-auto
-      grid
-      max-w-7xl
-      gap-12
-      px-6
-      lg:grid-cols-2
-    "
-  >
-
-
-    <!-- Contact Information -->
-
-    <div>
-
-
-      <h2
-        class="
-          text-4xl
-          font-bold
-          text-gray-900
-        "
-      >
-        Let's Talk About Your Project
-      </h2>
-
-
-
-      <p
-        class="
-          mt-6
-          text-lg
-          leading-relaxed
-          text-gray-600
-        "
-      >
-        WD Web Solutions provides website design, web
-        application development, and e-commerce
-        solutions for growing businesses.
-      </p>
-
-
-
-      <div
-        class="
-          mt-8
-          space-y-5
-        "
-      >
-
-        <div>
-
-          <h3
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Address
-          </h3>
-
-          <p
-            class="
-              text-gray-600
-            "
-          >
-            Austin, TX
-          </p>
-
-        </div>
-
-
-
-        <div>
-
-          <h3
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Email
-          </h3>
-
-          <a
-            href="mailto:zachw&#64;wdwebsolutions.com"
-            class="
-                text-blue-600
-                hover:underline
-            "
-            >
-            zachw&#64;wdwebsolutions.com
+          <div>
+            <h3 class="font-semibold text-forge-text">Email</h3>
+            <a href="mailto:support&#64;gunpartselector.com" class="text-forge-accent hover:underline">
+              support&#64;gunpartselector.com
             </a>
+          </div>
 
         </div>
 
+        <div class="mt-10 rounded-xl border border-forge-line bg-forge-steel p-6">
+
+          <h3 class="text-xl font-bold text-forge-text">What We Can Help With</h3>
+
+          <ul class="mt-4 space-y-2 text-forge-text-muted">
+            <li>✓ Part fitment &amp; compatibility questions</li>
+            <li>✓ Reporting incorrect or outdated part data</li>
+            <li>✓ Retailer link or checkout issues</li>
+            <li>✓ Retailer / affiliate partnership inquiries</li>
+          </ul>
+
+        </div>
 
       </div>
 
-
-
-      <div
-        class="
-          mt-10
-          rounded-xl
-          bg-gray-100
-          p-6
-        "
+      <!-- Form -->
+      <form
+        [formGroup]="contactForm"
+        (ngSubmit)="submitContactForm()"
+        appScrollReveal
+        class="rounded-xl border border-forge-line bg-forge-steel p-8 shadow-sm"
       >
 
-        <h3
-          class="
-            text-xl
-            font-bold
-            text-gray-900
-          "
+        <div class="grid gap-6 md:grid-cols-2">
+
+          <label>
+            <span class="font-semibold text-forge-text">Name</span>
+            <input
+              type="text"
+              formControlName="name"
+              autocomplete="name"
+              class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text focus:border-forge-brass focus:outline-none"
+            />
+            @if (hasError('name')) {
+              <small class="text-forge-danger">Enter your name.</small>
+            }
+          </label>
+
+          <label>
+            <span class="font-semibold text-forge-text">Company</span>
+            <input
+              type="text"
+              formControlName="company"
+              autocomplete="organization"
+              class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text"
+            />
+          </label>
+
+        </div>
+
+        <div class="mt-6 grid gap-6 md:grid-cols-2">
+
+          <label>
+            <span class="font-semibold text-forge-text">Email</span>
+            <input
+              type="email"
+              formControlName="emailAddress"
+              autocomplete="email"
+              class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text"
+            />
+            @if (hasError('emailAddress')) {
+              <small class="text-forge-danger">Enter a valid email.</small>
+            }
+          </label>
+
+          <label>
+            <span class="font-semibold text-forge-text">Phone</span>
+            <input
+              type="tel"
+              formControlName="phone"
+              autocomplete="tel"
+              class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text"
+            />
+          </label>
+
+        </div>
+
+        <label class="mt-6 block">
+          <span class="font-semibold text-forge-text">Topic</span>
+          <select
+            formControlName="service"
+            class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text"
+          >
+            <option value="">Select a topic</option>
+            @for (service of services; track service) {
+              <option [value]="service">{{ service }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="mt-6 block">
+          <span class="font-semibold text-forge-text">Message</span>
+          <textarea
+            formControlName="message"
+            rows="6"
+            class="mt-2 w-full rounded-lg border border-forge-line bg-forge-ink p-3 text-forge-text"
+            placeholder="Tell us what's going on..."
+          ></textarea>
+          @if (hasError('message')) {
+            <small class="text-forge-danger">Tell us what's going on.</small>
+          }
+        </label>
+
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="mt-8 rounded-lg bg-forge-accent px-8 py-4 font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
         >
-          Services We Provide
-        </h3>
+          {{ isSubmitting ? 'Sending...' : 'Send Message' }}
+        </button>
 
+        @if (successMessage) {
+          <p class="mt-6 text-forge-success">{{ successMessage }}</p>
+        }
 
-        <ul
-          class="
-            mt-4
-            space-y-2
-            text-gray-600
-          "
-        >
+        @if (errorMessage) {
+          <p class="mt-6 text-forge-danger">{{ errorMessage }}</p>
+        }
 
-          <li>
-            ✓ Website Design
-          </li>
-
-          <li>
-            ✓ Web Application Development
-          </li>
-
-          <li>
-            ✓ E-Commerce Solutions
-          </li>
-
-          <li>
-            ✓ Website Maintenance & Support
-          </li>
-
-        </ul>
-
-      </div>
-
+      </form>
 
     </div>
 
+  </section>
 
-
-
-
-    <!-- Form -->
-
-    <form
-
-      [formGroup]="contactForm"
-
-      (ngSubmit)="submitContactForm()"
-
-      class="
-        rounded-xl
-        bg-white
-        p-8
-        shadow-lg
-      "
-
-    >
-
-
-      <div
-        class="
-          grid
-          gap-6
-          md:grid-cols-2
-        "
-      >
-
-
-        <!-- Name -->
-
-        <label>
-
-          <span
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Name
-          </span>
-
-
-          <input
-
-            type="text"
-
-            formControlName="name"
-
-            autocomplete="name"
-
-            class="
-              mt-2
-              w-full
-              rounded-lg
-              border
-              border-gray-300
-              p-3
-              focus:border-blue-500
-              focus:outline-none
-            "
-
-          />
-
-
-          @if(hasError('name'))
-          {
-
-            <small
-              class="
-                text-red-600
-              "
-            >
-              Enter your name.
-            </small>
-
-          }
-
-
-        </label>
-
-
-
-
-        <!-- Company -->
-
-        <label>
-
-          <span
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Company
-          </span>
-
-
-          <input
-
-            type="text"
-
-            formControlName="company"
-
-            autocomplete="organization"
-
-            class="
-              mt-2
-              w-full
-              rounded-lg
-              border
-              border-gray-300
-              p-3
-            "
-
-          />
-
-        </label>
-
-
-      </div>
-
-
-
-
-
-      <div
-        class="
-          mt-6
-          grid
-          gap-6
-          md:grid-cols-2
-        "
-      >
-
-
-        <label>
-
-          <span
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Email
-          </span>
-
-
-          <input
-
-            type="email"
-
-            formControlName="emailAddress"
-
-            autocomplete="email"
-
-            class="
-              mt-2
-              w-full
-              rounded-lg
-              border
-              border-gray-300
-              p-3
-            "
-
-          />
-
-
-
-          @if(hasError('emailAddress'))
-          {
-
-            <small
-              class="
-                text-red-600
-              "
-            >
-              Enter a valid email.
-            </small>
-
-          }
-
-
-        </label>
-
-
-
-
-        <label>
-
-          <span
-            class="
-              font-semibold
-              text-gray-900
-            "
-          >
-            Phone
-          </span>
-
-
-          <input
-
-            type="tel"
-
-            formControlName="phone"
-
-            autocomplete="tel"
-
-            class="
-              mt-2
-              w-full
-              rounded-lg
-              border
-              border-gray-300
-              p-3
-            "
-
-          />
-
-        </label>
-
-
-      </div>
-
-
-
-
-
-
-      <!-- Service -->
-
-      <label
-        class="
-          mt-6
-          block
-        "
-      >
-
-        <span
-          class="
-            font-semibold
-            text-gray-900
-          "
-        >
-          Service Needed
-        </span>
-
-
-        <select
-
-          formControlName="service"
-
-          class="
-            mt-2
-            w-full
-            rounded-lg
-            border
-            border-gray-300
-            p-3
-          "
-
-        >
-
-          <option value="">
-            Select a service
-          </option>
-
-
-          @for(service of services; track service)
-          {
-
-            <option [value]="service">
-              {{service}}
-            </option>
-
-          }
-
-
-        </select>
-
-
-      </label>
-
-
-
-
-
-
-      <!-- Message -->
-
-      <label
-        class="
-          mt-6
-          block
-        "
-      >
-
-        <span
-          class="
-            font-semibold
-            text-gray-900
-          "
-        >
-          Project Details
-        </span>
-
-
-        <textarea
-
-          formControlName="message"
-
-          rows="6"
-
-          class="
-            mt-2
-            w-full
-            rounded-lg
-            border
-            border-gray-300
-            p-3
-          "
-
-          placeholder="Tell us about your project..."
-
-        ></textarea>
-
-
-
-        @if(hasError('message'))
-        {
-
-          <small
-            class="
-              text-red-600
-            "
-          >
-            Tell us about your project.
-          </small>
-
-        }
-
-
-      </label>
-
-
-
-
-
-      <button
-
-        type="submit"
-
-        [disabled]="isSubmitting"
-
-        class="
-          mt-8
-          rounded-lg
-          bg-blue-600
-          px-8
-          py-4
-          font-semibold
-          text-white
-          transition
-          hover:bg-blue-700
-          disabled:opacity-50
-        "
-
-      >
-
-        {{
-          isSubmitting
-            ? 'Sending...'
-            : 'Request Estimate'
-        }}
-
-      </button>
-
-
-
-
-
-      @if(successMessage)
-      {
-
-        <p
-          class="
-            mt-6
-            text-green-600
-          "
-        >
-          {{successMessage}}
-        </p>
-
-      }
-
-
-
-
-      @if(errorMessage)
-      {
-
-        <p
-          class="
-            mt-6
-            text-red-600
-          "
-        >
-          {{errorMessage}}
-        </p>
-
-      }
-
-
-    </form>
-
-
-  </div>
-
-</section>
+</div>
