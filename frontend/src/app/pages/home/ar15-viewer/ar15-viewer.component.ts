@@ -512,8 +512,13 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       // along the rail skews it), so using it produced a hitbox many times larger
       // than the gun itself, especially obvious from a top-down view.
       const dustCover = boundsByCategory.get('dust-cover');
-      const pad = height * 0.12;
-      const zPad = height * 0.08;
+      // Shrink to 70% of the dust cover's own bounding box before padding -- that box
+      // still came out visibly larger than the raised panel itself (likely includes a
+      // hinge/mounting tab extending past the visible part), so padding it directly
+      // was still oversized.
+      const shrink = 0.7;
+      const pad = height * 0.03;
+      const zPad = height * 0.02;
       const center = dustCover
         ? {
             x: (dustCover.min.x + dustCover.max.x) / 2,
@@ -523,9 +528,9 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
         : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2, z: (upper.min.z + upper.max.z) / 2 };
       const size = dustCover
         ? {
-            x: dustCover.max.x - dustCover.min.x + pad,
-            y: dustCover.max.y - dustCover.min.y + pad,
-            z: dustCover.max.z - dustCover.min.z + zPad
+            x: (dustCover.max.x - dustCover.min.x) * shrink + pad,
+            y: (dustCover.max.y - dustCover.min.y) * shrink + pad,
+            z: (dustCover.max.z - dustCover.min.z) * shrink + zPad
           }
         : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.4, z: upper.max.z - upper.min.z + height * 0.06 };
       addStandin(
