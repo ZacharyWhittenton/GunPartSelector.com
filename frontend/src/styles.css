@@ -26,25 +26,25 @@
      semantic tokens (bg-forge-ink, text-forge-text, etc.), so retuning the palette here
      re-themes the whole site without touching component markup. */
 
-  --color-forge-ink: #f7f3ec;
+  --color-forge-ink: #f1e3ca;
 
-  --color-forge-nav: #f1ead9;
+  --color-forge-nav: #ece0c5;
 
-  --color-forge-steel: #efe8dc;
+  --color-forge-steel: #e7d3ac;
 
-  --color-forge-line: #e1d6c2;
+  --color-forge-line: #cba876;
 
   --color-forge-accent: #a8342b;
 
-  --color-forge-brass: #9c7a3c;
+  --color-forge-brass: #93672c;
 
-  --color-forge-text: #2b241c;
+  --color-forge-text: #2b2116;
 
-  --color-forge-text-muted: #7a6f5e;
+  --color-forge-text-muted: #6e5d44;
 
-  --color-forge-nav-text: #2b241c;
+  --color-forge-nav-text: #2b2116;
 
-  --color-forge-nav-text-muted: #7a6f5e;
+  --color-forge-nav-text-muted: #6e5d44;
 
   --color-forge-success: #3f7d4a;
 
