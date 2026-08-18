@@ -75,7 +75,7 @@ const GLTF_DETAIL_NODE_NAMES = [
 
 /** Categories the loaded model has no part for -- built procedurally and anchored to
  * the loaded model's own geometry once it's known, rather than guessed coordinates. */
-const STANDIN_CATEGORIES = new Set(['buffer-tube', 'buffer-kit', 'bolt-carrier-group', 'gas-system']);
+const STANDIN_CATEGORIES = new Set(['bolt-carrier-group', 'gas-system']);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
  * detail meshes (rail ridges, M-LOK slots) don't round away into blobs while large
@@ -199,11 +199,14 @@ const PART_CONFIGS: PartMeshConfig[] = [
   },
   { categorySlug: 'trigger', build: () => [box(-1.85, -0.62, 0, 0.14, 0.35, 0.14)] },
   { categorySlug: 'pistol-grip', build: () => [box(-2.55, -0.95, 0, 0.3, 0.75, 0.4, 0.35)] },
-  { categorySlug: 'buffer-tube', build: () => [tube(-3.55, -0.05, 0, 1.5, 0.18, 0.18, 12)] },
-  { categorySlug: 'buffer-kit', build: () => [tube(-4.35, -0.05, 0, 0.35, 0.21, 0.21, 12)] },
   {
     categorySlug: 'stock-brace',
-    build: () => [box(-4.72, -0.05, 0, 0.34, 0.34, 0.42), box(-5.1, -0.28, 0, 0.42, 0.62, 0.5)]
+    build: () => [
+      tube(-3.55, -0.05, 0, 1.5, 0.18, 0.18, 12),
+      tube(-4.35, -0.05, 0, 0.35, 0.21, 0.21, 12),
+      box(-4.72, -0.05, 0, 0.34, 0.34, 0.42),
+      box(-5.1, -0.28, 0, 0.42, 0.62, 0.5)
+    ]
   }
 ];
 
@@ -216,8 +219,6 @@ const METAL_CATEGORIES = new Set([
   'bolt-carrier-group',
   'lower-receiver',
   'trigger',
-  'buffer-tube',
-  'buffer-kit',
   'gas-system'
 ]);
 
@@ -458,8 +459,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     const upper = boundsByCategory.get('upper-receiver');
     const handguard = boundsByCategory.get('handguard');
     const barrel = boundsByCategory.get('barrel');
-    const lower = boundsByCategory.get('lower-receiver');
-    const stock = boundsByCategory.get('stock-brace');
 
     const addStandin = (categorySlug: string, mesh: THREE.Mesh): void => {
       const kind = materialKindFor(categorySlug);
@@ -487,19 +486,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       const gasX = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.82);
       const barrelY = (barrel.min.y + barrel.max.y) / 2;
       addStandin('gas-system', tube(gasX, barrelY, 0, height * 1.6, height * 0.16));
-    }
-
-    if (lower && stock) {
-      const startX = Math.min(lower.min.x, stock.max.x);
-      const endX = stock.min.x + (stock.max.x - stock.min.x) * 0.15;
-      const midY = (lower.min.y + lower.max.y) / 2;
-      const radius = (lower.max.y - lower.min.y) * 0.28;
-      const kitLength = Math.abs(startX - endX) * 0.22;
-      addStandin(
-        'buffer-tube',
-        tube((startX + endX) / 2, midY, 0, Math.abs(startX - endX) * 0.8, radius, radius, 12)
-      );
-      addStandin('buffer-kit', tube(endX + kitLength / 2, midY, 0, kitLength, radius * 1.15, radius * 1.15, 12));
     }
   }
 
