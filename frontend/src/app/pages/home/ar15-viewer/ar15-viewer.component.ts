@@ -15,6 +15,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 interface PartMeshConfig {
   categorySlug: string;
@@ -23,14 +24,64 @@ interface PartMeshConfig {
 
 type MaterialKind = 'metal' | 'polymer' | 'glass';
 
+interface ClickableEntry {
+  mesh: THREE.Mesh;
+  neutralColor: THREE.Color;
+  recolorable: boolean;
+}
+
+const MODEL_URL = '/assets/models/uar15/scene.gltf';
+const TARGET_LENGTH = 9.5;
+
 // Matte anodized aluminum / phosphate-finish tones rather than raw silvery grey --
-// real AR-15 receivers and barrels read much darker than bare metal.
+// real AR-15 receivers and barrels read much darker than bare metal. Used for the
+// procedural stand-in parts (categories the loaded model doesn't include) and as the
+// full fallback rifle if the model fails to load.
 const COLOR_NEUTRAL_METAL = 0x35383d;
 const COLOR_NEUTRAL_POLYMER = 0x1f2225;
 const COLOR_SELECTED = 0xc0262f;
 const COLOR_HOVER = 0xe06068;
 const COLOR_DETAIL_METAL = 0x26282c;
 const COLOR_DETAIL_POLYMER = 0x1a1c1f;
+
+/** Real, named meshes in the loaded model mapped onto pickable catalog categories.
+ * Node names come from the source glTF (see /assets/models/uar15/license.txt), with
+ * spaces/dots sanitized to underscores -- GLTFLoader sanitizes node names on parse
+ * (three.js PropertyBinding.sanitizeNodeName) so "uar15 trigga_0" becomes
+ * "uar15_trigga_0" and "10.5in" becomes "105in" by the time nodes are traversed. */
+const GLTF_PART_NODE_TO_CATEGORY: Record<string, string> = {
+  uar15_trigga_0: 'trigger',
+  uar15_charging_handle_4: 'charging-handle',
+  uar15_lower_9: 'lower-receiver',
+  uar15_105in_barrel_10: 'barrel',
+  uar15_upper_11: 'upper-receiver',
+  uar15_flash_hider_12: 'muzzle-device',
+  uar15_grip_15: 'pistol-grip',
+  uar15_stock_16: 'stock-brace',
+  uar15_handguard_17: 'handguard'
+};
+
+/** Extra real meshes kept for visual richness but not tied to a pickable category. */
+const GLTF_DETAIL_NODE_NAMES = [
+  'uar15_selector_1',
+  'uar15_mag_catch_2',
+  'uar15_dust_cover_3',
+  'uar15_bolt_catch_5',
+  'uar15_bolt_6',
+  'ar15_30rnd_mag_(zbroyar)_14',
+  'uar15_iron_sight_18'
+];
+
+/** Categories the loaded model has no part for -- built procedurally and anchored to
+ * the loaded model's own geometry once it's known, rather than guessed coordinates. */
+const STANDIN_CATEGORIES = new Set([
+  'optic-mount',
+  'optic',
+  'foregrip',
+  'buffer-tube',
+  'buffer-kit',
+  'bolt-carrier-group'
+]);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
  * detail meshes (rail ridges, M-LOK slots) don't round away into blobs while large
@@ -73,12 +124,11 @@ function tube(
   return mesh;
 }
 
-/** Static, non-interactive detail meshes that flesh out the silhouette (magazine, trigger
- * guard, rail ridges, sights) but aren't tied to a pickable catalog category. */
+/** Static, non-interactive detail meshes for the fallback procedural rifle (magazine,
+ * trigger guard, rail ridges, sights) used only if the real model fails to load. */
 function buildDetailMeshes(): THREE.Mesh[] {
   const meshes: THREE.Mesh[] = [];
 
-  // Magazine: tapered polymer PMAG-style body hanging from the magwell.
   const magShape = new THREE.Shape();
   magShape.moveTo(-0.17, 0);
   magShape.lineTo(0.17, 0);
@@ -95,7 +145,6 @@ function buildDetailMeshes(): THREE.Mesh[] {
   magazine.scale.set(1.15, 1.15, 1.15);
   meshes.push(magazine);
 
-  // Trigger guard: thin extruded loop in front of the trigger.
   const guardShape = new THREE.Shape();
   guardShape.absarc(0, 0, 0.24, Math.PI * 0.15, Math.PI * 1.02, false);
   const guardHole = new THREE.Path();
@@ -108,20 +157,15 @@ function buildDetailMeshes(): THREE.Mesh[] {
   triggerGuard.position.set(-1.85, -0.68, 0);
   meshes.push(triggerGuard);
 
-  // Front sight post, near the muzzle end of the handguard.
   meshes.push(box(4.9, 0.42, 0, 0.1, 0.4, 0.1));
-  // Rear flip sight, atop the upper receiver.
   meshes.push(box(-1.0, 0.38, 0, 0.16, 0.22, 0.14));
 
-  // Picatinny rail ridges along the top of the upper receiver + handguard.
   for (let i = 0; i < 9; i++) {
     meshes.push(box(-0.75 + i * 0.24, 0.34, 0, 0.05, 0.06, 0.42));
   }
   for (let i = 0; i < 10; i++) {
     meshes.push(box(1.9 + i * 0.32, 0.29, 0, 0.06, 0.05, 0.4));
   }
-
-  // M-LOK slots along the underside of the handguard.
   for (let i = 0; i < 7; i++) {
     meshes.push(box(2.0 + i * 0.34, -0.27, 0, 0.16, 0.04, 0.06));
   }
@@ -141,10 +185,7 @@ const PART_CONFIGS: PartMeshConfig[] = [
   { categorySlug: 'barrel', build: () => [tube(6.3, 0, 0, 4.2, 0.11)] },
   { categorySlug: 'handguard', build: () => [tube(3.4, 0, 0, 3.4, 0.28, 0.28, 8)] },
   { categorySlug: 'foregrip', build: () => [box(2.6, -0.62, 0, 0.22, 0.4, 0.22)] },
-  {
-    categorySlug: 'upper-receiver',
-    build: () => [box(0.3, 0.05, 0, 2.2, 0.55, 0.5)]
-  },
+  { categorySlug: 'upper-receiver', build: () => [box(0.3, 0.05, 0, 2.2, 0.55, 0.5)] },
   { categorySlug: 'charging-handle', build: () => [box(-0.55, 0.38, 0, 0.35, 0.12, 0.2)] },
   { categorySlug: 'bolt-carrier-group', build: () => [box(0.05, 0.05, 0.3, 1.6, 0.2, 0.08)] },
   { categorySlug: 'optic-mount', build: () => [box(0.15, 0.36, 0, 0.9, 0.12, 0.35)] },
@@ -162,10 +203,7 @@ const PART_CONFIGS: PartMeshConfig[] = [
   { categorySlug: 'buffer-kit', build: () => [tube(-4.35, -0.05, 0, 0.35, 0.21, 0.21, 12)] },
   {
     categorySlug: 'stock-brace',
-    build: () => [
-      box(-4.72, -0.05, 0, 0.34, 0.34, 0.42),
-      box(-5.1, -0.28, 0, 0.42, 0.62, 0.5)
-    ]
+    build: () => [box(-4.72, -0.05, 0, 0.34, 0.34, 0.42), box(-5.1, -0.28, 0, 0.42, 0.62, 0.5)]
   }
 ];
 
@@ -208,7 +246,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
   private controls!: OrbitControls;
-  private readonly meshesBySlug = new Map<string, { mesh: THREE.Mesh; kind: MaterialKind }[]>();
+  private readonly meshesBySlug = new Map<string, ClickableEntry[]>();
   private readonly clickableMeshes: THREE.Mesh[] = [];
   private readonly allMeshes: THREE.Mesh[] = [];
   private readonly raycaster = new THREE.Raycaster();
@@ -229,7 +267,16 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       return;
     }
     this.initialized = true;
-    this.applySelectionColors();
+
+    this.loadRealModel()
+      .catch(error => {
+        console.warn('Falling back to the procedural rifle -- real model failed to load:', error);
+        this.buildProceduralFallback();
+      })
+      .finally(() => {
+        this.applySelectionColors();
+        this.animate();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -291,7 +338,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     rim.position.set(-2, -3, 5);
     this.scene.add(ambient, key, fill, rim);
 
-    // Soft contact shadow beneath the rifle so it reads as grounded rather than floating.
     const shadowTexture = this.createRadialShadowTexture();
     const shadowMaterial = new THREE.MeshBasicMaterial({
       map: shadowTexture,
@@ -301,20 +347,164 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     });
     const shadow = new THREE.Mesh(new THREE.PlaneGeometry(11, 3.2), shadowMaterial);
     shadow.rotation.x = -Math.PI / 2;
-    shadow.position.set(1.5, -1.3, 0);
+    shadow.position.set(0, -1.3, 0);
     this.scene.add(shadow);
 
+    this.resizeObserver = new ResizeObserver(() => this.handleResize());
+    this.resizeObserver.observe(host);
+    this.handleResize();
+
+    host.addEventListener('pointermove', this.onPointerMove);
+    host.addEventListener('pointerdown', this.onPointerDown);
+  }
+
+  /** Loads the real licensed AR-15 model, maps its named parts onto pickable
+   * categories, and builds procedural stand-ins (anchored to the model's own
+   * geometry) for the categories it doesn't include. */
+  private async loadRealModel(): Promise<void> {
+    const loader = new GLTFLoader();
+    const gltf = await loader.loadAsync(MODEL_URL);
+    const root = gltf.scene;
+
+    // Normalize to a consistent on-screen size/position regardless of the source
+    // file's native scale, so camera/lighting tuned for one model still work for
+    // any future swap.
+    root.updateMatrixWorld(true);
+    const rawBox = new THREE.Box3().setFromObject(root);
+    const rawSize = rawBox.getSize(new THREE.Vector3());
+    const scale = TARGET_LENGTH / Math.max(rawSize.x, 0.001);
+    root.scale.setScalar(scale);
+    root.updateMatrixWorld(true);
+
+    const scaledBox = new THREE.Box3().setFromObject(root);
+    const center = scaledBox.getCenter(new THREE.Vector3());
+    root.position.sub(center);
+    root.updateMatrixWorld(true);
+
+    this.scene.add(root);
+
+    const namedGroups = new Map<string, THREE.Object3D>();
+    root.traverse(node => {
+      if (namedGroups.has(node.name)) return;
+      namedGroups.set(node.name, node);
+    });
+
+    const meshesInGroup = (group: THREE.Object3D): THREE.Mesh[] => {
+      const found: THREE.Mesh[] = [];
+      group.traverse(node => {
+        if ((node as THREE.Mesh).isMesh) found.push(node as THREE.Mesh);
+      });
+      return found;
+    };
+
+    const boundsByCategory = new Map<string, THREE.Box3>();
+
+    for (const [nodeName, categorySlug] of Object.entries(GLTF_PART_NODE_TO_CATEGORY)) {
+      const group = namedGroups.get(nodeName);
+      if (!group) continue;
+
+      const entries: ClickableEntry[] = [];
+      for (const mesh of meshesInGroup(group)) {
+        this.applySharedSurfaceDetail(mesh.material as THREE.MeshStandardMaterial);
+        const neutralColor = (mesh.material as THREE.MeshStandardMaterial).color.clone();
+        mesh.userData['categorySlug'] = categorySlug;
+        this.clickableMeshes.push(mesh);
+        this.allMeshes.push(mesh);
+        entries.push({ mesh, neutralColor, recolorable: true });
+      }
+      this.meshesBySlug.set(categorySlug, entries);
+      boundsByCategory.set(categorySlug, new THREE.Box3().setFromObject(group));
+    }
+
+    for (const nodeName of GLTF_DETAIL_NODE_NAMES) {
+      const group = namedGroups.get(nodeName);
+      if (!group) continue;
+      for (const mesh of meshesInGroup(group)) {
+        this.allMeshes.push(mesh);
+      }
+    }
+
+    this.buildStandinParts(boundsByCategory);
+  }
+
+  /** Builds procedural parts for categories the loaded model has no mesh for,
+   * positioned from the real geometry's own bounding boxes instead of guessed
+   * coordinates, so they stay correctly anchored regardless of model proportions. */
+  private buildStandinParts(boundsByCategory: Map<string, THREE.Box3>): void {
+    const upper = boundsByCategory.get('upper-receiver');
+    const handguard = boundsByCategory.get('handguard');
+    const lower = boundsByCategory.get('lower-receiver');
+    const stock = boundsByCategory.get('stock-brace');
+
+    const addStandin = (categorySlug: string, mesh: THREE.Mesh): void => {
+      const kind = materialKindFor(categorySlug);
+      mesh.material = this.createMaterial(kind, COLOR_NEUTRAL_METAL);
+      mesh.userData['categorySlug'] = categorySlug;
+      this.scene.add(mesh);
+      this.clickableMeshes.push(mesh);
+      this.allMeshes.push(mesh);
+      this.meshesBySlug.set(categorySlug, [
+        { mesh, neutralColor: new THREE.Color(COLOR_NEUTRAL_METAL), recolorable: kind !== 'glass' }
+      ]);
+    };
+
+    if (upper) {
+      const centerX = (upper.min.x + upper.max.x) / 2;
+      const topY = upper.max.y;
+      const height = upper.max.y - upper.min.y;
+      addStandin('optic-mount', box(centerX, topY + height * 0.1, 0, (upper.max.x - centerX) * 0.9, height * 0.14, height * 0.85));
+      addStandin('optic', tube(centerX, topY + height * 0.42, 0, height * 1.05, height * 0.18));
+      addStandin(
+        'bolt-carrier-group',
+        box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
+      );
+    }
+
+    if (handguard) {
+      const x = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.32);
+      const height = handguard.max.y - handguard.min.y;
+      addStandin('foregrip', box(x, handguard.min.y - height * 0.55, 0, height * 0.55, height * 1.1, height * 0.55));
+    }
+
+    if (lower && stock) {
+      const startX = Math.min(lower.min.x, stock.max.x);
+      const endX = stock.min.x + (stock.max.x - stock.min.x) * 0.15;
+      const midY = (lower.min.y + lower.max.y) / 2;
+      const radius = (lower.max.y - lower.min.y) * 0.28;
+      const kitLength = Math.abs(startX - endX) * 0.22;
+      addStandin(
+        'buffer-tube',
+        tube((startX + endX) / 2, midY, 0, Math.abs(startX - endX) * 0.8, radius, radius, 12)
+      );
+      addStandin('buffer-kit', tube(endX + kitLength / 2, midY, 0, kitLength, radius * 1.15, radius * 1.15, 12));
+    }
+  }
+
+  private applySharedSurfaceDetail(material: THREE.MeshStandardMaterial): void {
+    material.roughnessMap = this.surfaceNoiseTexture ?? null;
+    material.bumpMap = this.surfaceNoiseTexture ?? null;
+    material.bumpScale = 0.004;
+    material.envMapIntensity = 1;
+    material.needsUpdate = true;
+  }
+
+  /** Full procedural rifle, used only if the licensed model fails to load. */
+  private buildProceduralFallback(): void {
     for (const config of PART_CONFIGS) {
       const kind = materialKindFor(config.categorySlug);
       const meshes = config.build();
-      const entries: { mesh: THREE.Mesh; kind: MaterialKind }[] = [];
+      const entries: ClickableEntry[] = [];
       for (const mesh of meshes) {
         mesh.material = this.createMaterial(kind, COLOR_NEUTRAL_METAL);
         mesh.userData['categorySlug'] = config.categorySlug;
         this.scene.add(mesh);
         this.clickableMeshes.push(mesh);
         this.allMeshes.push(mesh);
-        entries.push({ mesh, kind });
+        entries.push({
+          mesh,
+          neutralColor: new THREE.Color(COLOR_NEUTRAL_METAL),
+          recolorable: kind !== 'glass'
+        });
       }
       this.meshesBySlug.set(config.categorySlug, entries);
     }
@@ -328,15 +518,6 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       this.scene.add(mesh);
       this.allMeshes.push(mesh);
     }
-
-    this.resizeObserver = new ResizeObserver(() => this.handleResize());
-    this.resizeObserver.observe(host);
-    this.handleResize();
-
-    host.addEventListener('pointermove', this.onPointerMove);
-    host.addEventListener('pointerdown', this.onPointerDown);
-
-    this.animate();
   }
 
   private createMaterial(kind: MaterialKind, color: number): THREE.Material {
@@ -409,14 +590,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d')!;
-    const gradient = ctx.createRadialGradient(
-      size / 2,
-      size / 2,
-      0,
-      size / 2,
-      size / 2,
-      size / 2
-    );
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
     gradient.addColorStop(0, 'rgba(0,0,0,0.9)');
     gradient.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gradient;
@@ -471,25 +645,17 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private applySelectionColors(): void {
     const selected = new Set(this.selectedCategorySlugs);
     for (const [slug, entries] of this.meshesBySlug.entries()) {
-      let color = COLOR_NEUTRAL_METAL;
-      let usePolymerBase = false;
+      let color: THREE.Color | null = null;
       if (slug === this.hoveredSlug) {
-        color = COLOR_HOVER;
+        color = new THREE.Color(COLOR_HOVER);
       } else if (selected.has(slug)) {
-        color = COLOR_SELECTED;
-      } else {
-        usePolymerBase = true;
+        color = new THREE.Color(COLOR_SELECTED);
       }
 
-      for (const { mesh, kind } of entries) {
-        const material = mesh.material as THREE.MeshPhysicalMaterial;
-        if (usePolymerBase && kind === 'polymer') {
-          material.color.setHex(COLOR_NEUTRAL_POLYMER);
-        } else if (usePolymerBase && kind === 'glass') {
-          // glass parts keep their fixed lens color regardless of selection
-        } else {
-          material.color.setHex(color);
-        }
+      for (const entry of entries) {
+        if (!entry.recolorable) continue;
+        const material = entry.mesh.material as THREE.MeshStandardMaterial;
+        material.color.copy(color ?? entry.neutralColor);
       }
     }
   }
