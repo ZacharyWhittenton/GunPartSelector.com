@@ -356,6 +356,8 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
     host.addEventListener('pointermove', this.onPointerMove);
     host.addEventListener('pointerdown', this.onPointerDown);
+    host.addEventListener('pointerenter', this.onPointerEnter);
+    host.addEventListener('pointerleave', this.onPointerLeave);
   }
 
   /** Loads the real licensed AR-15 model, maps its named parts onto pickable
@@ -388,6 +390,23 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
       if (namedGroups.has(node.name)) return;
       namedGroups.set(node.name, node);
     });
+
+    // The source file includes extra decorative nodes (a spare/empty magazine, loose
+    // cartridge cases) we don't curate into a category or a detail mesh. Strip them
+    // so nothing unexpected renders -- otherwise they show up as un-styled, oddly
+    // placed geometry alongside the parts we do control.
+    const keepNodeNames = new Set([
+      ...Object.keys(GLTF_PART_NODE_TO_CATEGORY),
+      ...GLTF_DETAIL_NODE_NAMES
+    ]);
+    const sceneRoot = namedGroups.get('GLTF_SceneRootNode');
+    if (sceneRoot) {
+      for (const child of [...sceneRoot.children]) {
+        if (!keepNodeNames.has(child.name)) {
+          sceneRoot.remove(child);
+        }
+      }
+    }
 
     const meshesInGroup = (group: THREE.Object3D): THREE.Mesh[] => {
       const found: THREE.Mesh[] = [];
@@ -631,6 +650,20 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     if (slug) {
       this.categoryClick.emit(slug);
     }
+  };
+
+  // Auto-rotation makes precise clicking impossible -- by the time a user notices
+  // they're hovering the part they want, it has already spun past. Pause it while
+  // the pointer is over the model and resume once they look away.
+  private onPointerEnter = (): void => {
+    this.controls.autoRotate = false;
+  };
+
+  private onPointerLeave = (): void => {
+    this.controls.autoRotate = true;
+    this.hoveredSlug = null;
+    this.applySelectionColors();
+    this.hostRef.nativeElement.style.cursor = 'grab';
   };
 
   private pick(event: PointerEvent): THREE.Mesh | null {
