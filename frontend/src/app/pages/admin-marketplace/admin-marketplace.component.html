@@ -1,42 +1,40 @@
 <section class="mx-auto max-w-7xl px-6 py-12">
 
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Marketplace Items</h1>
-    <p class="mt-2 text-gray-500">
-      <a routerLink="/admin" class="font-semibold text-blue-600 hover:text-blue-800">Accounts</a>
+    <h1 class="text-3xl font-bold text-forge-text">Marketplace Items</h1>
+    <p class="mt-2 text-forge-text-muted">
+      <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
       ·
-      <a routerLink="/admin/blog" class="font-semibold text-blue-600 hover:text-blue-800">Blog</a>
+      <a routerLink="/admin/blog" class="font-semibold text-forge-accent hover:underline">Blog</a>
       ·
-      <a routerLink="/admin/schedule" class="font-semibold text-blue-600 hover:text-blue-800">Schedule</a>
+      <a routerLink="/admin/marketplace/orders" class="font-semibold text-forge-accent hover:underline">Orders</a>
       ·
-      <a routerLink="/admin/marketplace/orders" class="font-semibold text-blue-600 hover:text-blue-800">Orders</a>
-      ·
-      <a routerLink="/admin/discount-codes" class="font-semibold text-blue-600 hover:text-blue-800">Discount Codes</a>
+      <a routerLink="/admin/discount-codes" class="font-semibold text-forge-accent hover:underline">Discount Codes</a>
     </p>
   </div>
 
   @if(errorMessage())
   {
-  <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+  <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   <form
     [formGroup]="itemForm"
     (ngSubmit)="submit()"
-    class="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+    class="mt-8 rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm"
   >
-    <h2 class="text-lg font-bold text-gray-900">
+    <h2 class="text-lg font-bold text-forge-text">
       {{ editingId() ? 'Edit Item' : 'New Item' }}
     </h2>
 
     @if(saveError())
     {
-    <p class="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ saveError() }}</p>
+    <p class="mt-3 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ saveError() }}</p>
     }
 
     <div class="mt-4 grid gap-4 md:grid-cols-2">
       <div>
-        <label class="text-sm font-semibold text-gray-700">Name</label>
+        <label class="text-sm font-semibold text-forge-text">Name</label>
         <input
           type="text"
           formControlName="name"
@@ -45,22 +43,22 @@
           w-full
           rounded-lg
           border
-          border-gray-300
+          border-forge-line
           px-3
           py-2
           text-sm
           focus:outline-none
           focus:ring-2
-          focus:ring-blue-600"
+          focus:ring-forge-accent"
         >
         @if(hasError('name'))
         {
-        <p class="mt-1 text-xs text-red-600">Name is required.</p>
+        <p class="mt-1 text-xs text-forge-danger">Name is required.</p>
         }
       </div>
 
       <div>
-        <label class="text-sm font-semibold text-gray-700">Price (USD)</label>
+        <label class="text-sm font-semibold text-forge-text">Price (USD)</label>
         <input
           type="number"
           min="0"
@@ -71,22 +69,22 @@
           w-full
           rounded-lg
           border
-          border-gray-300
+          border-forge-line
           px-3
           py-2
           text-sm
           focus:outline-none
           focus:ring-2
-          focus:ring-blue-600"
+          focus:ring-forge-accent"
         >
         @if(hasError('priceDollars'))
         {
-        <p class="mt-1 text-xs text-red-600">Enter a valid price.</p>
+        <p class="mt-1 text-xs text-forge-danger">Enter a valid price.</p>
         }
       </div>
 
       <div class="md:col-span-2">
-        <label class="text-sm font-semibold text-gray-700">Sizes (comma-separated)</label>
+        <label class="text-sm font-semibold text-forge-text">Sizes (comma-separated)</label>
         <input
           type="text"
           formControlName="sizesText"
@@ -96,22 +94,22 @@
           w-full
           rounded-lg
           border
-          border-gray-300
+          border-forge-line
           px-3
           py-2
           text-sm
           focus:outline-none
           focus:ring-2
-          focus:ring-blue-600"
+          focus:ring-forge-accent"
         >
         @if(hasError('sizesText'))
         {
-        <p class="mt-1 text-xs text-red-600">Enter at least one size.</p>
+        <p class="mt-1 text-xs text-forge-danger">Enter at least one size.</p>
         }
       </div>
 
       <div class="md:col-span-2">
-        <label class="text-sm font-semibold text-gray-700">Description</label>
+        <label class="text-sm font-semibold text-forge-text">Description</label>
         <textarea
           formControlName="description"
           rows="3"
@@ -120,26 +118,26 @@
           w-full
           rounded-lg
           border
-          border-gray-300
+          border-forge-line
           px-3
           py-2
           text-sm
           focus:outline-none
           focus:ring-2
-          focus:ring-blue-600"
+          focus:ring-forge-accent"
         ></textarea>
         @if(hasError('description'))
         {
-        <p class="mt-1 text-xs text-red-600">Description is required.</p>
+        <p class="mt-1 text-xs text-forge-danger">Description is required.</p>
         }
       </div>
 
       <div class="md:col-span-2">
-        <label class="text-sm font-semibold text-gray-700">Image</label>
+        <label class="text-sm font-semibold text-forge-text">Image</label>
         <input type="file" accept="image/*" (change)="onImageSelected($event)" class="mt-1 block text-sm">
         @if(isUploadingImage())
         {
-        <p class="mt-1 text-xs text-gray-500">Uploading…</p>
+        <p class="mt-1 text-xs text-forge-text-muted">Uploading…</p>
         }
         @if(imageUrl())
         {
@@ -154,14 +152,14 @@
         [disabled]="isSaving()"
         class="
         rounded-lg
-        bg-blue-600
+        bg-forge-accent
         px-5
         py-2.5
         text-sm
         font-semibold
         text-white
         transition
-        hover:bg-blue-700
+        hover:brightness-110
         disabled:cursor-not-allowed
         disabled:opacity-50"
       >
@@ -176,14 +174,14 @@
         class="
         rounded-lg
         border
-        border-gray-300
+        border-forge-line
         px-5
         py-2.5
         text-sm
         font-semibold
-        text-gray-700
+        text-forge-text
         transition
-        hover:bg-gray-50"
+        hover:bg-forge-ink"
       >
         Cancel
       </button>
@@ -193,17 +191,17 @@
 
   @if(isLoading())
   {
-  <p class="mt-8 text-gray-500">Loading items…</p>
+  <p class="mt-8 text-forge-text-muted">Loading items…</p>
   }
   @else if(items().length === 0)
   {
-  <p class="mt-8 text-gray-500">No items yet.</p>
+  <p class="mt-8 text-forge-text-muted">No items yet.</p>
   }
   @else
   {
-  <div class="mt-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-    <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-      <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500">
+  <div class="mt-8 overflow-x-auto rounded-xl border border-forge-line bg-forge-steel shadow-sm">
+    <table class="min-w-full divide-y divide-forge-line text-left text-sm">
+      <thead class="bg-forge-ink text-xs font-semibold uppercase text-forge-text-muted">
         <tr>
           <th class="px-4 py-3">Name</th>
           <th class="px-4 py-3">Price</th>
@@ -212,24 +210,24 @@
           <th class="px-4 py-3">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-100">
+      <tbody class="divide-y divide-forge-line">
         @for(item of items(); track item.id)
         {
         <tr>
-          <td class="px-4 py-3 font-medium text-gray-900">{{ item.name }}</td>
-          <td class="px-4 py-3 text-gray-600">{{ (item.priceCents / 100) | currency }}</td>
+          <td class="px-4 py-3 font-medium text-forge-text">{{ item.name }}</td>
+          <td class="px-4 py-3 text-forge-text-muted">{{ (item.priceCents / 100) | currency }}</td>
           <td class="px-4 py-3">
             <span
               class="rounded-full px-2 py-1 text-xs font-semibold"
-              [class.bg-green-100]="item.isActive"
-              [class.text-green-700]="item.isActive"
-              [class.bg-gray-100]="!item.isActive"
-              [class.text-gray-600]="!item.isActive"
+              [class.bg-forge-success-muted]="item.isActive"
+              [class.text-forge-success]="item.isActive"
+              [class.bg-forge-steel]="!item.isActive"
+              [class.text-forge-text-muted]="!item.isActive"
             >
               {{ item.isActive ? 'active' : 'inactive' }}
             </span>
           </td>
-          <td class="px-4 py-3 text-gray-600">{{ item.updatedAt | date: 'mediumDate' }}</td>
+          <td class="px-4 py-3 text-forge-text-muted">{{ item.updatedAt | date: 'mediumDate' }}</td>
           <td class="px-4 py-3">
             <div class="flex flex-wrap items-center gap-2">
               <button
@@ -238,14 +236,14 @@
                 class="
                 rounded-lg
                 border
-                border-gray-300
+                border-forge-line
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
-                text-gray-700
+                text-forge-text
                 transition
-                hover:bg-gray-50"
+                hover:bg-forge-ink"
               >
                 Edit
               </button>
@@ -257,14 +255,14 @@
                 class="
                 rounded-lg
                 border
-                border-gray-300
+                border-forge-line
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
-                text-gray-700
+                text-forge-text
                 transition
-                hover:bg-gray-50
+                hover:bg-forge-ink
                 disabled:cursor-not-allowed
                 disabled:opacity-50"
               >
@@ -277,14 +275,14 @@
                 [disabled]="isPending(item.id)"
                 class="
                 rounded-lg
-                bg-red-600
+                bg-forge-danger
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
                 text-white
                 transition
-                hover:bg-red-700
+                hover:brightness-110
                 disabled:cursor-not-allowed
                 disabled:opacity-50"
               >
@@ -294,7 +292,7 @@
 
             @if(rowError(item.id))
             {
-            <p class="mt-1 text-xs text-red-600">{{ rowError(item.id) }}</p>
+            <p class="mt-1 text-xs text-forge-danger">{{ rowError(item.id) }}</p>
             }
           </td>
         </tr>

@@ -1,55 +1,55 @@
 <section class="mx-auto max-w-7xl px-6 py-12">
 
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Discount Codes</h1>
-    <p class="mt-2 text-gray-500">
-      <a routerLink="/admin" class="font-semibold text-blue-600 hover:text-blue-800">Accounts</a>
+    <h1 class="text-3xl font-bold text-forge-text">Discount Codes</h1>
+    <p class="mt-2 text-forge-text-muted">
+      <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
       ·
-      <a routerLink="/admin/marketplace" class="font-semibold text-blue-600 hover:text-blue-800">Marketplace</a>
+      <a routerLink="/admin/marketplace" class="font-semibold text-forge-accent hover:underline">Marketplace</a>
       ·
-      <a routerLink="/admin/marketplace/orders" class="font-semibold text-blue-600 hover:text-blue-800">Orders</a>
+      <a routerLink="/admin/marketplace/orders" class="font-semibold text-forge-accent hover:underline">Orders</a>
     </p>
   </div>
 
   @if (errorMessage()) {
-    <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+    <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   <form
     [formGroup]="codeForm"
     (ngSubmit)="submit()"
-    class="mt-8 rounded-xl border border-gray-200 bg-white p-6 shadow-sm"
+    class="mt-8 rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm"
   >
-    <h2 class="text-lg font-bold text-gray-900">
+    <h2 class="text-lg font-bold text-forge-text">
       {{ editingId() ? 'Edit Discount Code' : 'New Discount Code' }}
     </h2>
 
     @if (saveError()) {
-      <p class="mt-3 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ saveError() }}</p>
+      <p class="mt-3 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ saveError() }}</p>
     }
 
     <div class="mt-4 grid gap-4 md:grid-cols-2">
       <div>
-        <label class="text-sm font-semibold text-gray-700">Code</label>
+        <label class="text-sm font-semibold text-forge-text">Code</label>
         <input
           type="text"
           formControlName="code"
           placeholder="SAVE10"
-          class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm uppercase focus:outline-none focus:ring-2 focus:ring-forge-accent"
         >
         @if (hasError('code')) {
-          <p class="mt-1 text-xs text-red-600">Code is required.</p>
+          <p class="mt-1 text-xs text-forge-danger">Code is required.</p>
         }
         @if (editingId()) {
-          <p class="mt-1 text-xs text-gray-400">Codes can't be changed after creation.</p>
+          <p class="mt-1 text-xs text-forge-text-muted">Codes can't be changed after creation.</p>
         }
       </div>
 
       <div>
-        <label class="text-sm font-semibold text-gray-700">Discount Type</label>
+        <label class="text-sm font-semibold text-forge-text">Discount Type</label>
         <select
           formControlName="discountType"
-          class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
         >
           <option value="percent">Percent off</option>
           <option value="fixed">Fixed amount off</option>
@@ -58,51 +58,51 @@
 
       @if (codeForm.controls.discountType.value === 'percent') {
         <div>
-          <label class="text-sm font-semibold text-gray-700">Percent Off (1–100)</label>
+          <label class="text-sm font-semibold text-forge-text">Percent Off (1–100)</label>
           <input
             type="number"
             min="1"
             max="100"
             formControlName="percentValue"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
           >
           @if (hasError('percentValue')) {
-            <p class="mt-1 text-xs text-red-600">Enter a percent between 1 and 100.</p>
+            <p class="mt-1 text-xs text-forge-danger">Enter a percent between 1 and 100.</p>
           }
         </div>
       } @else {
         <div>
-          <label class="text-sm font-semibold text-gray-700">Amount Off (USD)</label>
+          <label class="text-sm font-semibold text-forge-text">Amount Off (USD)</label>
           <input
             type="number"
             min="0.01"
             step="0.01"
             formControlName="amountDollars"
-            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
           >
           @if (hasError('amountDollars')) {
-            <p class="mt-1 text-xs text-red-600">Enter a valid amount.</p>
+            <p class="mt-1 text-xs text-forge-danger">Enter a valid amount.</p>
           }
         </div>
       }
 
       <div>
-        <label class="text-sm font-semibold text-gray-700">Expires On (optional)</label>
+        <label class="text-sm font-semibold text-forge-text">Expires On (optional)</label>
         <input
           type="date"
           formControlName="expiresAt"
-          class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
         >
       </div>
 
       <div>
-        <label class="text-sm font-semibold text-gray-700">Max Redemptions (optional)</label>
+        <label class="text-sm font-semibold text-forge-text">Max Redemptions (optional)</label>
         <input
           type="number"
           min="1"
           formControlName="maxRedemptions"
           placeholder="Unlimited"
-          class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+          class="mt-1 w-full rounded-lg border border-forge-line px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
         >
       </div>
     </div>
@@ -111,7 +111,7 @@
       <button
         type="submit"
         [disabled]="isSaving()"
-        class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+        class="rounded-lg bg-forge-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {{ editingId() ? 'Save Changes' : 'Create Code' }}
       </button>
@@ -120,7 +120,7 @@
         <button
           type="button"
           (click)="cancelEdit()"
-          class="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+          class="rounded-lg border border-forge-line px-5 py-2.5 text-sm font-semibold text-forge-text transition hover:bg-forge-ink"
         >
           Cancel
         </button>
@@ -129,13 +129,13 @@
   </form>
 
   @if (isLoading()) {
-    <p class="mt-8 text-gray-500">Loading discount codes…</p>
+    <p class="mt-8 text-forge-text-muted">Loading discount codes…</p>
   } @else if (codes().length === 0) {
-    <p class="mt-8 text-gray-500">No discount codes yet.</p>
+    <p class="mt-8 text-forge-text-muted">No discount codes yet.</p>
   } @else {
-    <div class="mt-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-      <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-        <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500">
+    <div class="mt-8 overflow-x-auto rounded-xl border border-forge-line bg-forge-steel shadow-sm">
+      <table class="min-w-full divide-y divide-forge-line text-left text-sm">
+        <thead class="bg-forge-ink text-xs font-semibold uppercase text-forge-text-muted">
           <tr>
             <th class="px-4 py-3">Code</th>
             <th class="px-4 py-3">Discount</th>
@@ -145,24 +145,24 @@
             <th class="px-4 py-3">Actions</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-forge-line">
           @for (code of codes(); track code.id) {
             <tr>
-              <td class="px-4 py-3 font-mono font-medium text-gray-900">{{ code.code }}</td>
-              <td class="px-4 py-3 text-gray-600">{{ formatValue(code) }}</td>
-              <td class="px-4 py-3 text-gray-600">
+              <td class="px-4 py-3 font-mono font-medium text-forge-text">{{ code.code }}</td>
+              <td class="px-4 py-3 text-forge-text-muted">{{ formatValue(code) }}</td>
+              <td class="px-4 py-3 text-forge-text-muted">
                 {{ code.redemptionCount }}{{ code.maxRedemptions ? ' / ' + code.maxRedemptions : '' }}
               </td>
-              <td class="px-4 py-3 text-gray-600">
+              <td class="px-4 py-3 text-forge-text-muted">
                 {{ code.expiresAt ? (code.expiresAt | date: 'mediumDate') : 'Never' }}
               </td>
               <td class="px-4 py-3">
                 <span
                   class="rounded-full px-2 py-1 text-xs font-semibold"
-                  [class.bg-green-100]="code.isActive"
-                  [class.text-green-700]="code.isActive"
-                  [class.bg-gray-100]="!code.isActive"
-                  [class.text-gray-600]="!code.isActive"
+                  [class.bg-forge-success-muted]="code.isActive"
+                  [class.text-forge-success]="code.isActive"
+                  [class.bg-forge-steel]="!code.isActive"
+                  [class.text-forge-text-muted]="!code.isActive"
                 >
                   {{ code.isActive ? 'active' : 'inactive' }}
                 </span>
@@ -172,7 +172,7 @@
                   <button
                     type="button"
                     (click)="startEdit(code)"
-                    class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+                    class="rounded-lg border border-forge-line px-3 py-1.5 text-xs font-semibold text-forge-text transition hover:bg-forge-ink"
                   >
                     Edit
                   </button>
@@ -181,7 +181,7 @@
                     type="button"
                     (click)="toggleActive(code)"
                     [disabled]="isPending(code.id)"
-                    class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-lg border border-forge-line px-3 py-1.5 text-xs font-semibold text-forge-text transition hover:bg-forge-ink disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {{ code.isActive ? 'Deactivate' : 'Activate' }}
                   </button>
@@ -190,14 +190,14 @@
                     type="button"
                     (click)="deleteCode(code)"
                     [disabled]="isPending(code.id)"
-                    class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="rounded-lg bg-forge-danger px-3 py-1.5 text-xs font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     Delete
                   </button>
                 </div>
 
                 @if (rowError(code.id)) {
-                  <p class="mt-1 text-xs text-red-600">{{ rowError(code.id) }}</p>
+                  <p class="mt-1 text-xs text-forge-danger">{{ rowError(code.id) }}</p>
                 }
               </td>
             </tr>

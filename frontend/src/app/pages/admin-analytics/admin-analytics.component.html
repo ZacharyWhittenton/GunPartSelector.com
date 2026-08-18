@@ -1,25 +1,25 @@
 <section class="mx-auto max-w-7xl px-6 py-12">
 
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Analytics</h1>
-    <p class="mt-2 text-gray-500">
-      <a routerLink="/admin" class="font-semibold text-blue-600 hover:text-blue-800">Accounts</a>
+    <h1 class="text-3xl font-bold text-forge-text">Analytics</h1>
+    <p class="mt-2 text-forge-text-muted">
+      <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
       ·
-      <a routerLink="/admin/dashboard" class="font-semibold text-blue-600 hover:text-blue-800">Dashboard</a>
+      <a routerLink="/admin/dashboard" class="font-semibold text-forge-accent hover:underline">Dashboard</a>
     </p>
   </div>
 
   @if (errorMessage()) {
-    <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+    <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   <div class="mt-6 flex items-center gap-3">
-    <label class="text-sm font-semibold text-gray-700" for="days-select">Window</label>
+    <label class="text-sm font-semibold text-forge-text" for="days-select">Window</label>
     <select
       id="days-select"
       [value]="days()"
       (change)="onDaysChange($any($event.target).value)"
-      class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+      class="rounded-lg border border-forge-line px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-forge-accent"
     >
       <option value="7">Last 7 days</option>
       <option value="30">Last 30 days</option>
@@ -29,16 +29,16 @@
 
   <div class="mt-6 grid gap-6 lg:grid-cols-2">
     <div>
-      <h2 class="text-lg font-bold text-gray-900">Most Visited Pages</h2>
+      <h2 class="text-lg font-bold text-forge-text">Most Visited Pages</h2>
 
       @if (isLoadingPages()) {
-        <p class="mt-4 text-gray-500">Loading…</p>
+        <p class="mt-4 text-forge-text-muted">Loading…</p>
       } @else if (topPages().length === 0) {
-        <p class="mt-4 text-gray-500">No page views recorded yet.</p>
+        <p class="mt-4 text-forge-text-muted">No page views recorded yet.</p>
       } @else {
-        <div class="mt-4 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-          <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-            <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500">
+        <div class="mt-4 overflow-x-auto rounded-xl border border-forge-line bg-forge-steel shadow-sm">
+          <table class="min-w-full divide-y divide-forge-line text-left text-sm">
+            <thead class="bg-forge-ink text-xs font-semibold uppercase text-forge-text-muted">
               <tr>
                 <th class="px-4 py-3">Path</th>
                 <th class="px-4 py-3">Views</th>
@@ -46,17 +46,17 @@
                 <th class="px-4 py-3">Heatmap</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-forge-line">
               @for (page of topPages(); track page.path) {
-                <tr [class.bg-blue-50]="selectedPath() === page.path">
-                  <td class="px-4 py-3 font-mono text-xs text-gray-900">{{ page.path }}</td>
-                  <td class="px-4 py-3 text-gray-600">{{ page.viewCount }}</td>
-                  <td class="px-4 py-3 text-gray-600">{{ page.uniqueSessions }}</td>
+                <tr [class.bg-forge-steel]="selectedPath() === page.path">
+                  <td class="px-4 py-3 font-mono text-xs text-forge-text">{{ page.path }}</td>
+                  <td class="px-4 py-3 text-forge-text-muted">{{ page.viewCount }}</td>
+                  <td class="px-4 py-3 text-forge-text-muted">{{ page.uniqueSessions }}</td>
                   <td class="px-4 py-3">
                     <button
                       type="button"
                       (click)="selectPage(page.path)"
-                      class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-gray-700 transition hover:bg-gray-50"
+                      class="rounded-lg border border-forge-line px-3 py-1.5 text-xs font-semibold text-forge-text transition hover:bg-forge-ink"
                     >
                       View
                     </button>
@@ -70,22 +70,22 @@
     </div>
 
     <div>
-      <h2 class="text-lg font-bold text-gray-900">
+      <h2 class="text-lg font-bold text-forge-text">
         Click Hotzones
         @if (selectedPath()) {
-          <span class="font-mono text-sm font-normal text-gray-500">{{ selectedPath() }}</span>
+          <span class="font-mono text-sm font-normal text-forge-text-muted">{{ selectedPath() }}</span>
         }
       </h2>
 
       @if (isLoadingHeatmap()) {
-        <p class="mt-4 text-gray-500">Loading heatmap…</p>
+        <p class="mt-4 text-forge-text-muted">Loading heatmap…</p>
       } @else if (!selectedPath()) {
-        <p class="mt-4 text-gray-500">Select a page to view its click hotzones.</p>
+        <p class="mt-4 text-forge-text-muted">Select a page to view its click hotzones.</p>
       } @else if (heatmapPoints().length === 0) {
-        <p class="mt-4 text-gray-500">No clicks recorded for this page yet.</p>
+        <p class="mt-4 text-forge-text-muted">No clicks recorded for this page yet.</p>
       }
 
-      <div class="mt-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm">
+      <div class="mt-4 overflow-hidden rounded-xl border border-forge-line bg-forge-ink shadow-sm">
         <canvas
           #heatmapCanvas
           [width]="canvasWidth"
@@ -93,7 +93,7 @@
           class="block w-full"
         ></canvas>
       </div>
-      <p class="mt-2 text-xs text-gray-400">
+      <p class="mt-2 text-xs text-forge-text-muted">
         Warmer colors indicate more clicks. Position is relative to full page height, not just the visible viewport.
       </p>
     </div>

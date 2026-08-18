@@ -1,99 +1,92 @@
 <section class="mx-auto max-w-7xl px-6 py-12">
 
   <div>
-    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-    <p class="mt-2 text-gray-500">
-      <a routerLink="/admin" class="font-semibold text-blue-600 hover:text-blue-800">Accounts</a>
+    <h1 class="text-3xl font-bold text-forge-text">Dashboard</h1>
+    <p class="mt-2 text-forge-text-muted">
+      <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
       ·
-      <a routerLink="/admin/leads" class="font-semibold text-blue-600 hover:text-blue-800">Leads</a>
+      <a routerLink="/admin/leads" class="font-semibold text-forge-accent hover:underline">Leads</a>
       ·
-      <a routerLink="/admin/schedule" class="font-semibold text-blue-600 hover:text-blue-800">Schedule</a>
+      <a routerLink="/admin/blog" class="font-semibold text-forge-accent hover:underline">Blog</a>
       ·
-      <a routerLink="/admin/blog" class="font-semibold text-blue-600 hover:text-blue-800">Blog</a>
+      <a routerLink="/admin/marketplace" class="font-semibold text-forge-accent hover:underline">Marketplace</a>
       ·
-      <a routerLink="/admin/marketplace" class="font-semibold text-blue-600 hover:text-blue-800">Marketplace</a>
+      <a routerLink="/admin/testimonials" class="font-semibold text-forge-accent hover:underline">Testimonials</a>
       ·
-      <a routerLink="/admin/testimonials" class="font-semibold text-blue-600 hover:text-blue-800">Testimonials</a>
+      <a routerLink="/admin/discount-codes" class="font-semibold text-forge-accent hover:underline">Discount Codes</a>
       ·
-      <a routerLink="/admin/discount-codes" class="font-semibold text-blue-600 hover:text-blue-800">Discount Codes</a>
-      ·
-      <a routerLink="/admin/analytics" class="font-semibold text-blue-600 hover:text-blue-800">Analytics</a>
+      <a routerLink="/admin/analytics" class="font-semibold text-forge-accent hover:underline">Analytics</a>
     </p>
   </div>
 
   @if (errorMessage()) {
-    <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+    <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   @if (isLoading()) {
-    <p class="mt-8 text-gray-500">Loading dashboard…</p>
+    <p class="mt-8 text-forge-text-muted">Loading dashboard…</p>
   } @else if (summary(); as data) {
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 
-      <a routerLink="/admin/leads" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">New Leads Today</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{{ data.newLeadsToday }}</p>
+      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">New Leads Today</p>
+        <p class="mt-2 text-3xl font-bold text-forge-text">{{ data.newLeadsToday }}</p>
       </a>
 
-      <a routerLink="/admin/leads" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">New Leads This Week</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{{ data.newLeadsThisWeek }}</p>
+      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">New Leads This Week</p>
+        <p class="mt-2 text-3xl font-bold text-forge-text">{{ data.newLeadsThisWeek }}</p>
       </a>
 
-      <a routerLink="/admin/leads" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">Needs Follow-up</p>
+      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">Needs Follow-up</p>
         <p
           class="mt-2 text-3xl font-bold"
-          [class.text-red-600]="data.leadsNeedingFollowUp > 0"
-          [class.text-gray-900]="data.leadsNeedingFollowUp === 0"
+          [class.text-forge-danger]="data.leadsNeedingFollowUp > 0"
+          [class.text-forge-text]="data.leadsNeedingFollowUp === 0"
         >
           {{ data.leadsNeedingFollowUp }}
         </p>
       </a>
 
-      <a routerLink="/admin/schedule" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">Upcoming Appointments</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{{ data.upcomingAppointments }}</p>
-      </a>
-
-      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">Revenue This Week</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">
+      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">Revenue This Week</p>
+        <p class="mt-2 text-3xl font-bold text-forge-text">
           {{ (data.revenueThisWeekCents / 100) | currency }}
         </p>
       </a>
 
-      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">Revenue This Month</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">
+      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">Revenue This Month</p>
+        <p class="mt-2 text-3xl font-bold text-forge-text">
           {{ (data.revenueThisMonthCents / 100) | currency }}
         </p>
       </a>
 
-      <a routerLink="/admin/testimonials" class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-gray-500">Pending Testimonials</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900">{{ data.pendingTestimonials }}</p>
+      <a routerLink="/admin/testimonials" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+        <p class="text-sm font-semibold text-forge-text-muted">Pending Testimonials</p>
+        <p class="mt-2 text-3xl font-bold text-forge-text">{{ data.pendingTestimonials }}</p>
       </a>
 
     </div>
 
     <div class="mt-10">
-      <h2 class="text-xl font-bold text-gray-900">Recent Activity</h2>
+      <h2 class="text-xl font-bold text-forge-text">Recent Activity</h2>
 
       @if (data.recentActivity.length === 0) {
-        <p class="mt-4 text-gray-500">Nothing to show yet.</p>
+        <p class="mt-4 text-forge-text-muted">Nothing to show yet.</p>
       } @else {
-        <ul class="mt-4 divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white shadow-sm">
+        <ul class="mt-4 divide-y divide-forge-line rounded-xl border border-forge-line bg-forge-steel shadow-sm">
           @for (item of data.recentActivity; track item.id + item.activityType) {
             <li class="flex items-center gap-3 px-4 py-3">
               <span
                 class="h-2 w-2 shrink-0 rounded-full"
-                [class.bg-blue-500]="item.activityType === 'lead'"
-                [class.bg-purple-500]="item.activityType === 'appointment'"
-                [class.bg-green-500]="item.activityType === 'order'"
+                [class.bg-forge-steel0]="item.activityType === 'lead'"
+                [class.bg-forge-brass]="item.activityType === 'appointment'"
+                [class.bg-forge-success-muted0]="item.activityType === 'order'"
               ></span>
-              <span class="flex-1 text-sm text-gray-800">{{ item.label }}</span>
-              <span class="text-xs text-gray-400">{{ item.occurredAt | date: 'MMM d, h:mm a' }}</span>
+              <span class="flex-1 text-sm text-forge-text">{{ item.label }}</span>
+              <span class="text-xs text-forge-text-muted">{{ item.occurredAt | date: 'MMM d, h:mm a' }}</span>
             </li>
           }
         </ul>

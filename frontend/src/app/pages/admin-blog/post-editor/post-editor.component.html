@@ -1,75 +1,75 @@
 <section class="mx-auto max-w-3xl px-6 py-12">
 
-  <a routerLink="/admin/blog" class="text-sm font-semibold text-blue-600 hover:text-blue-800">
+  <a routerLink="/admin/blog" class="text-sm font-semibold text-forge-accent hover:underline">
     &larr; Back to Posts
   </a>
 
-  <h1 class="mt-4 text-3xl font-bold text-gray-900">
+  <h1 class="mt-4 text-3xl font-bold text-forge-text">
     {{ isEditMode() ? 'Edit Post' : 'New Post' }}
   </h1>
 
   @if(errorMessage())
   {
-  <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+  <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   @if(isLoading())
   {
-  <p class="mt-8 text-gray-500">Loading post…</p>
+  <p class="mt-8 text-forge-text-muted">Loading post…</p>
   }
   @else
   {
   <form [formGroup]="postForm" (ngSubmit)="submit()" class="mt-8 space-y-6">
 
     <div>
-      <label class="block text-sm font-semibold text-gray-700">Title</label>
+      <label class="block text-sm font-semibold text-forge-text">Title</label>
       <input
         formControlName="title"
-        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-forge-accent"
       >
       @if(hasError('title'))
       {
-      <p class="mt-1 text-sm text-red-600">Title is required.</p>
+      <p class="mt-1 text-sm text-forge-danger">Title is required.</p>
       }
     </div>
 
     <div>
-      <label class="block text-sm font-semibold text-gray-700">Excerpt</label>
+      <label class="block text-sm font-semibold text-forge-text">Excerpt</label>
       <textarea
         formControlName="excerpt"
         rows="2"
-        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-forge-accent"
       ></textarea>
       @if(hasError('excerpt'))
       {
-      <p class="mt-1 text-sm text-red-600">Excerpt is required.</p>
+      <p class="mt-1 text-sm text-forge-danger">Excerpt is required.</p>
       }
     </div>
 
     <div>
-      <label class="block text-sm font-semibold text-gray-700">Body</label>
+      <label class="block text-sm font-semibold text-forge-text">Body</label>
       <textarea
         formControlName="body"
         rows="12"
-        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-forge-accent"
       ></textarea>
       @if(hasError('body'))
       {
-      <p class="mt-1 text-sm text-red-600">Body is required.</p>
+      <p class="mt-1 text-sm text-forge-danger">Body is required.</p>
       }
     </div>
 
     <div>
-      <label class="block text-sm font-semibold text-gray-700">Tags (comma-separated)</label>
+      <label class="block text-sm font-semibold text-forge-text">Tags (comma-separated)</label>
       <input
         formControlName="tags"
         placeholder="web design, maintenance"
-        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-600"
+        class="mt-1 w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-forge-accent"
       >
     </div>
 
     <div>
-      <label class="block text-sm font-semibold text-gray-700">Cover Image</label>
+      <label class="block text-sm font-semibold text-forge-text">Cover Image</label>
 
       @if(coverImageUrl())
       {
@@ -81,12 +81,12 @@
         accept="image/jpeg,image/png,image/webp,image/gif"
         (change)="onImageSelected($event)"
         [disabled]="isUploadingImage()"
-        class="mt-2 block text-sm text-gray-600"
+        class="mt-2 block text-sm text-forge-text-muted"
       >
 
       @if(isUploadingImage())
       {
-      <p class="mt-1 text-sm text-gray-500">Uploading…</p>
+      <p class="mt-1 text-sm text-forge-text-muted">Uploading…</p>
       }
     </div>
 
@@ -95,13 +95,13 @@
       [disabled]="isSaving() || isUploadingImage()"
       class="
       rounded-lg
-      bg-blue-600
+      bg-forge-accent
       px-6
       py-3
       font-semibold
       text-white
       transition
-      hover:bg-blue-700
+      hover:brightness-110
       disabled:cursor-not-allowed
       disabled:opacity-50"
     >

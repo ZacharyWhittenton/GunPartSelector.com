@@ -2,9 +2,9 @@
 
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-3xl font-bold text-gray-900">Blog Posts</h1>
-      <p class="mt-2 text-gray-500">
-        <a routerLink="/admin" class="font-semibold text-blue-600 hover:text-blue-800">Accounts</a>
+      <h1 class="text-3xl font-bold text-forge-text">Blog Posts</h1>
+      <p class="mt-2 text-forge-text-muted">
+        <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
         · Blog
       </p>
     </div>
@@ -13,13 +13,13 @@
       routerLink="/admin/blog/new"
       class="
       rounded-lg
-      bg-blue-600
+      bg-forge-accent
       px-5
       py-3
       font-semibold
       text-white
       transition
-      hover:bg-blue-700"
+      hover:brightness-110"
     >
       New Post
     </a>
@@ -27,22 +27,22 @@
 
   @if(errorMessage())
   {
-  <p class="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage() }}</p>
+  <p class="mt-4 rounded-lg bg-forge-danger-muted px-4 py-3 text-sm text-forge-danger">{{ errorMessage() }}</p>
   }
 
   @if(isLoading())
   {
-  <p class="mt-8 text-gray-500">Loading posts…</p>
+  <p class="mt-8 text-forge-text-muted">Loading posts…</p>
   }
   @else if(posts().length === 0)
   {
-  <p class="mt-8 text-gray-500">No posts yet.</p>
+  <p class="mt-8 text-forge-text-muted">No posts yet.</p>
   }
   @else
   {
-  <div class="mt-8 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
-    <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-      <thead class="bg-gray-50 text-xs font-semibold uppercase text-gray-500">
+  <div class="mt-8 overflow-x-auto rounded-xl border border-forge-line bg-forge-steel shadow-sm">
+    <table class="min-w-full divide-y divide-forge-line text-left text-sm">
+      <thead class="bg-forge-ink text-xs font-semibold uppercase text-forge-text-muted">
         <tr>
           <th class="px-4 py-3">Title</th>
           <th class="px-4 py-3">Status</th>
@@ -51,24 +51,24 @@
           <th class="px-4 py-3">Actions</th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-gray-100">
+      <tbody class="divide-y divide-forge-line">
         @for(post of posts(); track post.id)
         {
         <tr>
-          <td class="px-4 py-3 font-medium text-gray-900">{{ post.title }}</td>
+          <td class="px-4 py-3 font-medium text-forge-text">{{ post.title }}</td>
           <td class="px-4 py-3">
             <span
               class="rounded-full px-2 py-1 text-xs font-semibold"
-              [class.bg-green-100]="post.status === 'published'"
-              [class.text-green-700]="post.status === 'published'"
-              [class.bg-gray-100]="post.status !== 'published'"
-              [class.text-gray-600]="post.status !== 'published'"
+              [class.bg-forge-success-muted]="post.status === 'published'"
+              [class.text-forge-success]="post.status === 'published'"
+              [class.bg-forge-steel]="post.status !== 'published'"
+              [class.text-forge-text-muted]="post.status !== 'published'"
             >
               {{ post.status }}
             </span>
           </td>
-          <td class="px-4 py-3 text-gray-600">{{ post.tags.join(', ') }}</td>
-          <td class="px-4 py-3 text-gray-600">{{ post.createdAt | date: 'mediumDate' }}</td>
+          <td class="px-4 py-3 text-forge-text-muted">{{ post.tags.join(', ') }}</td>
+          <td class="px-4 py-3 text-forge-text-muted">{{ post.createdAt | date: 'mediumDate' }}</td>
           <td class="px-4 py-3">
             <div class="flex flex-wrap items-center gap-2">
               <a
@@ -76,14 +76,14 @@
                 class="
                 rounded-lg
                 border
-                border-gray-300
+                border-forge-line
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
-                text-gray-700
+                text-forge-text
                 transition
-                hover:bg-gray-50"
+                hover:bg-forge-ink"
               >
                 Edit
               </a>
@@ -95,14 +95,14 @@
                 class="
                 rounded-lg
                 border
-                border-gray-300
+                border-forge-line
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
-                text-gray-700
+                text-forge-text
                 transition
-                hover:bg-gray-50
+                hover:bg-forge-ink
                 disabled:cursor-not-allowed
                 disabled:opacity-50"
               >
@@ -115,14 +115,14 @@
                 [disabled]="isPending(post.id)"
                 class="
                 rounded-lg
-                bg-red-600
+                bg-forge-danger
                 px-3
                 py-1.5
                 text-xs
                 font-semibold
                 text-white
                 transition
-                hover:bg-red-700
+                hover:brightness-110
                 disabled:cursor-not-allowed
                 disabled:opacity-50"
               >
