@@ -24,22 +24,28 @@ from site_api.db.database import Database
 from site_api.db.models import PartCategoryRecord, ProductRecord
 
 # (slug, name, section, sort_order)
+# Matches the standard upper/lower group breakdown of an AR-15
+# (see https://www.wingtactical.com/parts-of-an-ar-15/ for the reference taxonomy).
 CATEGORIES = [
     ("upper-receiver", "Upper Receiver", "upper", 1),
     ("barrel", "Barrel", "upper", 2),
-    ("handguard", "Handguard", "upper", 3),
-    ("bolt-carrier-group", "Bolt Carrier Group", "upper", 4),
-    ("charging-handle", "Charging Handle", "upper", 5),
-    ("lower-receiver", "Lower Receiver", "lower", 6),
-    ("trigger", "Trigger", "lower", 7),
-    ("pistol-grip", "Pistol Grip", "lower", 8),
-    ("stock-brace", "Stock & Brace", "stock", 9),
-    ("buffer-tube", "Buffer Tube", "stock", 10),
-    ("buffer-kit", "Buffer Kit", "stock", 11),
-    ("optic", "Optic", "optics", 12),
-    ("optic-mount", "Optic Mount", "optics", 13),
-    ("muzzle-device", "Muzzle Device", "accessories", 14),
-    ("foregrip", "Foregrip", "accessories", 15),
+    ("gas-system", "Gas Block & Tube", "upper", 3),
+    ("handguard", "Handguard", "upper", 4),
+    ("bolt-carrier-group", "Bolt Carrier Group", "upper", 5),
+    ("charging-handle", "Charging Handle", "upper", 6),
+    ("forward-assist", "Forward Assist", "upper", 7),
+    ("ejection-port-cover", "Ejection Port Cover", "upper", 8),
+    ("lower-receiver", "Lower Receiver", "lower", 9),
+    ("trigger", "Trigger", "lower", 10),
+    ("pistol-grip", "Pistol Grip", "lower", 11),
+    ("magazine", "Magazine", "lower", 12),
+    ("stock-brace", "Stock & Brace", "stock", 13),
+    ("buffer-tube", "Buffer Tube", "stock", 14),
+    ("buffer-kit", "Buffer Kit", "stock", 15),
+    ("optic", "Optic", "optics", 16),
+    ("optic-mount", "Optic Mount", "optics", 17),
+    ("muzzle-device", "Muzzle Device", "accessories", 18),
+    ("foregrip", "Foregrip", "accessories", 19),
 ]
 
 # category_slug -> list of (brand, name, sku, price_cents, weight_oz, description, tags)
@@ -89,6 +95,26 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
          "Carbon-fiber-wrapped stainless barrel, mid-length gas system.",
          ["caliber:556", "gassystem:mid", "thread:1-2x28", "handguard:mil-spec",
           "twist:1-8", "contour:carbon-wrapped", "finish:carbon-fiber"]),
+    ],
+    "gas-system": [
+        ("Odin Works", "Low-Profile Gas Block .750", "ODIN-GB-750", 3400, 1.8,
+         "Clamp-on low-profile gas block for .750in gas journals.",
+         ["gassystem:carbine", "mounttype:clamp-on", "bore:750"]),
+        ("BCM", "Carbine-Length Gas Tube", "BCM-GT-CAR", 1600, 0.6,
+         "Mil-spec stainless carbine-length gas tube.",
+         ["gassystem:carbine", "material:stainless"]),
+        ("Superlative Arms", "Adjustable Gas Block .750", "SUP-GB-ADJ750", 8900, 2.2,
+         "Bleed-off adjustable gas block for tuning suppressed or over-gassed builds.",
+         ["gassystem:mid", "mounttype:set-screw", "bore:750", "adjustable:yes"]),
+        ("VLTOR", "Mid-Length Gas Tube", "VLT-GT-MID", 1800, 0.7,
+         "Mil-spec stainless mid-length gas tube.",
+         ["gassystem:mid", "material:stainless"]),
+        ("Seekins Precision", "Low-Profile Gas Block .936", "SEEK-GB-936", 5900, 2.0,
+         "Clamp-on low-profile gas block for .936in gas journals.",
+         ["gassystem:rifle", "mounttype:clamp-on", "bore:936"]),
+        ("Faxon Firearms", "Rifle-Length Gas Tube", "FAX-GT-RIF", 2000, 0.8,
+         "Mil-spec stainless rifle-length gas tube.",
+         ["gassystem:rifle", "material:stainless"]),
     ],
     "handguard": [
         ("Geissele Automatics", "MK16 13in M-LOK Rail", "GEI-HG-MK16-13", 28900, 14.5,
@@ -150,6 +176,46 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
          "Billet ambidextrous charging handle with low-profile latch.",
          ["size:mil-spec"]),
     ],
+    "forward-assist": [
+        ("Aero Precision", "Forward Assist Assembly", "AP-FA-STD", 1200, 0.9,
+         "Mil-spec forward assist pawl, spring, and retaining pin.",
+         ["size:mil-spec"]),
+        ("BCM", "Forward Assist Assembly", "BCM-FA-STD", 1400, 0.9,
+         "Mil-spec forward assist assembly for USGI-pattern uppers.",
+         ["size:mil-spec"]),
+        ("CMMG", "Forward Assist Assembly", "CMMG-FA-STD", 1100, 0.9,
+         "Drop-in mil-spec forward assist assembly.",
+         ["size:mil-spec"]),
+        ("Rock River Arms", "Forward Assist Assembly", "RRA-FA-STD", 1300, 0.9,
+         "Mil-spec forward assist pawl and spring assembly.",
+         ["size:mil-spec"]),
+        ("Anderson Manufacturing", "Forward Assist Assembly", "AM-FA-STD", 900, 0.9,
+         "Budget-friendly mil-spec forward assist assembly.",
+         ["size:mil-spec"]),
+        ("Colt", "Forward Assist Assembly", "COLT-FA-STD", 1600, 0.9,
+         "OEM-spec forward assist assembly for mil-spec uppers.",
+         ["size:mil-spec"]),
+    ],
+    "ejection-port-cover": [
+        ("Aero Precision", "Ejection Port Cover Kit", "AP-EPC-STD", 1000, 0.8,
+         "Mil-spec dust cover, hinge pin, and C-clip.",
+         ["size:mil-spec"]),
+        ("BCM", "Ejection Port Cover Kit", "BCM-EPC-STD", 1200, 0.8,
+         "Mil-spec dust cover assembly for USGI-pattern uppers.",
+         ["size:mil-spec"]),
+        ("Troy Industries", "Ejection Port Cover Kit", "TROY-EPC-STD", 1500, 0.8,
+         "Mil-spec dust cover assembly with a reinforced hinge.",
+         ["size:mil-spec"]),
+        ("CMMG", "Ejection Port Cover Kit", "CMMG-EPC-STD", 950, 0.8,
+         "Drop-in mil-spec dust cover assembly.",
+         ["size:mil-spec"]),
+        ("Rock River Arms", "Ejection Port Cover Kit", "RRA-EPC-STD", 1100, 0.8,
+         "Mil-spec dust cover, hinge pin, and retaining clip.",
+         ["size:mil-spec"]),
+        ("Anderson Manufacturing", "Ejection Port Cover Kit", "AM-EPC-STD", 800, 0.8,
+         "Budget-friendly mil-spec dust cover assembly.",
+         ["size:mil-spec"]),
+    ],
     "lower-receiver": [
         ("Aero Precision", "M4E1 Stripped Lower Receiver", "AP-LO-M4E1", 12900, 8.0,
          "Forged 7075-T6 lower receiver machined to mil-spec dimensions.",
@@ -209,6 +275,26 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
         ("B5 Systems", "Type 23 P-Grip", "B5-GRP-T23", 2500, 3.2,
          "Polymer grip with an adjustable palm shelf.",
          ["material:polymer", "texture:type23"]),
+    ],
+    "magazine": [
+        ("Magpul", "PMAG 30 GEN M3", "MAG-MAG-PM3-30", 1500, 4.2,
+         "30-round polymer magazine, the standard-issue AR-15 magazine.",
+         ["caliber:556", "capacity:30", "material:polymer"]),
+        ("Lancer Systems", "L5AWM 30rd Magazine", "LAN-MAG-L5-30", 1800, 4.4,
+         "30-round translucent polymer magazine with steel feed lips.",
+         ["caliber:556", "capacity:30", "material:polymer-translucent"]),
+        ("Magpul", "PMAG 30 GEN M3 .300 BLK", "MAG-MAG-PM3-300B", 1600, 4.2,
+         "30-round polymer magazine marked and tuned for .300 Blackout.",
+         ["caliber:300blk", "capacity:30", "material:polymer"]),
+        ("C Products Defense", "6.5 Grendel 26rd Magazine", "CPD-MAG-GRN-26", 2900, 5.6,
+         "26-round stainless steel magazine for 6.5 Grendel.",
+         ["caliber:65grendel", "capacity:26", "material:stainless-steel"]),
+        ("D&H Industries", "USGI 30rd Aluminum Magazine", "DH-MAG-USGI-30", 1200, 4.0,
+         "Mil-spec aluminum magazine with a stainless spring.",
+         ["caliber:556", "capacity:30", "material:aluminum"]),
+        ("Magpul", "PMAG 10 GEN M3", "MAG-MAG-PM3-10", 1400, 3.4,
+         "10-round polymer magazine for capacity-restricted states.",
+         ["caliber:556", "capacity:10", "material:polymer"]),
     ],
     "stock-brace": [
         ("Magpul", "SL-K Carbine Stock", "MAG-STK-SLK", 8900, 8.0,
@@ -374,7 +460,10 @@ async def main() -> None:
                 await session.flush()
                 print(f"  created category: {name}")
             else:
-                print(f"  already exists: {name}")
+                record.name = name
+                record.section = section
+                record.sort_order = sort_order
+                print(f"  synced category: {name}")
             category_ids[slug] = record.id
 
         print("\nSeeding catalog products...")
