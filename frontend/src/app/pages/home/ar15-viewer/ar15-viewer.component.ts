@@ -499,29 +499,38 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     };
 
     if (upper) {
-      const centerX = (upper.min.x + upper.max.x) / 2;
-      const centerZ = (upper.min.z + upper.max.z) / 2;
       const height = upper.max.y - upper.min.y;
       // Nested fully inside the receiver's solid shell, this hit target was reachable
       // only through whatever incidental gaps exist in the mesh -- a sliver so thin it
-      // read as "can't select the BCG at all". An earlier fix extended it past the
-      // shell's own outer surface so raycasting always hits it first regardless of
-      // rotation, but that meant a visible box floating outside the gun. Raycasting
-      // doesn't care whether a mesh actually renders any pixels, so keep it fully
-      // transparent (colorWrite/depthWrite off) until hovered or selected instead --
-      // full coverage with nothing visible to look wrong.
-      //
-      // Center vertically on the dust cover (the ejection port opening) rather than
-      // the upper receiver's own bounding box -- that box is taller than the visible
-      // body (it includes other tall features further along the rail), so centering
-      // on it left the hitbox floating above the gun instead of over the receiver.
+      // read as "can't select the BCG at all". Raycasting doesn't care whether a mesh
+      // actually renders any pixels, so keep it fully transparent (colorWrite/
+      // depthWrite off) until hovered or selected -- full coverage with nothing
+      // visible to look wrong. Sized and centered on the dust cover (the one part of
+      // the BCG assembly actually exposed on the surface) with only a small margin,
+      // rather than the upper receiver's full bounding box -- that box is both taller
+      // and deeper than the visible body at this point (other geometry elsewhere
+      // along the rail skews it), so using it produced a hitbox many times larger
+      // than the gun itself, especially obvious from a top-down view.
       const dustCover = boundsByCategory.get('dust-cover');
-      const yCenter = dustCover ? (dustCover.min.y + dustCover.max.y) / 2 : (upper.min.y + upper.max.y) / 2;
-      const ySpan = dustCover ? dustCover.max.y - dustCover.min.y + height * 0.15 : height * 0.4;
-      const margin = height * 0.03;
+      const pad = height * 0.12;
+      const zPad = height * 0.08;
+      const center = dustCover
+        ? {
+            x: (dustCover.min.x + dustCover.max.x) / 2,
+            y: (dustCover.min.y + dustCover.max.y) / 2,
+            z: (dustCover.min.z + dustCover.max.z) / 2
+          }
+        : { x: (upper.min.x + upper.max.x) / 2, y: (upper.min.y + upper.max.y) / 2, z: (upper.min.z + upper.max.z) / 2 };
+      const size = dustCover
+        ? {
+            x: dustCover.max.x - dustCover.min.x + pad,
+            y: dustCover.max.y - dustCover.min.y + pad,
+            z: dustCover.max.z - dustCover.min.z + zPad
+          }
+        : { x: (upper.max.x - upper.min.x) * 0.65, y: height * 0.4, z: upper.max.z - upper.min.z + height * 0.06 };
       addStandin(
         'bolt-carrier-group',
-        box(centerX, yCenter, centerZ, (upper.max.x - upper.min.x) * 0.65, ySpan, upper.max.z - upper.min.z + margin * 2),
+        box(center.x, center.y, center.z, size.x, size.y, size.z),
         { hiddenWhenNeutral: true }
       );
     }
