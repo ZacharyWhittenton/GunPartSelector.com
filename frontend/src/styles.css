@@ -21,40 +21,62 @@
   --color-muted: #64748b;
 
 
-  /* Forge theme (AR-15 builder: /parts, /builder, /) -- white & grey, with navy + red accents */
+  /* Forge theme (AR-15 builder: /parts, /builder, /) -- warm neutral/editorial palette,
+     with brass + brick-red accents. Values only: every page already consumes these as
+     semantic tokens (bg-forge-ink, text-forge-text, etc.), so retuning the palette here
+     re-themes the whole site without touching component markup. */
 
-  --color-forge-ink: #ffffff;
+  --color-forge-ink: #f7f3ec;
 
-  --color-forge-nav: #3a5088;
+  --color-forge-nav: #f1ead9;
 
-  --color-forge-steel: #f1f3f6;
+  --color-forge-steel: #efe8dc;
 
-  --color-forge-line: #dde2e9;
+  --color-forge-line: #e1d6c2;
 
-  --color-forge-accent: #c0262f;
+  --color-forge-accent: #a8342b;
 
-  --color-forge-brass: #1d3a70;
+  --color-forge-brass: #9c7a3c;
 
-  --color-forge-text: #1a1f2b;
+  --color-forge-text: #2b241c;
 
-  --color-forge-text-muted: #5b6472;
+  --color-forge-text-muted: #7a6f5e;
 
-  --color-forge-nav-text: #f7f8fa;
+  --color-forge-nav-text: #2b241c;
 
-  --color-forge-nav-text-muted: #aab4c8;
+  --color-forge-nav-text-muted: #7a6f5e;
 
-  --color-forge-success: #15803d;
+  --color-forge-success: #3f7d4a;
 
-  --color-forge-success-muted: #e7f7ee;
+  --color-forge-success-muted: #e8f2e2;
 
-  --color-forge-warn: #b45309;
+  --color-forge-warn: #a5661f;
 
-  --color-forge-warn-muted: #fef3e2;
+  --color-forge-warn-muted: #f6ead7;
 
-  --color-forge-danger: #b91c1c;
+  --color-forge-danger: #a3352a;
 
-  --color-forge-danger-muted: #fdecec;
+  --color-forge-danger-muted: #f6e6df;
 
+
+  /* Typography */
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+
+}
+
+
+/* Motion -- shared timing so hover reveals, page transitions, and scroll-in effects
+   feel like one system instead of every component picking its own duration/easing. */
+:root {
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 200ms;
+  --transition-base: 350ms;
+  --transition-slow: 650ms;
 }
 
 
@@ -67,23 +89,19 @@ body {
 
   margin: 0;
 
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    sans-serif;
+  font-family: var(--font-sans);
 
-  color: #111827;
+  color: var(--color-forge-text);
 
-  background: #ffffff;
+  background: var(--color-forge-ink);
 
 }
 
 
 :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-  outline: 3px solid #ffffff !important;
+  outline: 3px solid var(--color-forge-text) !important;
   outline-offset: 3px;
-  box-shadow: 0 0 0 6px #1d4ed8 !important;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-forge-accent) 30%, transparent) !important;
 }
 
 
@@ -94,11 +112,11 @@ body {
   z-index: 100;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  color: #ffffff;
-  background: #111827;
+  color: var(--color-forge-ink);
+  background: var(--color-forge-text);
   font-weight: 700;
   transform: translateY(-200%);
-  transition: transform 150ms ease;
+  transition: transform var(--transition-fast) var(--ease-editorial);
 }
 
 
