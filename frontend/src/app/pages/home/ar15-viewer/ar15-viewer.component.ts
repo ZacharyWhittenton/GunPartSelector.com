@@ -58,7 +58,8 @@ const GLTF_PART_NODE_TO_CATEGORY: Record<string, string> = {
   uar15_flash_hider_12: 'muzzle-device',
   uar15_grip_15: 'pistol-grip',
   uar15_stock_16: 'stock-brace',
-  uar15_handguard_17: 'handguard'
+  uar15_handguard_17: 'handguard',
+  'ar15_30rnd_mag_(zbroyar)_14': 'magazine'
 };
 
 /** Extra real meshes kept for visual richness but not tied to a pickable category. */
@@ -68,7 +69,6 @@ const GLTF_DETAIL_NODE_NAMES = [
   'uar15_dust_cover_3',
   'uar15_bolt_catch_5',
   'uar15_bolt_6',
-  'ar15_30rnd_mag_(zbroyar)_14',
   'uar15_iron_sight_18'
 ];
 
@@ -80,7 +80,10 @@ const STANDIN_CATEGORIES = new Set([
   'foregrip',
   'buffer-tube',
   'buffer-kit',
-  'bolt-carrier-group'
+  'bolt-carrier-group',
+  'gas-system',
+  'forward-assist',
+  'ejection-port-cover'
 ]);
 
 /** Edge-bevel radius as a fraction of a part's smallest dimension, clamped so tiny
@@ -124,11 +127,8 @@ function tube(
   return mesh;
 }
 
-/** Static, non-interactive detail meshes for the fallback procedural rifle (magazine,
- * trigger guard, rail ridges, sights) used only if the real model fails to load. */
-function buildDetailMeshes(): THREE.Mesh[] {
-  const meshes: THREE.Mesh[] = [];
-
+/** Curved box magazine, shared by the fallback rifle's clickable "magazine" category. */
+function buildMagazineMesh(): THREE.Mesh {
   const magShape = new THREE.Shape();
   magShape.moveTo(-0.17, 0);
   magShape.lineTo(0.17, 0);
@@ -143,7 +143,13 @@ function buildDetailMeshes(): THREE.Mesh[] {
   magazine.position.set(-1.78, -0.42, 0);
   magazine.rotation.z = -0.12;
   magazine.scale.set(1.15, 1.15, 1.15);
-  meshes.push(magazine);
+  return magazine;
+}
+
+/** Static, non-interactive detail meshes for the fallback procedural rifle (trigger
+ * guard, rail ridges, sights) used only if the real model fails to load. */
+function buildDetailMeshes(): THREE.Mesh[] {
+  const meshes: THREE.Mesh[] = [];
 
   const guardShape = new THREE.Shape();
   guardShape.absarc(0, 0, 0.24, Math.PI * 0.15, Math.PI * 1.02, false);
@@ -190,6 +196,10 @@ const PART_CONFIGS: PartMeshConfig[] = [
   { categorySlug: 'bolt-carrier-group', build: () => [box(0.05, 0.05, 0.3, 1.6, 0.2, 0.08)] },
   { categorySlug: 'optic-mount', build: () => [box(0.15, 0.36, 0, 0.9, 0.12, 0.35)] },
   { categorySlug: 'optic', build: () => [tube(0.15, 0.72, 0, 0.9, 0.16)] },
+  { categorySlug: 'gas-system', build: () => [tube(2.1, 0.14, 0, 0.65, 0.05), box(1.85, 0.16, 0, 0.14, 0.14, 0.16)] },
+  { categorySlug: 'forward-assist', build: () => [box(-0.15, 0.05, 0.28, 0.16, 0.14, 0.1)] },
+  { categorySlug: 'ejection-port-cover', build: () => [box(0.2, 0.08, 0.27, 0.55, 0.28, 0.05)] },
+  { categorySlug: 'magazine', build: () => [buildMagazineMesh()] },
   {
     categorySlug: 'lower-receiver',
     build: () => [
@@ -218,7 +228,10 @@ const METAL_CATEGORIES = new Set([
   'lower-receiver',
   'trigger',
   'buffer-tube',
-  'buffer-kit'
+  'buffer-kit',
+  'gas-system',
+  'forward-assist',
+  'ejection-port-cover'
 ]);
 
 function materialKindFor(categorySlug: string): MaterialKind {
@@ -424,6 +437,11 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
       const entries: ClickableEntry[] = [];
       for (const mesh of meshesInGroup(group)) {
+        // GLTFLoader shares one material instance across every mesh that references the
+        // same glTF material index (e.g. the grip, stock, and magazine all use the
+        // "polymer" material) -- clone it per-mesh so recoloring one selected part
+        // doesn't bleed onto every other part sharing that material.
+        mesh.material = (mesh.material as THREE.MeshStandardMaterial).clone();
         this.applySharedSurfaceDetail(mesh.material as THREE.MeshStandardMaterial);
         const neutralColor = (mesh.material as THREE.MeshStandardMaterial).color.clone();
         mesh.userData['categorySlug'] = categorySlug;
@@ -452,6 +470,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private buildStandinParts(boundsByCategory: Map<string, THREE.Box3>): void {
     const upper = boundsByCategory.get('upper-receiver');
     const handguard = boundsByCategory.get('handguard');
+    const barrel = boundsByCategory.get('barrel');
     const lower = boundsByCategory.get('lower-receiver');
     const stock = boundsByCategory.get('stock-brace');
 
@@ -477,12 +496,26 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
         'bolt-carrier-group',
         box(centerX, (upper.min.y + upper.max.y) / 2, 0, (upper.max.x - upper.min.x) * 0.65, height * 0.3, height * 0.25)
       );
+
+      const midY = (upper.min.y + upper.max.y) / 2;
+      const side = upper.max.z + height * 0.05;
+      const forwardAssistX = THREE.MathUtils.lerp(upper.min.x, upper.max.x, 0.22);
+      addStandin('forward-assist', box(forwardAssistX, midY, side, height * 0.22, height * 0.22, height * 0.16));
+
+      const portX = THREE.MathUtils.lerp(upper.min.x, upper.max.x, 0.42);
+      addStandin('ejection-port-cover', box(portX, midY, side, height * 0.9, height * 0.5, height * 0.08));
     }
 
     if (handguard) {
       const x = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.32);
       const height = handguard.max.y - handguard.min.y;
       addStandin('foregrip', box(x, handguard.min.y - height * 0.55, 0, height * 0.55, height * 1.1, height * 0.55));
+
+      if (barrel) {
+        const gasX = THREE.MathUtils.lerp(handguard.min.x, handguard.max.x, 0.82);
+        const barrelY = (barrel.min.y + barrel.max.y) / 2;
+        addStandin('gas-system', tube(gasX, barrelY, 0, height * 1.6, height * 0.16));
+      }
     }
 
     if (lower && stock) {
