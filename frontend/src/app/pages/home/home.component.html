@@ -1,19 +1,40 @@
-<div class="forge-theme min-h-screen bg-forge-ink">
+<div
+  class="forge-theme min-h-screen bg-forge-ink"
+  [class.scene-forest]="scene() === 'forest'"
+  [class.scene-pasture]="scene() === 'pasture'"
+>
   <section class="relative overflow-hidden border-b border-forge-line">
     <img
-      src="/assets/images/scenery/red-rock-desert.jpg"
+      [src]="sceneImage()"
       alt=""
       class="hero-backdrop absolute inset-0 h-full w-full object-cover"
     >
     <div class="absolute inset-0 bg-gradient-to-b from-[#2b2116]/25 via-[#f1e3ca]/35 to-forge-ink"></div>
 
-    <div class="relative z-10 mx-auto max-w-7xl px-6 py-10">
-      <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">The AR-15 Builder</p>
-      <h1 class="mt-2 text-3xl font-bold text-forge-text sm:text-4xl">Build Your Rifle, Part by Part</h1>
-      <p class="mt-2 max-w-xl text-sm text-forge-text-muted">
-        Click any part on the model, or pick a category below, to start assembling your build with live
-        compatibility checks and running totals.
-      </p>
+    <div class="relative z-10 mx-auto flex max-w-7xl flex-wrap items-start justify-between gap-4 px-6 py-10">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">The AR-15 Builder</p>
+        <h1 class="mt-2 text-3xl font-bold text-forge-text sm:text-4xl">Build Your Rifle, Part by Part</h1>
+        <p class="mt-2 max-w-xl text-sm text-forge-text-muted">
+          Click any part on the model, or pick a category below, to start assembling your build with live
+          compatibility checks and running totals.
+        </p>
+      </div>
+
+      <div class="flex shrink-0 gap-1 rounded-full border border-forge-line bg-forge-ink/80 p-1 backdrop-blur">
+        @for (option of sceneOrder; track option) {
+          <button
+            type="button"
+            (click)="setScene(option)"
+            class="rounded-full px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide transition"
+            [class.bg-forge-accent]="scene() === option"
+            [class.text-white]="scene() === option"
+            [class.text-forge-text-muted]="scene() !== option"
+          >
+            {{ sceneConfig[option].label }}
+          </button>
+        }
+      </div>
     </div>
 
     <div class="relative z-10 mx-auto h-[420px] max-w-7xl px-6 sm:h-[500px]">

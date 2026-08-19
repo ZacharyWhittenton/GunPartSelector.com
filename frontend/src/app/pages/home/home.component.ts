@@ -22,6 +22,27 @@ const SECTION_LABELS: Record<CatalogSection, string> = {
 
 const SECTION_ORDER: CatalogSection[] = ['upper', 'lower', 'stock', 'optics', 'accessories'];
 
+export type HomeScene = 'desert' | 'forest' | 'pasture';
+
+const SCENE_STORAGE_KEY = 'wd_home_scene';
+
+interface SceneConfig {
+  label: string;
+  image: string;
+}
+
+const SCENE_CONFIG: Record<HomeScene, SceneConfig> = {
+  desert: { label: 'Desert', image: '/assets/images/scenery/red-rock-desert.jpg' },
+  forest: { label: 'Forest', image: '/assets/images/scenery/alpine-forest-lake.jpg' },
+  pasture: { label: 'Pasture', image: '/assets/images/scenery/olive-grove-golden-hour.jpg' }
+};
+
+const SCENE_ORDER: HomeScene[] = ['desert', 'forest', 'pasture'];
+
+function isHomeScene(value: string | null): value is HomeScene {
+  return value === 'desert' || value === 'forest' || value === 'pasture';
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -48,6 +69,11 @@ export class HomeComponent implements OnInit {
 
   readonly categories = signal<PartCategory[]>([]);
   readonly webglUnavailable = signal(false);
+
+  readonly scene = signal<HomeScene>(this.readStoredScene());
+  readonly sceneOrder = SCENE_ORDER;
+  readonly sceneConfig = SCENE_CONFIG;
+  readonly sceneImage = computed(() => SCENE_CONFIG[this.scene()].image);
 
   readonly isLoadingCategories = signal(false);
 
@@ -132,5 +158,23 @@ export class HomeComponent implements OnInit {
 
   clearBuild(): void {
     this.buildService.clear();
+  }
+
+  setScene(scene: HomeScene): void {
+    this.scene.set(scene);
+    try {
+      localStorage.setItem(SCENE_STORAGE_KEY, scene);
+    } catch {
+      // localStorage unavailable (e.g. private browsing) -- scene choice just won't persist
+    }
+  }
+
+  private readStoredScene(): HomeScene {
+    try {
+      const stored = localStorage.getItem(SCENE_STORAGE_KEY);
+      return isHomeScene(stored) ? stored : 'desert';
+    } catch {
+      return 'desert';
+    }
   }
 }

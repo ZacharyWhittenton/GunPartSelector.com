@@ -3,6 +3,17 @@
   transform: scale(1.06);
 }
 
+/* Scene toggle: desert keeps the site's default tan/brick accent. Forest and
+   pasture override it locally to this page only -- the rest of the site (nav,
+   other pages) is unaffected since these only apply inside the scene wrapper. */
+.scene-forest {
+  --color-forge-accent: #4f6b35;
+}
+
+.scene-pasture {
+  --color-forge-accent: #c1732c;
+}
+
 @keyframes home-hero-zoom {
   from {
     transform: scale(1.06);
