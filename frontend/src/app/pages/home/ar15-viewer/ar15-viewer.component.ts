@@ -5,11 +5,13 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  NgZone,
   OnChanges,
   OnDestroy,
   Output,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  inject
 } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -241,6 +243,8 @@ function materialKindFor(categorySlug: string): MaterialKind {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
+  private readonly ngZone = inject(NgZone);
+
   @ViewChild('host', { static: true }) hostRef!: ElementRef<HTMLDivElement>;
 
   @Input() selectedCategorySlugs: string[] = [];
@@ -265,24 +269,32 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
   private surfaceNoiseTexture?: THREE.Texture;
 
   ngAfterViewInit(): void {
-    try {
-      this.initScene();
-    } catch (error) {
-      console.error('3D viewer unavailable:', error);
-      this.webglUnavailable.emit();
-      return;
-    }
-    this.initialized = true;
+    // The render loop runs continuously (OrbitControls damping/auto-rotate keep the
+    // scene changing every frame), and zone.js patches requestAnimationFrame -- left
+    // inside Angular's zone, every one of those frames would trigger a full
+    // app-wide change-detection pass for bindings that have nothing to do with this
+    // canvas. Running Three.js setup and the animation loop outside the zone avoids
+    // that entirely; only the two @Output emits below need to explicitly re-enter it.
+    this.ngZone.runOutsideAngular(() => {
+      try {
+        this.initScene();
+      } catch (error) {
+        console.error('3D viewer unavailable:', error);
+        this.ngZone.run(() => this.webglUnavailable.emit());
+        return;
+      }
+      this.initialized = true;
 
-    this.loadRealModel()
-      .catch(error => {
-        console.warn('Falling back to the procedural rifle -- real model failed to load:', error);
-        this.buildProceduralFallback();
-      })
-      .finally(() => {
-        this.applySelectionColors();
-        this.animate();
-      });
+      this.loadRealModel()
+        .catch(error => {
+          console.warn('Falling back to the procedural rifle -- real model failed to load:', error);
+          this.buildProceduralFallback();
+        })
+        .finally(() => {
+          this.applySelectionColors();
+          this.animate();
+        });
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -672,6 +684,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
 
   private animate = (): void => {
     this.frameId = requestAnimationFrame(this.animate);
+    if (document.hidden) return;
     this.controls.update();
     this.renderer.render(this.scene, this.camera);
   };
@@ -699,7 +712,7 @@ export class Ar15ViewerComponent implements AfterViewInit, OnChanges, OnDestroy 
     const hit = this.pick(event);
     const slug = hit?.userData['categorySlug'] as string | undefined;
     if (slug) {
-      this.categoryClick.emit(slug);
+      this.ngZone.run(() => this.categoryClick.emit(slug));
     }
   };
 
