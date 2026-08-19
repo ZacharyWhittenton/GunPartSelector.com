@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from site_api.db.models import (
@@ -1206,6 +1206,7 @@ def _to_domain_product(record: ProductRecord) -> Product:
         affiliate_retailer_name=record.affiliate_retailer_name,
         stock_status=StockStatus(record.stock_status),
         attribute_tags=list(record.attribute_tags),
+        view_count=record.view_count,
         is_active=record.is_active,
         created_at=record.created_at,
         updated_at=record.updated_at,
@@ -1225,6 +1226,10 @@ class SqlAlchemyProductRepository:
             ).where(PartCategoryRecord.slug == product_filter.category_slug)
         if product_filter.brand:
             query = query.where(ProductRecord.brand.in_(product_filter.brand))
+        if product_filter.retailer:
+            query = query.where(
+                ProductRecord.affiliate_retailer_name.in_(product_filter.retailer)
+            )
         if product_filter.price_min_cents is not None:
             query = query.where(ProductRecord.price_cents >= product_filter.price_min_cents)
         if product_filter.price_max_cents is not None:
@@ -1250,6 +1255,8 @@ class SqlAlchemyProductRepository:
             query = query.order_by(ProductRecord.price_cents.desc())
         elif product_filter.sort is ProductSort.NAME_ASC:
             query = query.order_by(ProductRecord.name.asc())
+        elif product_filter.sort is ProductSort.POPULARITY:
+            query = query.order_by(ProductRecord.view_count.desc())
         else:
             query = query.order_by(ProductRecord.created_at.desc())
 
@@ -1272,16 +1279,22 @@ class SqlAlchemyProductRepository:
     async def list_distinct_facets(self, category_id: UUID) -> ProductFacets:
         result = await self._session.execute(
             select(
-                ProductRecord.brand, ProductRecord.price_cents, ProductRecord.attribute_tags
+                ProductRecord.brand,
+                ProductRecord.affiliate_retailer_name,
+                ProductRecord.price_cents,
+                ProductRecord.attribute_tags,
             ).where(ProductRecord.category_id == category_id, ProductRecord.is_active.is_(True))
         )
         rows = result.all()
 
         brands: set[str] = set()
+        retailers: set[str] = set()
         tag_groups: dict[str, set[str]] = {}
         prices: list[int] = []
-        for brand, price_cents, attribute_tags in rows:
+        for brand, retailer, price_cents, attribute_tags in rows:
             brands.add(brand)
+            if retailer:
+                retailers.add(retailer)
             prices.append(price_cents)
             for tag in attribute_tags:
                 prefix, _, value = tag.partition(":")
@@ -1291,11 +1304,19 @@ class SqlAlchemyProductRepository:
 
         return ProductFacets(
             brands=sorted(brands),
+            retailers=sorted(retailers),
             attribute_tag_groups={
                 prefix: sorted(values) for prefix, values in sorted(tag_groups.items())
             },
             price_min_cents=min(prices) if prices else 0,
             price_max_cents=max(prices) if prices else 0,
+        )
+
+    async def increment_view_count(self, product_id: UUID) -> None:
+        await self._session.execute(
+            update(ProductRecord)
+            .where(ProductRecord.id == product_id)
+            .values(view_count=ProductRecord.view_count + 1)
         )
 
 

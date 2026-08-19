@@ -47,6 +47,7 @@ def _make_product(**overrides: object) -> Product:
         "affiliate_retailer_name": None,
         "stock_status": StockStatus.IN_STOCK,
         "attribute_tags": ["caliber:556", "gassystem:mid"],
+        "view_count": 0,
         "is_active": True,
         "created_at": NOW,
         "updated_at": NOW,
@@ -141,6 +142,52 @@ async def test_list_products_sorts_price_ascending(
 
 
 @pytest.mark.asyncio
+async def test_list_products_sorts_by_popularity(
+    catalog_service: CatalogService,
+    product_repository: InMemoryProductRepository,
+) -> None:
+    product_repository.products.append(_make_product(id=UUID(int=1), view_count=3))
+    product_repository.products.append(_make_product(id=UUID(int=2), view_count=40))
+
+    products, _ = await catalog_service.list_products(ProductFilter(sort=ProductSort.POPULARITY))
+
+    assert [p.id for p in products] == [UUID(int=2), UUID(int=1)]
+
+
+@pytest.mark.asyncio
+async def test_list_products_filters_by_retailer(
+    catalog_service: CatalogService,
+    product_repository: InMemoryProductRepository,
+) -> None:
+    product_repository.products.append(
+        _make_product(id=UUID(int=1), affiliate_retailer_name="Brownells")
+    )
+    product_repository.products.append(
+        _make_product(id=UUID(int=2), affiliate_retailer_name="MidwayUSA")
+    )
+
+    products, total = await catalog_service.list_products(ProductFilter(retailer=["Brownells"]))
+
+    assert total == 1
+    assert products[0].affiliate_retailer_name == "Brownells"
+
+
+@pytest.mark.asyncio
+async def test_get_product_by_slug_increments_view_count(
+    catalog_service: CatalogService,
+    product_repository: InMemoryProductRepository,
+) -> None:
+    product_repository.products.append(_make_product(id=UUID(int=1), view_count=2))
+
+    product = await catalog_service.get_product_by_slug("bcm-standard-16in-barrel")
+    assert product.view_count == 2
+
+    stored = await product_repository.get_by_id(UUID(int=1))
+    assert stored is not None
+    assert stored.view_count == 3
+
+
+@pytest.mark.asyncio
 async def test_list_products_paginates(
     catalog_service: CatalogService,
     product_repository: InMemoryProductRepository,
@@ -173,6 +220,7 @@ async def test_get_category_facets_groups_tags_by_prefix(
             id=UUID(int=1),
             category_id=category.id,
             brand="BCM",
+            affiliate_retailer_name="Brownells",
             price_cents=10000,
             attribute_tags=["caliber:556", "gassystem:mid"],
         )
@@ -182,6 +230,7 @@ async def test_get_category_facets_groups_tags_by_prefix(
             id=UUID(int=2),
             category_id=category.id,
             brand="Faxon Firearms",
+            affiliate_retailer_name="MidwayUSA",
             price_cents=30000,
             attribute_tags=["caliber:300blk", "gassystem:pistol"],
         )
@@ -190,6 +239,7 @@ async def test_get_category_facets_groups_tags_by_prefix(
     facets = await catalog_service.get_category_facets("barrel")
 
     assert facets.brands == ["BCM", "Faxon Firearms"]
+    assert facets.retailers == ["Brownells", "MidwayUSA"]
     assert facets.attribute_tag_groups["caliber"] == ["300blk", "556"]
     assert facets.price_min_cents == 10000
     assert facets.price_max_cents == 30000

@@ -28,6 +28,7 @@ def _make_product(**overrides: object) -> Product:
         "affiliate_retailer_name": None,
         "stock_status": StockStatus.IN_STOCK,
         "attribute_tags": ["caliber:556"],
+        "view_count": 0,
         "is_active": True,
         "created_at": NOW,
         "updated_at": NOW,

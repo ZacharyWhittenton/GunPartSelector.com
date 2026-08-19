@@ -14,6 +14,7 @@ interface CompatibilityDimension {
 }
 
 const COMPATIBILITY_DIMENSIONS: CompatibilityDimension[] = [
+  { prefix: 'platform', label: 'Receiver platform', severity: 'error' },
   { prefix: 'caliber', label: 'Caliber', severity: 'error' },
   { prefix: 'buffertube', label: 'Buffer tube spec', severity: 'error' },
   { prefix: 'handguard', label: 'Handguard interface', severity: 'error' },

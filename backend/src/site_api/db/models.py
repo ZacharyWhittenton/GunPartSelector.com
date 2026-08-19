@@ -372,9 +372,10 @@ class ProductRecord(Base):
     weight_oz: Mapped[float] = mapped_column(Float)
     image_url: Mapped[str | None] = mapped_column(String(500))
     affiliate_url: Mapped[str] = mapped_column(String(500))
-    affiliate_retailer_name: Mapped[str | None] = mapped_column(String(100))
+    affiliate_retailer_name: Mapped[str | None] = mapped_column(String(100), index=True)
     stock_status: Mapped[str] = mapped_column(String(20), default="in_stock")
     attribute_tags: Mapped[list[str]] = mapped_column(ARRAY(String(60)), default=list)
+    view_count: Mapped[int] = mapped_column(Integer, default=0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

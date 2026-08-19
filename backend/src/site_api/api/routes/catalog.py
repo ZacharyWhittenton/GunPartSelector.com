@@ -36,6 +36,7 @@ class FacetsResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     brands: list[str]
+    retailers: list[str]
     attribute_tag_groups: dict[str, list[str]]
     price_min_cents: int
     price_max_cents: int
@@ -101,6 +102,7 @@ def to_product_detail(product: Product) -> ProductDetail:
 def to_facets_response(facets: ProductFacets) -> FacetsResponse:
     return FacetsResponse(
         brands=facets.brands,
+        retailers=facets.retailers,
         attribute_tag_groups=facets.attribute_tag_groups,
         price_min_cents=facets.price_min_cents,
         price_max_cents=facets.price_max_cents,
@@ -152,6 +154,7 @@ async def list_products(
     service: Annotated[CatalogService, Depends(get_catalog_service)],
     category: str | None = None,
     brand: Annotated[list[str] | None, Query()] = None,
+    retailer: Annotated[list[str] | None, Query()] = None,
     price_min: Annotated[int | None, Query(alias="priceMin")] = None,
     price_max: Annotated[int | None, Query(alias="priceMax")] = None,
     stock: StockStatus | None = None,
@@ -164,6 +167,7 @@ async def list_products(
         ProductFilter(
             category_slug=category,
             brand=brand,
+            retailer=retailer,
             price_min_cents=price_min,
             price_max_cents=price_max,
             stock_status=stock,

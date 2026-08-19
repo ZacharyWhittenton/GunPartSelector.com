@@ -736,6 +736,12 @@ class InMemoryProductRepository:
             ]
         if product_filter.brand:
             matches = [product for product in matches if product.brand in product_filter.brand]
+        if product_filter.retailer:
+            matches = [
+                product
+                for product in matches
+                if product.affiliate_retailer_name in product_filter.retailer
+            ]
         if product_filter.price_min_cents is not None:
             price_min = product_filter.price_min_cents
             matches = [product for product in matches if product.price_cents >= price_min]
@@ -762,6 +768,8 @@ class InMemoryProductRepository:
             matches.sort(key=lambda p: p.price_cents, reverse=True)
         elif product_filter.sort is ProductSort.NAME_ASC:
             matches.sort(key=lambda p: p.name)
+        elif product_filter.sort is ProductSort.POPULARITY:
+            matches.sort(key=lambda p: p.view_count, reverse=True)
         else:
             matches.sort(key=lambda p: p.created_at, reverse=True)
 
@@ -787,6 +795,9 @@ class InMemoryProductRepository:
             if product.category_id == category_id and product.is_active
         ]
         brands = sorted({product.brand for product in matches})
+        retailers = sorted(
+            {product.affiliate_retailer_name for product in matches if product.affiliate_retailer_name}
+        )
         tag_groups: dict[str, set[str]] = {}
         for product in matches:
             for tag in product.attribute_tags:
@@ -798,12 +809,19 @@ class InMemoryProductRepository:
 
         return ProductFacets(
             brands=brands,
+            retailers=retailers,
             attribute_tag_groups={
                 prefix: sorted(values) for prefix, values in sorted(tag_groups.items())
             },
             price_min_cents=min(prices) if prices else 0,
             price_max_cents=max(prices) if prices else 0,
         )
+
+    async def increment_view_count(self, product_id: UUID) -> None:
+        for index, product in enumerate(self.products):
+            if product.id == product_id:
+                self.products[index] = replace(product, view_count=product.view_count + 1)
+                return
 
 
 class InMemoryBuildRepository:

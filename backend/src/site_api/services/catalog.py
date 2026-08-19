@@ -36,6 +36,7 @@ class CatalogService:
         product = await self._products.get_by_slug(slug)
         if product is None:
             raise ProductNotFoundError
+        await self._products.increment_view_count(product.id)
         return product
 
     async def get_category_facets(self, slug: str) -> ProductFacets:
