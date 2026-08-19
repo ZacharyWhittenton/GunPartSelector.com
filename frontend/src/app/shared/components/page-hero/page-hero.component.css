@@ -1,6 +1,12 @@
 .hero-image {
   animation: page-hero-zoom 6s var(--ease-editorial, ease-out) forwards;
   transform: scale(1.08);
+  /* Without this, the browser may not promote the image to its own compositor
+     layer up front, so the first frames of the scale animation can force a
+     main-thread paint instead of a pure GPU composite -- which reads as a stutter
+     right as the page loads, exactly where it's most visible. */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .hero-copy {

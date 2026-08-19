@@ -1,6 +1,8 @@
 .hero-backdrop {
   animation: home-hero-zoom 10s var(--ease-editorial, ease-out) forwards;
   transform: scale(1.06);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 /* Scene toggle: desert keeps the site's default warm-tan palette. Forest and
