@@ -128,9 +128,9 @@
         routerLinkActive="text-forge-accent"
         ariaCurrentWhenActive="page"
         aria-label="Cart"
-        class="relative text-xl text-forge-nav-text-muted transition hover:text-forge-nav-text"
+        class="relative flex items-center text-lg text-forge-nav-text-muted transition hover:text-forge-nav-text"
       >
-        🛒
+        <i class="fa-solid fa-cart-shopping"></i>
         @if (cartItemCount() > 0) {
           <span class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-forge-accent text-xs font-bold text-white">
             {{ cartItemCount() }}
@@ -175,7 +175,8 @@
         <a routerLink="/merch" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-nav-text transition hover:text-forge-accent">
           Store
         </a>
-        <a routerLink="/cart" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-nav-text transition hover:text-forge-accent">
+        <a routerLink="/cart" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="flex items-center gap-2 font-medium text-forge-nav-text transition hover:text-forge-accent">
+          <i class="fa-solid fa-cart-shopping"></i>
           Cart{{ cartItemCount() > 0 ? ' (' + cartItemCount() + ')' : '' }}
         </a>
 
