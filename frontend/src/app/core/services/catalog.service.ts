@@ -39,6 +39,7 @@ export class CatalogService {
     if (query.limit != null) params = params.set('limit', query.limit);
     if (query.offset != null) params = params.set('offset', query.offset);
     for (const brand of query.brand ?? []) params = params.append('brand', brand);
+    for (const retailer of query.retailer ?? []) params = params.append('retailer', retailer);
     for (const tag of query.tag ?? []) params = params.append('tag', tag);
 
     return this.http.get<PaginatedResponse<ProductSummary>>('/api/catalog/products', { params });

@@ -51,9 +51,10 @@ export class CategoryBrowseComponent implements OnInit {
             next: facets => this.facets.set(facets)
           });
 
-          return this.catalogService.listProducts(this.query());
-        }),
-        finalize(() => this.isLoading.set(false))
+          return this.catalogService
+            .listProducts(this.query())
+            .pipe(finalize(() => this.isLoading.set(false)));
+        })
       )
       .subscribe({
         next: page => {

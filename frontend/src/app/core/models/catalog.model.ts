@@ -2,7 +2,7 @@ export type CatalogSection = 'upper' | 'lower' | 'stock' | 'optics' | 'accessori
 
 export type StockStatus = 'in_stock' | 'out_of_stock' | 'unknown';
 
-export type ProductSort = 'price_asc' | 'price_desc' | 'name_asc' | 'newest';
+export type ProductSort = 'price_asc' | 'price_desc' | 'name_asc' | 'newest' | 'popularity';
 
 export interface PartCategory {
   id: string;
@@ -34,6 +34,7 @@ export interface ProductDetail extends ProductSummary {
 
 export interface ProductFacets {
   brands: string[];
+  retailers: string[];
   attributeTagGroups: Record<string, string[]>;
   priceMinCents: number;
   priceMaxCents: number;
@@ -49,6 +50,7 @@ export interface PaginatedResponse<T> {
 export interface ProductQuery {
   category?: string;
   brand?: string[];
+  retailer?: string[];
   priceMin?: number;
   priceMax?: number;
   stock?: StockStatus;

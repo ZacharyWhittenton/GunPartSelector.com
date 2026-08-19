@@ -23,6 +23,14 @@ export class FacetSidebarComponent {
     this.queryChange.emit({ ...this.query, brand: next.length ? next : undefined, offset: 0 });
   }
 
+  toggleRetailer(retailer: string): void {
+    const current = this.query.retailer ?? [];
+    const next = current.includes(retailer)
+      ? current.filter(r => r !== retailer)
+      : [...current, retailer];
+    this.queryChange.emit({ ...this.query, retailer: next.length ? next : undefined, offset: 0 });
+  }
+
   toggleTag(prefix: string, value: string): void {
     const tag = `${prefix}:${value}`;
     const current = this.query.tag ?? [];
@@ -32,6 +40,10 @@ export class FacetSidebarComponent {
 
   isBrandSelected(brand: string): boolean {
     return (this.query.brand ?? []).includes(brand);
+  }
+
+  isRetailerSelected(retailer: string): boolean {
+    return (this.query.retailer ?? []).includes(retailer);
   }
 
   isTagSelected(prefix: string, value: string): boolean {

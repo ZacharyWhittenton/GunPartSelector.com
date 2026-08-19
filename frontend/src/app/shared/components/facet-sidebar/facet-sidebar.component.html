@@ -50,6 +50,16 @@
     </div>
   </div>
 
+  <div *ngIf="facets.retailers.length">
+    <h4 class="mb-2 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">Retailer</h4>
+    <div class="flex max-h-48 flex-col gap-1.5 overflow-y-auto pr-1">
+      <label *ngFor="let retailer of facets.retailers" class="flex items-center gap-2 text-sm text-forge-text">
+        <input type="checkbox" [checked]="isRetailerSelected(retailer)" (change)="toggleRetailer(retailer)" />
+        {{ retailer }}
+      </label>
+    </div>
+  </div>
+
   <div *ngFor="let group of facets.attributeTagGroups | keyvalue">
     <h4 class="mb-2 font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">{{ group.key }}</h4>
     <div class="flex flex-col gap-1.5">

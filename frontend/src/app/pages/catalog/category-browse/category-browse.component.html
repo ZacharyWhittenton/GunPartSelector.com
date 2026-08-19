@@ -6,9 +6,22 @@
       <span>{{ categoryName() }}</span>
     </nav>
 
-    <div class="mb-6 flex items-center justify-between">
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
       <h1 class="text-2xl font-bold text-forge-text">{{ categoryName() }}</h1>
-      <span class="font-mono text-xs text-forge-text-muted">{{ total() }} results</span>
+      <div class="flex items-center gap-3">
+        <span class="font-mono text-xs text-forge-text-muted">{{ total() }} results</span>
+        <select
+          [value]="query().sort ?? 'newest'"
+          (change)="onSortChange($any($event.target).value)"
+          class="rounded border border-forge-line bg-forge-steel px-2 py-1.5 font-mono text-xs uppercase tracking-wide text-forge-text"
+        >
+          <option value="newest">Newest</option>
+          <option value="popularity">Most Popular</option>
+          <option value="price_asc">Price: Low to High</option>
+          <option value="price_desc">Price: High to Low</option>
+          <option value="name_asc">Name: A to Z</option>
+        </select>
+      </div>
     </div>
 
     <p *ngIf="errorMessage()" class="mb-4 text-forge-danger">{{ errorMessage() }}</p>
