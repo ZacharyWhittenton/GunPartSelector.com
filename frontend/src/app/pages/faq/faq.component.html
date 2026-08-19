@@ -1,0 +1,59 @@
+<div class="forge-theme min-h-screen bg-forge-ink pb-20">
+
+  <app-page-hero
+    imageUrl="/assets/images/scenery/alpine-forest-lake.jpg"
+    imageAlt=""
+    eyebrow="Support"
+    title="Frequently Asked Questions"
+    subtitle="How the builder works, how orders actually route, and what to do when something looks off."
+    height="short"
+  ></app-page-hero>
+
+  <app-page-container>
+    <div class="mt-14 flex flex-col gap-12">
+      @for (group of groups; track group.label; let groupIndex = $index) {
+        <div appScrollReveal>
+          <h2 class="font-mono text-xs uppercase tracking-[0.2em] text-forge-accent">{{ group.label }}</h2>
+
+          <div class="mt-4 divide-y divide-forge-line rounded-lg border border-forge-line bg-forge-steel">
+            @for (entry of group.entries; track entry.question; let entryIndex = $index) {
+              <div>
+                <button
+                  type="button"
+                  (click)="toggle(keyFor(groupIndex, entryIndex))"
+                  [attr.aria-expanded]="isOpen(keyFor(groupIndex, entryIndex))"
+                  class="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                >
+                  <span class="font-semibold text-forge-text">{{ entry.question }}</span>
+                  <span
+                    aria-hidden="true"
+                    class="shrink-0 font-mono text-lg text-forge-accent transition-transform"
+                    [class.rotate-45]="isOpen(keyFor(groupIndex, entryIndex))"
+                  >+</span>
+                </button>
+
+                @if (isOpen(keyFor(groupIndex, entryIndex))) {
+                  <p class="px-5 pb-4 text-sm leading-relaxed text-forge-text-muted">{{ entry.answer }}</p>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="mt-16 rounded-lg border border-forge-line bg-forge-steel p-6 text-center" appScrollReveal>
+      <h2 class="font-semibold text-forge-text">Didn't find your answer?</h2>
+      <p class="mt-2 text-sm text-forge-text-muted">
+        Send us a message and we'll get back to you.
+      </p>
+      <a
+        routerLink="/contact"
+        class="mt-4 inline-block rounded-md bg-forge-accent px-5 py-2.5 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
+      >
+        Contact Us
+      </a>
+    </div>
+  </app-page-container>
+
+</div>

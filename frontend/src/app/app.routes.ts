@@ -93,6 +93,16 @@ export const routes: Routes = [
 
 
       {
+        path: 'faq',
+
+        loadComponent: () =>
+          import('./pages/faq/faq.component')
+            .then(m => m.FaqComponent)
+
+      },
+
+
+      {
         path: 'login',
 
         loadComponent: () =>
