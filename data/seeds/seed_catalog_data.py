@@ -63,6 +63,12 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
         ("Palmetto State Armory", "PA-15 Stripped Upper Receiver", "PSA-UP-15", 6900, 7.4,
          "Budget-friendly forged upper, mil-spec dimensions.",
          ["material:forged", "style:mil-spec"]),
+        ("Aero Precision", "M5 Stripped Upper Receiver", "AP-UP-M5", 21900, 11.8,
+         "Large-frame (AR-10 pattern) forged upper receiver, .308-length action.",
+         ["material:forged", "style:large-frame", "platform:ar10"]),
+        ("DPMS Panther Arms", "GII Stripped Upper Receiver", "DPMS-UP-GII", 18900, 12.2,
+         "Large-frame (AR-10 pattern) forged upper receiver for .308-length cartridges.",
+         ["material:forged", "style:large-frame", "platform:ar10"]),
     ],
     "barrel": [
         ("BCM", "Standard 16in 5.56 Government Profile Barrel", "BCM-BBL-16-GOV", 22900, 28.5,
@@ -89,6 +95,11 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
          "Carbon-fiber-wrapped stainless barrel, mid-length gas system.",
          ["caliber:556", "gassystem:mid", "thread:1-2x28", "handguard:mil-spec",
           "twist:1-8", "contour:carbon-wrapped", "finish:carbon-fiber"]),
+        ("Criterion Barrels", "18in .308 Win M5 Barrel", "CRIT-BBL-18-M5", 38900, 42.0,
+         "Large-frame (AR-10 pattern) barrel chambered in .308 Winchester -- will not fit "
+         "a small-frame AR-15 upper receiver.",
+         ["caliber:308win", "gassystem:rifle", "thread:5-8x24", "handguard:large-frame",
+          "twist:1-10", "contour:medium", "finish:stainless", "platform:ar10"]),
     ],
     "gas-system": [
         ("Odin Works", "Low-Profile Gas Block .750", "ODIN-GB-750", 3400, 1.8,
@@ -149,6 +160,10 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
         ("Rise Armament", "Match Bolt Carrier Group 5.56", "RA-BCG-556-M", 21900, 10.8,
          "Nickel-boron coated semi-auto-only match BCG.",
          ["caliber:556", "coating:nickel-boron", "style:semi-auto"]),
+        ("Aero Precision", "M5 Bolt Carrier Group .308", "AP-BCG-M5-308", 19900, 14.2,
+         "Large-frame (AR-10 pattern) BCG sized for the larger M5 bolt face -- will not "
+         "cycle in a small-frame AR-15 upper.",
+         ["caliber:308win", "coating:phosphate", "style:full-auto", "platform:ar10"]),
     ],
     "charging-handle": [
         ("BCM", "Gunfighter Charging Handle Mod 4", "BCM-CH-GF4", 5900, 3.1,
@@ -189,6 +204,12 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
         ("Palmetto State Armory", "PA-15 Stripped Lower Receiver", "PSA-LO-15", 5900, 8.2,
          "Budget-friendly forged lower, mil-spec dimensions.",
          ["material:forged", "style:mil-spec"]),
+        ("Aero Precision", "M5 Stripped Lower Receiver", "AP-LO-M5", 21900, 11.6,
+         "Large-frame (AR-10 pattern) forged lower receiver, .308-length magwell.",
+         ["material:forged", "style:large-frame", "platform:ar10"]),
+        ("DPMS Panther Arms", "GII Stripped Lower Receiver", "DPMS-LO-GII", 17900, 12.0,
+         "Large-frame (AR-10 pattern) forged lower receiver for .308-length cartridges.",
+         ["material:forged", "style:large-frame", "platform:ar10"]),
     ],
     "trigger": [
         ("Geissele Automatics", "SSA-E Two Stage Trigger", "GEI-TRG-SSAE", 24000, 5.5,
@@ -366,6 +387,87 @@ PRODUCTS: dict[str, list[tuple[str, str, str, int, float, str, list[str]]]] = {
     ],
 }
 
+# Categories where the physical receiver-platform pattern matters (an AR-10-pattern
+# part will not fit an AR-15-pattern part in these categories, regardless of
+# caliber). Every product below is AR-15-pattern by default unless it already
+# carries an explicit platform: tag (the AR-10 examples added above).
+PLATFORM_LOCKED_CATEGORIES = {
+    "upper-receiver", "lower-receiver", "barrel", "bolt-carrier-group", "handguard", "magazine",
+}
+for _category_slug in PLATFORM_LOCKED_CATEGORIES:
+    PRODUCTS[_category_slug] = [
+        (brand, name, sku, price_cents, weight_oz, description, tags)
+        if any(tag.startswith("platform:") for tag in tags)
+        else (brand, name, sku, price_cents, weight_oz, description, [*tags, "platform:ar15"])
+        for brand, name, sku, price_cents, weight_oz, description, tags in PRODUCTS[_category_slug]
+    ]
+
+# brand -> affiliate retailer, drawn from the affiliate program tracker (see
+# Affiliate_Program_Tracker.xlsx). Brands that run their own affiliate program are
+# mapped to themselves; everything else is mapped to whichever tracked retailer most
+# plausibly carries that brand, falling back to Brownells (90,000+ SKU generalist)
+# for anything not otherwise covered. This is a placeholder mapping for local
+# development -- once a real retailer datafeed is wired up, real per-offer retailer
+# data replaces this entirely.
+BRAND_TO_RETAILER: dict[str, str] = {
+    "Aero Precision": "Aero Precision",
+    "Faxon Firearms": "Faxon Firearms",
+    "Palmetto State Armory": "Palmetto State Armory",
+    # Optics-focused brands -> the optics specialist.
+    "Aimpoint": "OpticsPlanet",
+    "EOTech": "OpticsPlanet",
+    "Holosun": "OpticsPlanet",
+    "Leupold": "OpticsPlanet",
+    "Trijicon": "OpticsPlanet",
+    "Vortex Optics": "OpticsPlanet",
+    "American Defense Manufacturing": "OpticsPlanet",
+    "LaRue Tactical": "OpticsPlanet",
+    "Scalarworks": "OpticsPlanet",
+    "Unity Tactical": "OpticsPlanet",
+    # High-end AR-15 parts brands -> the high-end AR-15 parts specialist.
+    "Sons of Liberty Gun Works": "Rainier Arms",
+    "Battle Arms Development": "Rainier Arms",
+    "Radian Weapons": "Rainier Arms",
+    "Geissele Automatics": "Rainier Arms",
+    "VLTOR": "Rainier Arms",
+    "Spike's Tactical": "Rainier Arms",
+    # Broad reloading/parts retailer.
+    "BCM": "MidwayUSA",
+    "Magpul": "MidwayUSA",
+    "LMT": "MidwayUSA",
+    "Odin Works": "MidwayUSA",
+    "Criterion Barrels": "MidwayUSA",
+    "Ballistic Advantage": "MidwayUSA",
+    "Proof Research": "MidwayUSA",
+    "Seekins Precision": "MidwayUSA",
+    "DPMS Panther Arms": "MidwayUSA",
+    # AR parts/accessories generalist -> everything else.
+    "Anderson Manufacturing": "AT3 Tactical",
+    "Toolcraft": "AT3 Tactical",
+    "Rise Armament": "AT3 Tactical",
+    "CMC Triggers": "AT3 Tactical",
+    "Timney Triggers": "AT3 Tactical",
+    "TriggerTech": "AT3 Tactical",
+    "Elftmann Tactical": "AT3 Tactical",
+    "Forward Controls Design": "AT3 Tactical",
+    "Superlative Arms": "AT3 Tactical",
+    "Sprinco": "AT3 Tactical",
+    "JP Enterprises": "AT3 Tactical",
+    "VG6 Precision": "AT3 Tactical",
+    "Griffin Armament": "AT3 Tactical",
+    "SureFire": "AT3 Tactical",
+    "Precision Armament": "AT3 Tactical",
+    "B5 Systems": "AT3 Tactical",
+    "Ergo Grip": "AT3 Tactical",
+    "Hogue": "AT3 Tactical",
+    "SB Tactical": "AT3 Tactical",
+    "Maxim Defense": "AT3 Tactical",
+    "Lancer Systems": "AT3 Tactical",
+    "C Products Defense": "AT3 Tactical",
+    "D&H Industries": "AT3 Tactical",
+}
+DEFAULT_RETAILER = "Brownells"
+
 
 async def main() -> None:
     settings = Settings()
@@ -399,11 +501,15 @@ async def main() -> None:
             category_id = category_ids[category_slug]
             for brand, name, sku, price_cents, weight_oz, description, tags in products:
                 slug = slugify(f"{brand} {name}")
+                retailer = BRAND_TO_RETAILER.get(brand, DEFAULT_RETAILER)
                 existing = await session.execute(
-                    select(ProductRecord.id).where(ProductRecord.slug == slug)
+                    select(ProductRecord).where(ProductRecord.slug == slug)
                 )
-                if existing.scalar_one_or_none() is not None:
-                    print(f"  already exists: {brand} {name}")
+                record = existing.scalar_one_or_none()
+                if record is not None:
+                    record.attribute_tags = tags
+                    record.affiliate_retailer_name = retailer
+                    print(f"  synced: {brand} {name}")
                     continue
 
                 session.add(
@@ -419,7 +525,7 @@ async def main() -> None:
                         weight_oz=weight_oz,
                         image_url=None,
                         affiliate_url="#",
-                        affiliate_retailer_name=None,
+                        affiliate_retailer_name=retailer,
                         stock_status="in_stock",
                         attribute_tags=tags,
                         is_active=True,
