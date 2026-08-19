@@ -3,15 +3,25 @@
   transform: scale(1.06);
 }
 
-/* Scene toggle: desert keeps the site's default tan/brick accent. Forest and
-   pasture override it locally to this page only -- the rest of the site (nav,
-   other pages) is unaffected since these only apply inside the scene wrapper. */
+/* Scene toggle: desert keeps the site's default warm-tan palette. Forest and
+   pasture retint the page background, card panels, and borders (not just the
+   accent) so the whole page reads as a different scene, not just its buttons.
+   Scoped to this page's own wrapper class, so the rest of the site (nav, other
+   pages) is unaffected. */
 .scene-forest {
+  --color-forge-ink: #e9e6d3;
+  --color-forge-steel: #d8dec2;
+  --color-forge-line: #a9b98f;
   --color-forge-accent: #4f6b35;
+  --color-forge-brass: #5c7a44;
 }
 
 .scene-pasture {
+  --color-forge-ink: #f4e5c4;
+  --color-forge-steel: #edd39c;
+  --color-forge-line: #cf9c55;
   --color-forge-accent: #c1732c;
+  --color-forge-brass: #a9762f;
 }
 
 @keyframes home-hero-zoom {

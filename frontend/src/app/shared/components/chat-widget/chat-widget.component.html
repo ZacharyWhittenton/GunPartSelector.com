@@ -7,7 +7,6 @@
       forge-theme
       mb-4
       flex
-      h-[32rem]
       w-96
       max-w-[calc(100vw-3rem)]
       flex-col
@@ -21,107 +20,49 @@
   >
 
     <div class="flex items-center justify-between bg-forge-brass px-4 py-3 text-white">
-      <div>
-        <p class="font-semibold">GunPartSelector Assistant</p>
-        <p class="text-xs text-white/80">{{ greeting }}</p>
-      </div>
+      <p class="font-semibold">Quick Help</p>
       <button
         type="button"
         (click)="toggle()"
-        aria-label="Close chat"
+        aria-label="Close quick help"
         class="text-white/80 transition hover:text-white"
       >
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
     </div>
 
-    <div class="flex-1 space-y-3 overflow-y-auto bg-forge-steel px-4 py-4">
+    <div class="flex flex-col gap-1 px-4 py-4">
+      <p class="font-mono text-[11px] uppercase tracking-wide text-forge-text-muted">Common Questions</p>
 
-      @if(messages().length === 0)
-      {
-      <p class="text-sm text-forge-text-muted">
-        Ask about parts, build compatibility, or how the configurator works.
-      </p>
-      }
-
-      @for(turn of messages(); track $index)
-      {
-      <div
-        class="flex"
-        [class.justify-end]="turn.role === 'user'"
-      >
-        <div
-          class="max-w-[85%] rounded-xl px-3 py-2 text-sm"
-          [class.bg-forge-brass]="turn.role === 'user'"
-          [class.text-white]="turn.role === 'user'"
-          [class.bg-forge-ink]="turn.role === 'assistant'"
-          [class.text-forge-text]="turn.role === 'assistant'"
-          [class.border]="turn.role === 'assistant'"
-          [class.border-forge-line]="turn.role === 'assistant'"
+      @for (entry of quickFaqEntries; track entry.question) {
+        <a
+          routerLink="/faq"
+          (click)="toggle()"
+          class="rounded-md px-2 py-2 text-sm text-forge-text transition hover:bg-forge-steel"
         >
-          {{ turn.content }}
-        </div>
-      </div>
+          {{ entry.question }}
+        </a>
       }
 
-      @if(isSending())
-      {
-      <div class="flex justify-start">
-        <div class="rounded-xl border border-forge-line bg-forge-ink px-3 py-2 text-sm text-forge-text-muted">
-          Thinking&hellip;
-        </div>
-      </div>
-      }
-
-      @if(errorMessage())
-      {
-      <p class="text-xs text-forge-danger">{{ errorMessage() }}</p>
-      }
-
-      <div #scrollAnchor></div>
-
+      <a
+        routerLink="/faq"
+        (click)="toggle()"
+        class="mt-2 rounded-md px-2 py-2 text-sm font-semibold text-forge-accent transition hover:bg-forge-steel"
+      >
+        View all FAQs →
+      </a>
     </div>
 
-    <form (ngSubmit)="send()" class="flex items-center gap-2 border-t border-forge-line p-3">
-      <input
-        type="text"
-        name="message"
-        [(ngModel)]="draftMessage"
-        placeholder="Type a message&hellip;"
-        autocomplete="off"
-        class="
-          flex-1
-          rounded-lg
-          border
-          border-forge-line
-          bg-forge-ink
-          px-3
-          py-2
-          text-sm
-          text-forge-text
-          focus:border-forge-brass
-          focus:outline-none
-        "
+    <div class="border-t border-forge-line px-4 py-4">
+      <p class="text-sm text-forge-text-muted">Still need help?</p>
+      <a
+        routerLink="/services"
+        (click)="toggle()"
+        class="mt-2 block rounded-lg bg-forge-accent px-3 py-2 text-center text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
       >
-      <button
-        type="submit"
-        [disabled]="isSending() || !draftMessage.trim()"
-        aria-label="Send message"
-        class="
-          rounded-lg
-          bg-forge-brass
-          px-3
-          py-2
-          text-white
-          transition
-          hover:brightness-110
-          disabled:cursor-not-allowed
-          disabled:opacity-50
-        "
-      >
-        <i class="fa-solid fa-paper-plane"></i>
-      </button>
-    </form>
+        Visit Support
+      </a>
+    </div>
 
   </div>
   }
@@ -129,7 +70,7 @@
   <button
     type="button"
     (click)="toggle()"
-    [attr.aria-label]="isOpen() ? 'Close chat' : 'Open chat'"
+    [attr.aria-label]="isOpen() ? 'Close quick help' : 'Open quick help'"
     class="
       flex
       h-14
@@ -147,7 +88,7 @@
       hover:shadow-xl
     "
   >
-    <i class="fa-solid" [class.fa-comment]="!isOpen()" [class.fa-xmark]="isOpen()"></i>
+    <i class="fa-solid" [class.fa-circle-question]="!isOpen()" [class.fa-xmark]="isOpen()"></i>
   </button>
 
 </div>
