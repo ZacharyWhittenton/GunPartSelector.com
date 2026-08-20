@@ -103,6 +103,13 @@ export class HomeComponent implements OnInit {
       .map(category => category.slug);
   });
 
+  readonly buildProgress = computed(() => {
+    const total = this.categories().length;
+    if (!total) return { percent: 0, filled: 0, total: 0 };
+    const filled = this.selectedCategorySlugs().length;
+    return { percent: Math.round((filled / total) * 100), filled, total };
+  });
+
   ngOnInit(): void {
     this.isLoadingCategories.set(true);
     this.catalogService
