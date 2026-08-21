@@ -5,15 +5,9 @@
     <p class="mt-2 text-forge-text-muted">
       <a routerLink="/admin" class="font-semibold text-forge-accent hover:underline">Accounts</a>
       ·
-      <a routerLink="/admin/leads" class="font-semibold text-forge-accent hover:underline">Leads</a>
-      ·
       <a routerLink="/admin/blog" class="font-semibold text-forge-accent hover:underline">Blog</a>
       ·
-      <a routerLink="/admin/marketplace" class="font-semibold text-forge-accent hover:underline">Marketplace</a>
-      ·
       <a routerLink="/admin/testimonials" class="font-semibold text-forge-accent hover:underline">Testimonials</a>
-      ·
-      <a routerLink="/admin/discount-codes" class="font-semibold text-forge-accent hover:underline">Discount Codes</a>
       ·
       <a routerLink="/admin/analytics" class="font-semibold text-forge-accent hover:underline">Analytics</a>
     </p>
@@ -27,41 +21,6 @@
     <p class="mt-8 text-forge-text-muted">Loading dashboard…</p>
   } @else if (summary(); as data) {
     <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-
-      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-forge-text-muted">New Leads Today</p>
-        <p class="mt-2 text-3xl font-bold text-forge-text">{{ data.newLeadsToday }}</p>
-      </a>
-
-      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-forge-text-muted">New Leads This Week</p>
-        <p class="mt-2 text-3xl font-bold text-forge-text">{{ data.newLeadsThisWeek }}</p>
-      </a>
-
-      <a routerLink="/admin/leads" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-forge-text-muted">Needs Follow-up</p>
-        <p
-          class="mt-2 text-3xl font-bold"
-          [class.text-forge-danger]="data.leadsNeedingFollowUp > 0"
-          [class.text-forge-text]="data.leadsNeedingFollowUp === 0"
-        >
-          {{ data.leadsNeedingFollowUp }}
-        </p>
-      </a>
-
-      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-forge-text-muted">Revenue This Week</p>
-        <p class="mt-2 text-3xl font-bold text-forge-text">
-          {{ (data.revenueThisWeekCents / 100) | currency }}
-        </p>
-      </a>
-
-      <a routerLink="/admin/marketplace/orders" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-        <p class="text-sm font-semibold text-forge-text-muted">Revenue This Month</p>
-        <p class="mt-2 text-3xl font-bold text-forge-text">
-          {{ (data.revenueThisMonthCents / 100) | currency }}
-        </p>
-      </a>
 
       <a routerLink="/admin/testimonials" class="rounded-xl border border-forge-line bg-forge-steel p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
         <p class="text-sm font-semibold text-forge-text-muted">Pending Testimonials</p>
