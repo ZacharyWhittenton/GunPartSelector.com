@@ -40,15 +40,6 @@
         Builds
       </a>
 
-      <a
-        routerLink="/merch"
-        routerLinkActive="text-forge-accent"
-        ariaCurrentWhenActive="page"
-        class="font-medium text-forge-nav-text-muted transition hover:text-forge-nav-text"
-      >
-        Store
-      </a>
-
       <div class="relative" data-nav-dropdown>
         <button
           type="button"
@@ -127,21 +118,6 @@
       }
 
       <a
-        routerLink="/cart"
-        routerLinkActive="text-forge-accent"
-        ariaCurrentWhenActive="page"
-        aria-label="Cart"
-        class="relative flex items-center text-lg text-forge-nav-text-muted transition hover:text-forge-nav-text"
-      >
-        <i class="fa-solid fa-cart-shopping"></i>
-        @if (cartItemCount() > 0) {
-          <span class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-forge-accent text-xs font-bold text-white">
-            {{ cartItemCount() }}
-          </span>
-        }
-      </a>
-
-      <a
         routerLink="/"
         class="rounded-md bg-forge-accent px-4 py-2 text-sm font-semibold uppercase tracking-wide text-white transition hover:brightness-110"
       >
@@ -175,14 +151,6 @@
         <a routerLink="/gallery" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-nav-text transition hover:text-forge-accent">
           Builds
         </a>
-        <a routerLink="/merch" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="block font-medium text-forge-nav-text transition hover:text-forge-accent">
-          Store
-        </a>
-        <a routerLink="/cart" routerLinkActive="text-forge-accent" ariaCurrentWhenActive="page" (click)="closeMenu()" class="flex items-center gap-2 font-medium text-forge-nav-text transition hover:text-forge-accent">
-          <i class="fa-solid fa-cart-shopping"></i>
-          Cart{{ cartItemCount() > 0 ? ' (' + cartItemCount() + ')' : '' }}
-        </a>
-
         <div>
           <button type="button" (click)="toggleMobileGroup('guides')" class="flex w-full items-center justify-between font-medium text-forge-nav-text">
             Guides
