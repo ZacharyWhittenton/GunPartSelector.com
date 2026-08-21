@@ -65,6 +65,23 @@ nvm use
 24.18.0 automatically.) If you get "N/A: version not found", install it
 first with `nvm install`.
 
+### "nvm: command not found"
+
+Your terminal window is running bash instead of your Mac's default zsh, so
+it never loaded `~/.zshrc` (where nvm gets set up). Switch the window to
+zsh, then retry:
+
+```bash
+zsh
+```
+
+```bash
+nvm use
+```
+
+Opening a brand new Terminal window/tab instead of reusing an old one
+usually avoids this.
+
 ## Database
 
 Apply migrations and load sample catalog data from `backend/`:
