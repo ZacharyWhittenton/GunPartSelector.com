@@ -1,6 +1,6 @@
 .hero-backdrop {
-  animation: home-hero-zoom 10s var(--ease-editorial, ease-out) forwards;
-  transform: scale(1.06);
+  animation: home-hero-zoom 4s var(--ease-editorial, ease-out) forwards;
+  transform: scale(1.03);
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -28,7 +28,7 @@
 
 @keyframes home-hero-zoom {
   from {
-    transform: scale(1.06);
+    transform: scale(1.03);
   }
   to {
     transform: scale(1);

@@ -3,7 +3,7 @@
   [class.scene-forest]="scene() === 'forest'"
   [class.scene-pasture]="scene() === 'pasture'"
 >
-  <section class="relative overflow-hidden border-b border-forge-line">
+  <section class="relative isolate overflow-hidden border-b border-forge-line" style="contain: layout paint;">
     <img
       [src]="sceneImage()"
       alt=""
@@ -23,7 +23,7 @@
         </p>
       </div>
 
-      <div class="flex shrink-0 gap-1 rounded-full border border-forge-line bg-forge-ink/80 p-1 backdrop-blur">
+      <div class="flex shrink-0 gap-1 rounded-full border border-forge-line bg-forge-ink p-1">
         @for (option of sceneOrder; track option) {
           <button
             type="button"

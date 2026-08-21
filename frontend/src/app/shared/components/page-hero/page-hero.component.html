@@ -1,6 +1,7 @@
 <section
-  class="relative overflow-hidden"
-  [class]="height === 'tall' ? 'relative overflow-hidden h-[70vh] min-h-[520px]' : 'relative overflow-hidden h-[42vh] min-h-[320px]'"
+  class="relative isolate overflow-hidden"
+  style="contain: layout paint;"
+  [class]="height === 'tall' ? 'relative isolate overflow-hidden h-[70vh] min-h-[520px]' : 'relative isolate overflow-hidden h-[42vh] min-h-[320px]'"
 >
   <img
     [src]="imageUrl"
