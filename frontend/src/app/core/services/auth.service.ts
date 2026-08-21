@@ -60,6 +60,19 @@ export class AuthService {
       );
   }
 
+  /** Dev-only quick login for the login page's Admin/Customer buttons -- no
+   * password involved, so no credential ever needs to live in frontend source.
+   * The backend 404s this route outside local/test, so it's a no-op in production
+   * regardless of whether the calling UI is shown. */
+  devLogin(role: 'admin' | 'customer'): Observable<AuthUser> {
+    return this.http
+      .post<AuthApiResponse>('/api/auth/dev-login', { role })
+      .pipe(
+        tap(response => this.storeSession(response)),
+        map(response => response.user)
+      );
+  }
+
   logout(): void {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     localStorage.removeItem(USER_STORAGE_KEY);

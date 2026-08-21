@@ -1,8 +1,11 @@
 from uuid import UUID
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from site_api.api.dependencies import get_settings
+from site_api.core.config import Settings
 from site_api.domain.users import AccountStatus
 from tests.conftest import InMemoryUserRepository
 
@@ -136,3 +139,42 @@ def test_me_rejects_invalid_token(client: TestClient) -> None:
     )
 
     assert response.status_code == 401
+
+
+def test_dev_login_signs_in_as_seeded_admin(client: TestClient) -> None:
+    _register(client, email="admin@example.com")
+
+    response = client.post("/api/auth/dev-login", json={"role": "admin"})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["user"]["emailAddress"] == "admin@example.com"
+    assert body["accessToken"]
+
+
+def test_dev_login_signs_in_as_seeded_customer(client: TestClient) -> None:
+    _register(client, email="morgan.rivera@example.com")
+
+    response = client.post("/api/auth/dev-login", json={"role": "customer"})
+
+    assert response.status_code == 200
+    assert response.json()["user"]["emailAddress"] == "morgan.rivera@example.com"
+
+
+def test_dev_login_returns_404_when_seed_account_missing(client: TestClient) -> None:
+    response = client.post("/api/auth/dev-login", json={"role": "admin"})
+
+    assert response.status_code == 404
+
+
+def test_dev_login_returns_404_in_production(client: TestClient, app: FastAPI) -> None:
+    _register(client, email="admin@example.com")
+    app.dependency_overrides[get_settings] = lambda: Settings(
+        environment="production", jwt_secret_key="a-real-secret-key-not-the-default"
+    )
+
+    try:
+        response = client.post("/api/auth/dev-login", json={"role": "admin"})
+        assert response.status_code == 404
+    finally:
+        del app.dependency_overrides[get_settings]

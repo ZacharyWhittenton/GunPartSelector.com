@@ -64,6 +64,9 @@ class AuthService:
         logger.bind(user_id=str(saved_user.id)).info("User registered")
         return saved_user
 
+    async def get_by_email(self, email_address: str) -> User | None:
+        return await self._repository.get_by_email(email_address)
+
     async def authenticate(self, command: AuthenticateUser) -> User:
         user = await self._repository.get_by_email(command.email_address)
         if user is None or not self._password_verifier(command.password, user.hashed_password):

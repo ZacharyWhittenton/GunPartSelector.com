@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, isDevMode, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -22,6 +22,7 @@ export class LoginComponent {
 
   readonly isSubmitting = signal(false);
   readonly errorMessage = signal('');
+  readonly showDevLogin = isDevMode();
 
   loginForm = this.formBuilder.nonNullable.group({
     emailAddress: ['', [Validators.required, Validators.email]],
@@ -63,5 +64,36 @@ export class LoginComponent {
   hasError(controlName: keyof typeof this.loginForm.controls): boolean {
     const control = this.loginForm.controls[controlName];
     return control.invalid && (control.touched || control.dirty);
+  }
+
+  /** Dev-only shortcuts (see showDevLogin) so testing role-gated pages doesn't
+   * require remembering seed credentials. No password ever touches this file --
+   * see AuthService.devLogin and the backend's /auth/dev-login route. */
+  quickLoginAsAdmin(): void {
+    this.quickLogin('admin');
+  }
+
+  quickLoginAsCustomer(): void {
+    this.quickLogin('customer');
+  }
+
+  continueAsVisitor(): void {
+    this.authService.logout();
+    this.router.navigateByUrl('/');
+  }
+
+  private quickLogin(role: 'admin' | 'customer'): void {
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
+    this.authService
+      .devLogin(role)
+      .pipe(finalize(() => this.isSubmitting.set(false)))
+      .subscribe({
+        next: () => this.router.navigateByUrl('/'),
+        error: () =>
+          this.errorMessage.set(
+            'Demo account not seeded yet -- run the seed scripts in data/seeds/.'
+          )
+      });
   }
 }

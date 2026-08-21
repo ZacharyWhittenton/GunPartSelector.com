@@ -25,6 +25,14 @@ from site_api.services.auth import AuthenticateUser, AuthService, RegisterUser
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+# Fixed seed accounts (see data/seeds/seed_admin_account.py and seed_demo_data.py) that
+# the login page's dev-only "quick login" buttons sign in as. Deliberately not a
+# password-based flow -- see the /dev-login route below for why.
+DEV_LOGIN_ACCOUNTS: dict[UserRole, str] = {
+    UserRole.ADMIN: "admin@example.com",
+    UserRole.CUSTOMER: "morgan.rivera@example.com",
+}
+
 
 class RegisterRequest(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
@@ -39,6 +47,12 @@ class LoginRequest(BaseModel):
 
     email_address: EmailStr
     password: str = Field(min_length=1, max_length=200)
+
+
+class DevLoginRequest(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    role: UserRole
 
 
 class UserPublic(BaseModel):
@@ -134,6 +148,39 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This account has been suspended",
         ) from error
+
+    return _issue_token(user, settings)
+
+
+@router.post(
+    "/dev-login",
+    response_model=AuthResponse,
+    response_model_by_alias=True,
+)
+async def dev_login(
+    payload: DevLoginRequest,
+    service: Annotated[AuthService, Depends(get_auth_service)],
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> AuthResponse:
+    # No password check by design -- this exists purely so the frontend's dev-only
+    # quick-login buttons never need a real credential embedded in shipped JS (which
+    # a build's isDevMode() check does NOT prevent -- it only gates whether the UI
+    # renders, not whether literal strings survive into the bundle). The route
+    # itself is the actual security boundary: it 404s outside local/test, same as if
+    # it didn't exist.
+    if settings.environment == "production":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    email_address = DEV_LOGIN_ACCOUNTS.get(payload.role)
+    if email_address is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    user = await service.get_by_email(email_address)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"{email_address} not seeded -- run the seed scripts in data/seeds/",
+        )
 
     return _issue_token(user, settings)
 
